@@ -36,13 +36,6 @@ export const Hero = () => {
               <span>Joined by 10,000+ ambitious women</span>
             </div>
 
-            {/* Logo */}
-            <div className="mb-8">
-              <h3 className="font-serif text-2xl tracking-wider text-primary">
-                Celestial
-              </h3>
-            </div>
-
             {/* Main Content */}
             <h1 className="text-5xl md:text-6xl font-serif font-medium mb-4 text-primary-dark leading-[1.1]">
               Align Your Life with Cosmic Intelligence
