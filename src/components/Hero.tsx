@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, CheckCircle, Users, Clock } from "lucide-react";
+import { Calendar, Lightbulb, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export const Hero = () => {
@@ -62,14 +62,18 @@ export const Hero = () => {
             </p>
             
             {/* Features List */}
-            <div className="grid grid-cols-2 gap-4 mb-8 animate-fade-up">
+            <div className="flex flex-col space-y-4 mb-8 animate-fade-up">
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-accent-sage" />
-                <span className="text-sm">Relationship Insights</span>
+                <Calendar className="w-5 h-5 text-accent-sage" />
+                <span className="text-sm">Google/Apple Calendar Sync</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-accent-sage" />
-                <span className="text-sm">Perfect Timing</span>
+                <Lightbulb className="w-5 h-5 text-accent-sage" />
+                <span className="text-sm">Daily decision guidance</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-accent-sage" />
+                <span className="text-sm">Personalized life phases</span>
               </div>
             </div>
             
