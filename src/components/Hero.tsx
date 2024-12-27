@@ -14,6 +14,13 @@ export const Hero = () => {
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left space-y-6">
+            {/* Logo */}
+            <div className="mb-8">
+              <h3 className="font-serif text-2xl tracking-wider text-primary">
+                Celestial
+              </h3>
+            </div>
+
             {/* Social Proof */}
             <div className="flex items-center gap-3 text-primary/80 font-mono text-sm mb-8">
               <div className="flex -space-x-3">
