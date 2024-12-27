@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
 
 export const Hero = () => {
   const scrollToForm = () => {
@@ -16,13 +15,25 @@ export const Hero = () => {
           {/* Left Column */}
           <div className="flex-1 text-left space-y-6">
             {/* Social Proof */}
-            <div className="flex items-center gap-2 text-primary/80 font-mono text-sm mb-8">
-              <div className="flex -space-x-1">
-                <Star className="h-4 w-4 fill-primary text-primary" />
-                <Star className="h-4 w-4 fill-primary text-primary" />
-                <Star className="h-4 w-4 fill-primary text-primary" />
+            <div className="flex items-center gap-3 text-primary/80 font-mono text-sm mb-8">
+              <div className="flex -space-x-3">
+                <img 
+                  src="https://randomuser.me/api/portraits/women/17.jpg" 
+                  alt="User" 
+                  className="w-8 h-8 rounded-full border-2 border-white"
+                />
+                <img 
+                  src="https://randomuser.me/api/portraits/women/49.jpg" 
+                  alt="User" 
+                  className="w-8 h-8 rounded-full border-2 border-white"
+                />
+                <img 
+                  src="https://randomuser.me/api/portraits/women/63.jpg" 
+                  alt="User" 
+                  className="w-8 h-8 rounded-full border-2 border-white"
+                />
               </div>
-              <span>Trusted by 10,000+ seekers worldwide</span>
+              <span>Joined by 10,000+ ambitious women</span>
             </div>
 
             {/* Logo */}
@@ -33,19 +44,19 @@ export const Hero = () => {
             </div>
 
             {/* Main Content */}
-            <h1 className="text-5xl md:text-6xl font-serif font-medium mb-6 text-primary-dark leading-tight">
-              Your Personal Guide to Cosmic Alignment
+            <h1 className="text-5xl md:text-6xl font-serif font-medium mb-4 text-primary-dark leading-[1.1]">
+              Align Your Life with Cosmic Intelligence
             </h1>
-            <p className="text-lg text-primary-dark/80 font-mono leading-relaxed mb-8 max-w-xl">
-              Transform your daily decisions with personalized astrological insights. 
-              Align your schedule with the cosmos for optimal timing and success.
+            <p className="text-lg text-primary-dark/80 font-mono leading-relaxed mb-8 max-w-lg">
+              Join thousands of successful women using astrology to make better decisions, 
+              find their perfect timing, and unlock their full potential.
             </p>
             
             <Button 
               onClick={scrollToForm}
               className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg font-mono"
             >
-              Discover Your Cosmic Path
+              Get Your Personalized Roadmap
             </Button>
           </div>
 
@@ -53,9 +64,9 @@ export const Hero = () => {
           <div className="flex-1 relative">
             <div className="relative rounded-2xl overflow-hidden">
               <img 
-                src="photo-1581091226825-a6a2a5aee158" 
+                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80" 
                 alt="Successful woman using laptop" 
-                className="w-full h-auto rounded-2xl object-cover"
+                className="w-full h-[600px] rounded-2xl object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent mix-blend-overlay" />
             </div>
