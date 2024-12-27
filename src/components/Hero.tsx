@@ -13,7 +13,7 @@ export const Hero = () => {
       <div className="container mx-auto px-4 py-24">
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
-          <div className="flex-1 text-left space-y-6">
+          <div className="flex-1 text-left space-y-6 transform md:translate-y-12">
             {/* Logo */}
             <div className="mb-8">
               <h3 className="font-serif text-2xl tracking-wider text-primary">
@@ -44,7 +44,7 @@ export const Hero = () => {
             </div>
 
             {/* Main Content */}
-            <h1 className="text-5xl md:text-6xl font-serif font-medium mb-4 text-primary-dark leading-[1.1]">
+            <h1 className="text-5xl md:text-6xl font-serif font-medium mb-4 text-primary-dark leading-[1.1] max-w-xl">
               Align Your Life with Cosmic Intelligence
             </h1>
             <p className="text-lg text-primary-dark/80 font-mono leading-relaxed mb-8 max-w-lg">
@@ -61,14 +61,14 @@ export const Hero = () => {
           </div>
 
           {/* Right Column - Image */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative md:-translate-y-12">
             <div className="relative rounded-2xl overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80" 
-                alt="Successful woman using laptop" 
-                className="w-full h-[600px] rounded-2xl object-cover"
+                src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80" 
+                alt="Bohemian woman looking towards CTA" 
+                className="w-full h-[600px] rounded-2xl object-cover object-[75%_center]"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-accent-sage/20 to-transparent mix-blend-overlay" />
+              <div className="absolute inset-0 bg-gradient-to-bl from-accent-sage/20 to-transparent mix-blend-overlay" />
             </div>
           </div>
         </div>
