@@ -68,7 +68,7 @@ export const Hero = () => {
                 alt="Successful woman using laptop" 
                 className="w-full h-[600px] rounded-2xl object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent mix-blend-overlay" />
+              <div className="absolute inset-0 bg-gradient-to-r from-accent-sage/20 to-transparent mix-blend-overlay" />
             </div>
           </div>
         </div>

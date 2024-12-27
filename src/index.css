@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-[#FCFAFF] text-primary-dark font-mono antialiased;
+    @apply bg-[#FCFAF7] text-primary-dark font-mono antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -15,7 +15,7 @@
 }
 
 .celestial-bg {
-  background: radial-gradient(circle at center, #E5DEFF 0%, #FCFAFF 100%);
+  background: radial-gradient(circle at center, #F2FCE2 0%, #FCFAF7 100%);
   position: absolute;
   top: 0;
   left: 0;
@@ -26,5 +26,5 @@
 
 .birth-chart-form {
   @apply bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg max-w-md mx-auto;
-  border: 1px solid rgba(110, 89, 165, 0.1);
+  border: 1px solid rgba(64, 62, 67, 0.1);
 }

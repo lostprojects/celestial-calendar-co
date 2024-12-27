@@ -25,13 +25,13 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#6E59A5",
-          light: "#E5DEFF",
+          DEFAULT: "#403E43",
+          light: "#F2FCE2",
           dark: "#1A1F2C",
         },
         accent: {
-          peach: "#FDE1D3",
-          pink: "#FFDEE2",
+          sage: "#D4DCCD",
+          sand: "#F5E6D3",
         },
       },
       fontFamily: {
