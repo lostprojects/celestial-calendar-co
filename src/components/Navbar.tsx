@@ -1,4 +1,4 @@
-import { Menu, Moon } from "lucide-react";
+import { Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Navbar = () => {
@@ -7,20 +7,19 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Moon className="w-5 h-5 text-primary rotate-12" />
-          <div className="font-serif text-2xl text-primary">Celestial</div>
+          <div className="font-serif text-2xl text-primary tracking-wide">Celestial</div>
         </div>
         
         <div className="hidden md:flex items-center space-x-8">
           <a href="#features" className="text-primary-dark/80 hover:text-primary transition-colors">Features</a>
           <a href="#about" className="text-primary-dark/80 hover:text-primary transition-colors">About</a>
-          <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+          <Button 
+            variant="outline" 
+            className="border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300"
+          >
             Sign In
           </Button>
         </div>
-        
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-6 w-6" />
-        </Button>
       </div>
     </nav>
   );
