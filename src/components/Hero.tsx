@@ -81,10 +81,10 @@ export const Hero = () => {
             {/* CTA */}
             <Button 
               onClick={scrollToForm}
-              className="bg-[#D4DCCD] hover:bg-[#D4DCCD]/90 text-primary-dark px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
+              className="bg-[#FEC6A1] hover:bg-[#FEC6A1]/90 text-primary-dark px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
             >
               <span className="relative z-10">Get Your Cosmic Blueprint</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#F5E6D3] to-[#D4DCCD] opacity-50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#FDE1D3] to-[#FEC6A1] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Button>
           </div>
 
