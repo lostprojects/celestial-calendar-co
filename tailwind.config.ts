@@ -35,7 +35,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        mono: ["IBM Plex Mono", "monospace"],
         serif: ["Playfair Display", "serif"],
       },
       keyframes: {

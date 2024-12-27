@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
+import { BirthChartSection } from "@/components/BirthChartSection";
 import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
@@ -7,6 +8,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
+      <BirthChartSection />
       <Toaster />
     </div>
   );
