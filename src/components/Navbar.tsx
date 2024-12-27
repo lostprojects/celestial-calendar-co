@@ -1,11 +1,14 @@
-import { Menu } from "lucide-react";
+import { Menu, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Navbar = () => {
   return (
     <nav className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-primary/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="font-serif text-2xl text-primary">Astro</div>
+        <div className="flex items-center gap-2">
+          <Moon className="w-5 h-5 text-primary rotate-12" />
+          <div className="font-serif text-2xl text-primary">Celestial</div>
+        </div>
         
         <div className="hidden md:flex items-center space-x-8">
           <a href="#features" className="text-primary-dark/80 hover:text-primary transition-colors">Features</a>
