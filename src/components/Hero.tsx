@@ -92,8 +92,8 @@ export const Hero = () => {
           <div className="flex-1 relative">
             <div className="relative rounded-2xl overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1213&q=80"
-                alt="Starry night sky" 
+                src="/lovable-uploads/a63fd645-18a2-49ec-aaa7-2177e393c156.png"
+                alt="Woman gazing at stars" 
                 className="w-full h-[600px] rounded-2xl object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-bl from-[#FEC6A1]/30 to-transparent mix-blend-overlay" />
