@@ -1,4 +1,3 @@
-import { Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Navbar = () => {
@@ -6,8 +5,11 @@ export const Navbar = () => {
     <nav className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-primary/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Moon className="w-5 h-5 text-primary rotate-12" />
-          <div className="font-serif text-2xl text-primary tracking-wide">Celestial</div>
+          <img 
+            src="/lovable-uploads/7e072194-4028-41bf-b0e7-3b1372099ff2.png" 
+            alt="Celestial Logo" 
+            className="h-8"
+          />
         </div>
         
         <div className="hidden md:flex items-center space-x-8">
