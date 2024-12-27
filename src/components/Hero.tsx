@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Star, CheckCircle, Users, Clock, Sparkles, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +19,7 @@ export const Hero = () => {
   };
 
   // Show random signup notification every 30 seconds
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(showNewSignup, 30000);
     return () => clearInterval(interval);
   }, []);
