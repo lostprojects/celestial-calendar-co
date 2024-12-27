@@ -15,6 +15,7 @@ export const Hero = () => {
     toast({
       title: "Someone just joined!",
       description: "Sarah from New York started their celestial journey",
+      className: "bg-[#FDE1D3] border-[#F97316] text-[#403E43]",
     });
   };
 
@@ -25,9 +26,9 @@ export const Hero = () => {
 
   return (
     <div className="relative min-h-screen">
-      <div className="celestial-bg animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FEC6A1] via-[#FDE1D3] to-[#E5DEFF] opacity-80" />
       
-      <div className="container mx-auto px-4 py-24">
+      <div className="container mx-auto px-4 py-24 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left space-y-6">
@@ -37,20 +38,20 @@ export const Hero = () => {
                 <img 
                   src="https://randomuser.me/api/portraits/women/17.jpg" 
                   alt="User" 
-                  className="w-8 h-8 rounded-full border-2 border-white"
+                  className="w-8 h-8 rounded-full border-2 border-[#FEC6A1]"
                 />
                 <img 
                   src="https://randomuser.me/api/portraits/women/49.jpg" 
                   alt="User" 
-                  className="w-8 h-8 rounded-full border-2 border-white"
+                  className="w-8 h-8 rounded-full border-2 border-[#FEC6A1]"
                 />
                 <img 
                   src="https://randomuser.me/api/portraits/women/63.jpg" 
                   alt="User" 
-                  className="w-8 h-8 rounded-full border-2 border-white"
+                  className="w-8 h-8 rounded-full border-2 border-[#FEC6A1]"
                 />
               </div>
-              <span className="text-primary/80 font-mono text-sm">Join 10,000+ seekers of cosmic wisdom</span>
+              <span className="text-primary font-mono text-sm">Join 10,000+ seekers of cosmic wisdom</span>
             </div>
 
             {/* Main Content */}
@@ -64,15 +65,15 @@ export const Hero = () => {
             {/* Features List */}
             <div className="flex flex-col space-y-4 mb-8 animate-fade-up">
               <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-accent-sage" />
+                <Calendar className="w-5 h-5 text-[#F97316]" />
                 <span className="text-sm">Google/Apple Calendar Sync</span>
               </div>
               <div className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-accent-sage" />
+                <Lightbulb className="w-5 h-5 text-[#F97316]" />
                 <span className="text-sm">Daily decision guidance</span>
               </div>
               <div className="flex items-center gap-2">
-                <User className="w-5 h-5 text-accent-sage" />
+                <User className="w-5 h-5 text-[#F97316]" />
                 <span className="text-sm">Personalized life phases</span>
               </div>
             </div>
@@ -80,10 +81,10 @@ export const Hero = () => {
             {/* CTA */}
             <Button 
               onClick={scrollToForm}
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
+              className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
             >
               <span className="relative z-10">Get Your Cosmic Blueprint</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-accent-sage/20 to-accent-sand/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FEC6A1] to-[#F97316] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </Button>
           </div>
 
@@ -95,7 +96,7 @@ export const Hero = () => {
                 alt="Starry night sky" 
                 className="w-full h-[600px] rounded-2xl object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-bl from-accent-sage/20 to-transparent mix-blend-overlay" />
+              <div className="absolute inset-0 bg-gradient-to-bl from-[#FEC6A1]/40 to-transparent mix-blend-overlay" />
             </div>
           </div>
         </div>
