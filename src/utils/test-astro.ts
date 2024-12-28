@@ -62,8 +62,8 @@ const calculateSunSign = (jd: number): string => {
 const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   
-  // Get true lunar position (already in tropical zodiac)
-  const moonCoord = moonposition.true(jd);
+  // Get lunar position (already in tropical zodiac)
+  const moonCoord = moonposition.position(jd);
   const moonLongitude = (moonCoord.lon * 180 / Math.PI);
   const moonSign = getZodiacSign(moonLongitude);
   
