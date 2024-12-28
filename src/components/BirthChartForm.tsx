@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import opencage from 'opencage-api-client';
 import { useDebounce } from "@/hooks/use-debounce";
+
+const OPENCAGE_KEY_STORAGE = 'opencage_api_key';
 
 export const BirthChartForm = () => {
   const [formData, setFormData] = useState({
@@ -14,10 +16,25 @@ export const BirthChartForm = () => {
   });
   const [suggestions, setSuggestions] = useState<Array<{ place_name: string }>>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [apiKey, setApiKey] = useState<string>("");
   const { toast } = useToast();
+
+  useEffect(() => {
+    const storedKey = localStorage.getItem(OPENCAGE_KEY_STORAGE);
+    if (storedKey) {
+      setApiKey(storedKey);
+    } else {
+      // Prompt user to enter API key if not found
+      const key = prompt("Please enter your OpenCage API key (this will be stored in your browser):");
+      if (key) {
+        localStorage.setItem(OPENCAGE_KEY_STORAGE, key);
+        setApiKey(key);
+      }
+    }
+  }, []);
   
   const debouncedSearch = useDebounce(async (searchTerm: string) => {
-    if (searchTerm.length < 3) {
+    if (searchTerm.length < 3 || !apiKey) {
       setSuggestions([]);
       return;
     }
@@ -25,7 +42,7 @@ export const BirthChartForm = () => {
     try {
       const result = await opencage.geocode({
         q: searchTerm,
-        key: 'c04ff95f388b4142950a74b10abde245',
+        key: apiKey,
         limit: 5,
       });
 
