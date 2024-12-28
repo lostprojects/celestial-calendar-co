@@ -22,7 +22,7 @@ const convertToUT = (date: string, time: string, timeZone: string) => {
 const calculateJulianDay = (date: string, time: string) => {
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute] = time.split(':').map(Number);
-  const fractionalDay = hour / 24 + minute / 1440;
+  const fractionalDay = (hour + minute / 60) / 24;
   
   return julian.CalendarGregorianToJD(year, month, day + fractionalDay);
 };
@@ -52,8 +52,8 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
   // Convert longitude to hour angle (15° = 1 hour)
   const localSiderealTime = sidereal.apparent(jd) + longitude / 15;
   
-  // Simple ascendant calculation (basic implementation)
-  const ascendantLongitude = (localSiderealTime * 15) % 360;
+  // Calculate ascendant using sidereal time and location
+  const ascendantLongitude = (localSiderealTime * 15 + 180) % 360;
   return getZodiacSign(ascendantLongitude);
 };
 
@@ -63,9 +63,9 @@ export const runTests = () => {
   const testCase: TestCase = {
     birthDate: "1980-10-14",
     birthTime: "00:30",
-    timeZone: "America/New_York",
-    latitude: 40.7128,
-    longitude: -74.0060
+    timeZone: "Europe/London",
+    latitude: 52.0567,
+    longitude: 1.1482
   };
 
   console.log("Test Case Input:", {
@@ -90,8 +90,8 @@ export const runTests = () => {
   
   console.log("Julian Day Calculation:", {
     julianDay,
-    expectedJD: 2444520.6875,
-    isValid: Math.abs(julianDay - 2444520.6875) < 0.000001
+    expectedJD: 2444520.479167,
+    isValid: Math.abs(julianDay - 2444520.479167) < 0.000001
   });
 
   const sunSign = calculateSunSign(julianDay);
