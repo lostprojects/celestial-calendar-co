@@ -107,13 +107,6 @@ export const runTests = () => {
     longitude: 1.1482
   };
 
-  console.log("Test Case Input:", {
-    localDateTime: `${testCase.birthDate}T${testCase.birthTime}`,
-    latitude: testCase.latitude,
-    longitude: testCase.longitude,
-    timeZone: testCase.timeZone
-  });
-
   const utcConversion = convertToUT(
     testCase.birthDate,
     testCase.birthTime,
@@ -131,21 +124,7 @@ export const runTests = () => {
     calculateRisingSign(julianDay, testCase.latitude, testCase.longitude) : 
     undefined;
 
-  console.log("\n=== Final Results ===");
-  console.log("Astrological Signs:", {
-    sunSign,
-    moonSign,
-    risingSign,
-    validation: {
-      sunSignMatch: sunSign === "Libra",
-      moonSignMatch: moonSign === "Libra",
-      risingSignMatch: risingSign === "Leo"
-    }
-  });
-
-  console.log("\n=== Astrological Calculations Tests Complete ===\n");
-
-  return {
+  const results = {
     julianDay,
     signs: {
       sun: sunSign,
@@ -153,4 +132,9 @@ export const runTests = () => {
       rising: risingSign
     }
   };
+
+  console.log("\n=== Final Results ===");
+  console.log("runTests() Return Value:", results);
+
+  return results;
 };
