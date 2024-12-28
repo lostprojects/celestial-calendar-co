@@ -1,23 +1,12 @@
-FROM python:3.9
+FROM denoland/deno:1.37.0
 
+# Install Python and pip
+RUN apt-get update && apt-get install -y python3 python3-pip
+
+# Install Kerykeion
+RUN pip3 install kerykeion
+
+# The rest is handled by Deno
 WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Deno
-RUN curl -fsSL https://deno.land/x/install/install.sh | sh
-ENV DENO_INSTALL="/root/.deno"
-ENV PATH="$DENO_INSTALL/bin:$PATH"
-
-# Install Python dependencies
-RUN pip install kerykeion
-
-# Copy function code
-COPY . .
-
-# Start the function
-CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-run", "--allow-read", "--allow-write", "index.ts"]
+ADD . .
+CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-read", "--allow-write", "--allow-run", "index.ts"]

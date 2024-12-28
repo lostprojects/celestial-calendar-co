@@ -44,11 +44,12 @@ print(f'{{"sunSign": "{sun_sign}", "moonSign": "{moon_sign}", "ascendantSign": "
 `
 
     // Write Python script to temporary file
-    await Deno.writeTextFile("script.py", pythonScript)
+    const tempFile = await Deno.makeTempFile({ suffix: '.py' });
+    await Deno.writeTextFile(tempFile, pythonScript);
 
     // Execute Python script
     const pythonProcess = new Deno.Command("python3", {
-      args: ["script.py"],
+      args: [tempFile],
       stdout: "piped",
       stderr: "piped",
     });
@@ -64,7 +65,11 @@ print(f'{{"sunSign": "{sun_sign}", "moonSign": "{moon_sign}", "ascendantSign": "
     const output = new TextDecoder().decode(stdout).trim()
 
     // Clean up
-    await Deno.remove("script.py")
+    try {
+      await Deno.remove(tempFile)
+    } catch (error) {
+      console.error('Error removing temp file:', error)
+    }
 
     return new Response(
       output,
