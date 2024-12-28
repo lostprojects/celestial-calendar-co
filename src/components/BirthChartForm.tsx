@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationSearch } from "./LocationSearch";
+import { runTests } from "@/utils/test-astro";
 
 interface FormData {
   name: string;
@@ -54,6 +55,15 @@ export const BirthChartForm = () => {
     }
   };
 
+  const handleTestClick = () => {
+    const results = runTests();
+    console.log("Test Results:", results);
+    toast({
+      title: "Test Results",
+      description: "Check the console for test output",
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit} className="birth-chart-form w-full max-w-md mx-auto space-y-6">
       <div className="space-y-2">
@@ -100,6 +110,14 @@ export const BirthChartForm = () => {
           })
         }
       />
+      
+      <Button 
+        type="button" 
+        onClick={handleTestClick}
+        className="w-full bg-secondary hover:bg-secondary/90 text-white mb-4"
+      >
+        Run Installation Tests
+      </Button>
       
       <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
         Save Birth Chart Data
