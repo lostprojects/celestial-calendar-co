@@ -18,8 +18,9 @@ serve(async (req) => {
     const [year, month, day] = birthDate.split('-').map(Number)
     const [hour, minute] = birthTime.split(':').map(Number)
 
-    // Create Python script content
-    const pythonScript = `
+    // Execute Python directly with arguments
+    const pythonProcess = new Deno.Command("python3", {
+      args: ["-c", `
 from kerykeion import KrInstance, Report
 
 # Create birth chart
@@ -41,15 +42,7 @@ asc_sign = chart.asc['sign']
 
 # Print results as JSON
 print(f'{{"sunSign": "{sun_sign}", "moonSign": "{moon_sign}", "ascendantSign": "{asc_sign}"}}')
-`
-
-    // Write Python script to temporary file
-    const tempFile = await Deno.makeTempFile({ suffix: '.py' });
-    await Deno.writeTextFile(tempFile, pythonScript);
-
-    // Execute Python script
-    const pythonProcess = new Deno.Command("python3", {
-      args: [tempFile],
+`],
       stdout: "piped",
       stderr: "piped",
     });
@@ -63,13 +56,6 @@ print(f'{{"sunSign": "{sun_sign}", "moonSign": "{moon_sign}", "ascendantSign": "
     }
 
     const output = new TextDecoder().decode(stdout).trim()
-
-    // Clean up
-    try {
-      await Deno.remove(tempFile)
-    } catch (error) {
-      console.error('Error removing temp file:', error)
-    }
 
     return new Response(
       output,
