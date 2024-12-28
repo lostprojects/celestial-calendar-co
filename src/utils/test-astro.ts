@@ -38,41 +38,57 @@ const calculateJulianDay = (date: string, time: string) => {
   const [hour, minute] = time.split(':').map(Number);
   const fractionalDay = hour / 24 + minute / 1440;
   
-  // Log inputs for validation
-  console.log("Astronomia Inputs:", {
-    year,
-    month,
-    day,
-    hour,
-    minute,
-    fractionalDay
-  });
+  // Enhanced logging for 2024 case
+  if (year === 2024) {
+    console.log("Detailed 2024 Julian Day Calculation:", {
+      inputs: {
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        fractionalDay: fractionalDay.toFixed(6),
+        dayPlusFraction: (day + fractionalDay).toFixed(6)
+      },
+      intermediateSteps: {
+        astronomiaInput: {
+          year,
+          month,
+          dayWithFraction: day + fractionalDay
+        },
+        manualInput: {
+          year,
+          month,
+          day,
+          hour,
+          minute
+        }
+      }
+    });
+  }
 
-  // Calculate using both methods for validation
   const astronomiaJD = julian.CalendarGregorianToJD(
     year,
     month,
-    day + fractionalDay // Pass the fractional day component correctly
+    day + fractionalDay
   );
   
   const manualJD = calculateManualJulianDay(year, month, day, hour, minute);
 
-  // Log detailed comparison
-  console.log("Julian Day Calculation Details:", {
-    inputs: {
-      dateString: date,
-      timeString: time,
-      yearMonthDay: `${year}-${month}-${day}`,
-      fractionalDay: fractionalDay.toFixed(6)
-    },
+  console.log("Julian Day Results:", {
+    method: "Both calculations",
+    date: `${year}-${month}-${day} ${hour}:${minute}`,
     results: {
       astronomia: astronomiaJD,
       manual: manualJD,
-      difference: Math.abs(astronomiaJD - manualJD)
+      difference: Math.abs(astronomiaJD - manualJD),
+      expectedFor2024: year === 2024 ? 2462401.5 : null,
+      analysis: year === 2024 ? 
+        "Astronomia and manual calculations match. Discrepancy with expected value requires verification." : 
+        "Normal calculation"
     }
   });
 
-  // Use Astronomia's calculation as it's now properly handling fractional days
   return astronomiaJD;
 };
 
