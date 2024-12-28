@@ -1,4 +1,4 @@
-import { BirthChartCalculator } from "./BirthChartCalculator";
+import { BirthChartForm } from "./BirthChartForm";
 
 export const BirthChartSection = () => {
   return (
@@ -13,7 +13,7 @@ export const BirthChartSection = () => {
           </p>
         </div>
         
-        <BirthChartCalculator />
+        <BirthChartForm />
       </div>
     </section>
   );
