@@ -1,4 +1,4 @@
-import { julian, solar, lunar, sidereal } from "astronomia";
+import { julian, solar, moon, sidereal } from "astronomia";
 import moment from "moment-timezone";
 
 interface TestCase {
@@ -43,8 +43,8 @@ const calculateSunSign = (jd: number): string => {
 };
 
 const calculateMoonSign = (jd: number): string => {
-  const moonLongitude = lunar.position(jd).lon;
-  return getZodiacSign(moonLongitude);
+  const moonPosition = moon.position(jd);
+  return getZodiacSign(moonPosition.lon);
 };
 
 const calculateRisingSign = (jd: number, latitude: number, longitude: number): string => {
@@ -52,7 +52,6 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
   const localSiderealTime = sidereal.apparent(jd) + longitude / 15;
   
   // Simple ascendant calculation (basic implementation)
-  // Note: This is a simplified version and might need refinement
   const ascendantLongitude = (localSiderealTime * 15) % 360;
   return getZodiacSign(ascendantLongitude);
 };
@@ -94,33 +93,31 @@ export const runTests = () => {
     isValid: Math.abs(julianDay - 2444520.6875) < 0.000001
   });
 
-  if (testCase.latitude && testCase.longitude) {
-    const sunSign = calculateSunSign(julianDay);
-    const moonSign = calculateMoonSign(julianDay);
-    const risingSign = calculateRisingSign(julianDay, testCase.latitude, testCase.longitude);
+  const sunSign = calculateSunSign(julianDay);
+  const moonSign = calculateMoonSign(julianDay);
+  const risingSign = testCase.latitude && testCase.longitude ? 
+    calculateRisingSign(julianDay, testCase.latitude, testCase.longitude) : 
+    undefined;
 
-    console.log("Astrological Signs:", {
-      sunSign,
-      moonSign,
-      risingSign,
-      validation: {
-        sunSignMatch: sunSign === "Libra",
-        moonSignMatch: moonSign === "Taurus",
-        risingSignMatch: risingSign === "Cancer"
-      }
-    });
-  }
+  console.log("Astrological Signs:", {
+    sunSign,
+    moonSign,
+    risingSign,
+    validation: {
+      sunSignMatch: sunSign === "Libra",
+      moonSignMatch: moonSign === "Taurus",
+      risingSignMatch: risingSign === "Cancer"
+    }
+  });
 
   console.log("\n=== Astrological Calculations Tests Complete ===\n");
 
   return {
     julianDay,
     signs: {
-      sun: calculateSunSign(julianDay),
-      moon: calculateMoonSign(julianDay),
-      rising: testCase.latitude && testCase.longitude ? 
-        calculateRisingSign(julianDay, testCase.latitude, testCase.longitude) : 
-        undefined
+      sun: sunSign,
+      moon: moonSign,
+      rising: risingSign
     }
   };
 };
