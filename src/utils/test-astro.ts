@@ -2,7 +2,6 @@ import { julian, solar, moonposition } from "astronomia";
 import moment from "moment-timezone";
 
 const normalizeLongitude = (longitude: number): number => {
-  // Convert from radians to degrees and normalize to 0-360 range
   const degrees = (longitude * 180 / Math.PI) % 360;
   return degrees < 0 ? degrees + 360 : degrees;
 };
@@ -14,9 +13,7 @@ const getZodiacSign = (longitude: number): string => {
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
   
-  // Test mapping for debugging
   console.log(`Mapping longitude ${longitude}° to zodiac sign...`);
-  
   const signIndex = Math.floor(longitude / 30);
   const sign = signs[signIndex];
   console.log(`Longitude ${longitude}° maps to ${sign} (index: ${signIndex})`);
@@ -24,45 +21,65 @@ const getZodiacSign = (longitude: number): string => {
   return sign;
 };
 
-const testZodiacMapping = () => {
-  console.log("\n=== Testing Zodiac Mapping ===");
-  const testLongitudes = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
-  testLongitudes.forEach((longitude) => {
-    console.log(`Longitude: ${longitude}°, Sign: ${getZodiacSign(longitude)}`);
-  });
-};
-
 const calculateJulianDay = (date: string, time: string, timeZone: string): number => {
   console.log("\n=== Julian Day Calculation ===");
   console.log("Input:", { date, time, timeZone });
   
+  // Convert to UTC
   const utcMoment = moment.tz(`${date}T${time}:00`, timeZone).utc();
   const utcDate = utcMoment.format('YYYY-MM-DD');
   const utcTime = utcMoment.format('HH:mm');
+  
+  console.log("UTC DateTime:", { utcDate, utcTime });
   
   const [year, month, day] = utcDate.split('-').map(Number);
   const [hour, minute] = utcTime.split(':').map(Number);
   const fractionalDay = (hour + minute / 60) / 24;
   
   const jd = julian.CalendarGregorianToJD(year, month, day + fractionalDay);
-  console.log("Output:", { julianDay: jd });
+  console.log("Calculated Julian Day:", jd);
   return jd;
+};
+
+const convertToTropicalLongitude = (siderealLongitude: number, jd: number): number => {
+  // Apply precession correction
+  const T = (jd - 2451545.0) / 36525.0;
+  const precessionCorrection = 50.29 * T;
+  const tropicalLong = (siderealLongitude - precessionCorrection + 360) % 360;
+  
+  console.log("Longitude Conversion:", {
+    sidereal: siderealLongitude,
+    precessionCorrection,
+    tropical: tropicalLong
+  });
+  
+  return tropicalLong;
 };
 
 const calculateSunPosition = (jd: number) => {
   console.log("\n=== Sun Position Calculation ===");
+  console.log("Input Julian Day:", jd);
+  
   const sunLongitude = solar.apparentLongitude(jd);
+  console.log("Raw Sun Longitude (Radians):", sunLongitude);
+  
   const tropicalLongitude = normalizeLongitude(sunLongitude);
   console.log("Tropical Sun Longitude (Degrees):", tropicalLongitude);
+  
   const sunSign = getZodiacSign(tropicalLongitude);
   return { longitude: tropicalLongitude, sign: sunSign };
 };
 
 const calculateMoonPosition = (jd: number) => {
   console.log("\n=== Moon Position Calculation ===");
+  console.log("Input Julian Day:", jd);
+  
   const moonPos = moonposition.position(jd);
+  console.log("Raw Moon Position:", moonPos);
+  
   const tropicalLongitude = normalizeLongitude(moonPos.lon);
   console.log("Tropical Moon Longitude (Degrees):", tropicalLongitude);
+  
   const moonSign = getZodiacSign(tropicalLongitude);
   return { longitude: tropicalLongitude, sign: moonSign };
 };
@@ -111,9 +128,6 @@ export const runTests = () => {
     longitude: testCase.longitude,
     timeZone: testCase.timeZone
   });
-
-  // Run zodiac mapping tests first
-  testZodiacMapping();
 
   const julianDay = calculateJulianDay(
     testCase.birthDate,
