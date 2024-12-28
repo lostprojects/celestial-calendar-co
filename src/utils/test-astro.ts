@@ -39,13 +39,18 @@ const calculateJulianDay = (date: string, time: string) => {
 };
 
 const getZodiacSign = (longitude: number): string => {
+  console.log("\n=== Zodiac Sign Calculation ===");
+  console.log("Input longitude:", longitude);
+  
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
     "Leo", "Virgo", "Libra", "Scorpio", 
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
   const signIndex = Math.floor(longitude / 30) % 12;
-  return signs[signIndex];
+  const result = signs[signIndex];
+  console.log("Output sign:", result);
+  return result;
 };
 
 const calculateSunSign = (jd: number): string => {
@@ -125,6 +130,14 @@ export const runTests = () => {
     calculateRisingSign(julianDay, testCase.latitude, testCase.longitude) : 
     undefined;
 
+  // Add the requested debug logs
+  console.log("\n=== Final Calculated Signs ===");
+  console.log("Final calculated signs:", {
+    sunSign,
+    moonSign,
+    risingSign
+  });
+
   const results = {
     julianDay,
     signs: {
@@ -134,8 +147,7 @@ export const runTests = () => {
     }
   };
 
-  console.log("\n=== Final Results ===");
-  console.log("runTests() Return Value:", results);
+  console.log("Final results object:", results);
 
   return results;
 };
