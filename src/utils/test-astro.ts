@@ -42,10 +42,18 @@ const calculateJulianDay = (date: string, time: string, timeZone: string): numbe
 };
 
 const convertToTropicalLongitude = (siderealLongitude: number, jd: number): number => {
-  // Apply precession correction
+  // Calculate T - centuries since J2000.0
   const T = (jd - 2451545.0) / 36525.0;
-  const precessionCorrection = 50.29 * T;
-  const tropicalLong = (siderealLongitude - precessionCorrection + 360) % 360;
+  
+  // Calculate precession correction
+  const precessionCorrection = (50.29 * T) / 3600; // Convert arcseconds to degrees
+  
+  // Convert sidereal to tropical
+  let tropicalLong = siderealLongitude - precessionCorrection;
+  
+  // Normalize to [0, 360)
+  while (tropicalLong < 0) tropicalLong += 360;
+  while (tropicalLong >= 360) tropicalLong -= 360;
   
   console.log("Longitude Conversion:", {
     sidereal: siderealLongitude,
@@ -61,9 +69,10 @@ const calculateSunPosition = (jd: number) => {
   console.log("Input Julian Day:", jd);
   
   const sunLongitude = solar.apparentLongitude(jd);
-  console.log("Raw Sun Longitude (Radians):", sunLongitude);
+  const siderealLongitude = normalizeLongitude(sunLongitude);
+  console.log("Sidereal Sun Longitude (Degrees):", siderealLongitude);
   
-  const tropicalLongitude = normalizeLongitude(sunLongitude);
+  const tropicalLongitude = convertToTropicalLongitude(siderealLongitude, jd);
   console.log("Tropical Sun Longitude (Degrees):", tropicalLongitude);
   
   const sunSign = getZodiacSign(tropicalLongitude);
@@ -75,9 +84,10 @@ const calculateMoonPosition = (jd: number) => {
   console.log("Input Julian Day:", jd);
   
   const moonPos = moonposition.position(jd);
-  console.log("Raw Moon Position:", moonPos);
+  const siderealLongitude = normalizeLongitude(moonPos.lon);
+  console.log("Sidereal Moon Longitude (Degrees):", siderealLongitude);
   
-  const tropicalLongitude = normalizeLongitude(moonPos.lon);
+  const tropicalLongitude = convertToTropicalLongitude(siderealLongitude, jd);
   console.log("Tropical Moon Longitude (Degrees):", tropicalLongitude);
   
   const moonSign = getZodiacSign(tropicalLongitude);
@@ -105,10 +115,13 @@ const calculateAscendant = (jd: number, latitude: number, longitude: number) => 
   
   const ascendantRad = Math.atan(tanAsc);
   const ascendantDeg = normalizeLongitude(ascendantRad);
-  const ascendantSign = getZodiacSign(ascendantDeg);
   
-  console.log("Ascendant Longitude (Degrees):", ascendantDeg);
-  return { longitude: ascendantDeg, sign: ascendantSign };
+  // Convert to tropical
+  const tropicalAscendant = convertToTropicalLongitude(ascendantDeg, jd);
+  const ascendantSign = getZodiacSign(tropicalAscendant);
+  
+  console.log("Tropical Ascendant Longitude (Degrees):", tropicalAscendant);
+  return { longitude: tropicalAscendant, sign: ascendantSign };
 };
 
 export const runTests = () => {
