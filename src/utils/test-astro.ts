@@ -10,17 +10,14 @@ interface TestCase {
 }
 
 const normalizeLongitude = (longitude: number): number => {
-  return (longitude % 360 + 360) % 360;
+  return ((longitude % 360) + 360) % 360;
 };
 
 const convertToUT = (date: string, time: string, timeZone: string) => {
   console.log("\n=== UTC Conversion Function ===");
   console.log("Input:", { date, time, timeZone });
   
-  // Create a moment object in the specified timezone
   const localDateTime = moment.tz(`${date} ${time}`, "YYYY-MM-DD HH:mm", timeZone);
-  
-  // Convert to UTC
   const utcDateTime = localDateTime.utc();
   
   const result = {
@@ -40,8 +37,17 @@ const calculateJulianDay = (date: string, time: string) => {
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute] = time.split(':').map(Number);
   
-  // Calculate decimal day (UTC)
-  const fractionalDay = day + (hour + minute / 60) / 24;
+  // Calculate decimal hours and fractional day correctly
+  const decimalHours = hour + minute / 60;
+  const fractionalDay = day + decimalHours / 24;
+  
+  console.log("Intermediate steps:", {
+    year,
+    month,
+    day,
+    decimalHours,
+    fractionalDay
+  });
   
   const jd = julian.CalendarGregorianToJD(year, month, fractionalDay);
   console.log("Output:", { julianDay: jd });
@@ -72,7 +78,6 @@ const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   console.log("Input Julian Day:", jd);
   
-  // Get tropical longitude
   const sunLongitude = solar.apparentLongitude(jd);
   const normalizedLongitude = normalizeLongitude(sunLongitude);
   console.log("Tropical Sun Longitude:", normalizedLongitude);
@@ -87,7 +92,6 @@ const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   console.log("Input Julian Day:", jd);
   
-  // Get tropical longitude from position()
   const moonData = moonposition.position(jd);
   const normalizedLongitude = normalizeLongitude(moonData.lon);
   console.log("Tropical Moon Longitude:", normalizedLongitude);
@@ -107,15 +111,22 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
   console.log("GMST (hours):", gmst);
   
   // Convert GMST to degrees and add local longitude
-  const ramc = normalizeLongitude((gmst * 15) + longitude);
-  console.log("RAMC (degrees):", ramc);
+  const gmstDegrees = gmst * 15;
+  const rawRAMC = gmstDegrees + longitude;
+  const ramc = normalizeLongitude(rawRAMC);
+  
+  console.log("RAMC calculation:", {
+    gmstDegrees,
+    rawRAMC,
+    normalizedRAMC: ramc
+  });
   
   // Calculate obliquity of the ecliptic
-  const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const T = (jd - 2451545.0) / 36525;
   const epsilon = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
   console.log("Obliquity:", epsilon);
   
-  // Calculate Ascendant using the standard formula for tropical calculations
+  // Calculate Ascendant
   const tanAsc = Math.cos(ramc * Math.PI / 180) / 
     (Math.sin(latitude * Math.PI / 180) * Math.tan(epsilon * Math.PI / 180) - 
      Math.cos(latitude * Math.PI / 180) * Math.sin(ramc * Math.PI / 180));
@@ -128,10 +139,9 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
   }
   ascendant = normalizeLongitude(ascendant);
   
-  console.log("Calculated values:", {
-    epsilon,
-    ramc,
-    ascendant
+  console.log("Ascendant calculation:", {
+    rawAscendant: Math.atan(tanAsc) * 180 / Math.PI,
+    finalAscendant: ascendant
   });
   
   const risingSign = getZodiacSign(ascendant);
