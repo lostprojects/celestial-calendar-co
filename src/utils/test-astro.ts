@@ -9,6 +9,13 @@ interface TestCase {
   longitude?: number;
 }
 
+const normalizeLongitude = (longitude: number): number => {
+  console.log("Normalizing longitude:", longitude);
+  const normalized = (longitude % 360 + 360) % 360;
+  console.log("Normalized result:", normalized);
+  return normalized;
+};
+
 const convertToUT = (date: string, time: string, timeZone: string) => {
   console.log("\n=== UTC Conversion Function ===");
   console.log("Input:", { date, time, timeZone });
@@ -42,14 +49,24 @@ const getZodiacSign = (longitude: number): string => {
   console.log("\n=== Zodiac Sign Calculation ===");
   console.log("Input longitude:", longitude);
   
+  const normalizedLongitude = normalizeLongitude(longitude);
+  console.log("Normalized longitude for zodiac:", normalizedLongitude);
+  
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
     "Leo", "Virgo", "Libra", "Scorpio", 
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
-  const signIndex = Math.floor(longitude / 30) % 12;
+  
+  const signIndex = Math.floor(normalizedLongitude / 30) % 12;
   const result = signs[signIndex];
-  console.log("Output sign:", result);
+  
+  console.log("Zodiac calculation:", {
+    normalizedLongitude,
+    signIndex,
+    result
+  });
+  
   return result;
 };
 
@@ -57,13 +74,12 @@ const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   console.log("Input Julian Day:", jd);
   
-  const sunLongitude = solar.apparentLongitude(jd);
-  const sunSign = getZodiacSign(sunLongitude);
+  const rawSunLongitude = solar.apparentLongitude(jd);
+  console.log("Raw Sun Longitude:", rawSunLongitude);
   
-  console.log("Output:", { 
-    sunLongitude,
-    sunSign 
-  });
+  const sunSign = getZodiacSign(rawSunLongitude);
+  console.log("Final Sun Sign:", sunSign);
+  
   return sunSign;
 };
 
@@ -72,12 +88,11 @@ const calculateMoonSign = (jd: number): string => {
   console.log("Input Julian Day:", jd);
   
   const moonData = moonposition.position(jd);
-  const moonSign = getZodiacSign(moonData.lon);
+  console.log("Raw Moon Longitude:", moonData.lon);
   
-  console.log("Output:", { 
-    moonLongitude: moonData.lon,
-    moonSign 
-  });
+  const moonSign = getZodiacSign(moonData.lon);
+  console.log("Final Moon Sign:", moonSign);
+  
   return moonSign;
 };
 
@@ -89,15 +104,17 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
     longitude 
   });
   
-  const localSiderealTime = sidereal.apparent(jd) + longitude / 15;
-  const ascendantLongitude = (localSiderealTime * 15 + 180) % 360;
-  const risingSign = getZodiacSign(ascendantLongitude);
+  // Calculate tropical ascendant using local sidereal time
+  const localSiderealTime = sidereal.apparent(jd);
+  console.log("Local Sidereal Time:", localSiderealTime);
   
-  console.log("Output:", { 
-    localSiderealTime,
-    ascendantLongitude,
-    risingSign 
-  });
+  // Convert to tropical longitude (this is the key change)
+  const rawAscendantLongitude = (localSiderealTime * 15 + longitude + 180) % 360;
+  console.log("Raw Ascendant Longitude:", rawAscendantLongitude);
+  
+  const risingSign = getZodiacSign(rawAscendantLongitude);
+  console.log("Final Rising Sign:", risingSign);
+  
   return risingSign;
 };
 
@@ -123,19 +140,17 @@ export const runTests = () => {
     utcConversion.utcTime
   );
   
-  // Calculate signs directly from their respective functions
   const sunSign = calculateSunSign(julianDay);
   const moonSign = calculateMoonSign(julianDay);
   const risingSign = testCase.latitude && testCase.longitude ? 
     calculateRisingSign(julianDay, testCase.latitude, testCase.longitude) : 
     undefined;
 
-  // Add the requested debug logs
-  console.log("\n=== Final Calculated Signs ===");
-  console.log("Final calculated signs:", {
-    sunSign,
-    moonSign,
-    risingSign
+  console.log("\n=== Final Results ===");
+  console.log("Calculated Signs:", {
+    sun: sunSign,
+    moon: moonSign,
+    rising: risingSign
   });
 
   const results = {
@@ -148,6 +163,5 @@ export const runTests = () => {
   };
 
   console.log("Final results object:", results);
-
   return results;
 };
