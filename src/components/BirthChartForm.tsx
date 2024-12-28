@@ -2,13 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import opencage from 'opencage-api-client';
-import { useDebounce } from "@/hooks/use-debounce";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationSearch } from "./LocationSearch";
 import { BirthChartDisplay } from "./BirthChartDisplay";
-
-const OPENCAGE_KEY_STORAGE = 'opencage_api_key';
+import moment from "moment-timezone";
 
 interface BirthChartResult {
   sunSign: string;
@@ -22,6 +19,7 @@ export const BirthChartForm = () => {
     birthDate: "",
     birthTime: "",
     birthPlace: "",
+    timeZone: moment.tz.guess(), // Get user's local timezone as default
   });
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [birthChart, setBirthChart] = useState<BirthChartResult | null>(null);
@@ -49,6 +47,7 @@ export const BirthChartForm = () => {
           birthTime: formData.birthTime,
           latitude: selectedLocation.lat,
           longitude: selectedLocation.lng,
+          timeZone: formData.timeZone,
         },
       });
 
@@ -63,7 +62,7 @@ export const BirthChartForm = () => {
       console.error('Birth chart calculation error:', error);
       toast({
         title: "Error",
-        description: "Failed to calculate birth chart. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to calculate birth chart. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -98,7 +97,7 @@ export const BirthChartForm = () => {
         </div>
         
         <div className="space-y-2">
-          <label className="text-sm font-medium text-primary-dark">Birth Time</label>
+          <label className="text-sm font-medium text-primary-dark">Birth Time (24-hour)</label>
           <Input
             type="time"
             value={formData.birthTime}
@@ -113,6 +112,22 @@ export const BirthChartForm = () => {
           onBirthPlaceChange={(value) => setFormData({ ...formData, birthPlace: value })}
           onLocationSelect={(location) => setSelectedLocation(location)}
         />
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-primary-dark">Time Zone</label>
+          <select
+            value={formData.timeZone}
+            onChange={(e) => setFormData({ ...formData, timeZone: e.target.value })}
+            className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
+            required
+          >
+            {moment.tz.names().map((zone) => (
+              <option key={zone} value={zone}>
+                {zone}
+              </option>
+            ))}
+          </select>
+        </div>
         
         <Button 
           type="submit" 
