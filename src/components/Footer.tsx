@@ -19,11 +19,7 @@ export const Footer = () => {
   return (
     <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
       <div className="container max-w-7xl mx-auto flex justify-center">
-        <Button 
-          onClick={handleTestClick}
-          variant="outline"
-          className="gap-2"
-        >
+        <Button onClick={handleTestClick} variant="outline" className="gap-2">
           <TestTube className="h-4 w-4" />
           Run Astrological Tests
         </Button>

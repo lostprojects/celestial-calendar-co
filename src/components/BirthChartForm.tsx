@@ -31,7 +31,6 @@ export const BirthChartForm = () => {
     e.preventDefault();
     
     try {
-      // Run the tested and verified calculations
       const testResults = runTests();
       const { signs } = testResults;
 
