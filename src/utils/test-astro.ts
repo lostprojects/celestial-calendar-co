@@ -118,6 +118,7 @@ export const runTests = () => {
     utcConversion.utcTime
   );
   
+  // Calculate signs directly from their respective functions
   const sunSign = calculateSunSign(julianDay);
   const moonSign = calculateMoonSign(julianDay);
   const risingSign = testCase.latitude && testCase.longitude ? 
