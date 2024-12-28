@@ -1,4 +1,4 @@
-import { julian, solar, moonposition, sidereal, coord } from "astronomia";
+import { julian, solar, moonposition, coord } from "astronomia";
 import moment from "moment-timezone";
 
 const convertToUT = (date: string, time: string, timeZone: string) => {
@@ -47,8 +47,9 @@ const getZodiacSign = (longitude: number): string => {
 const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   
-  // Get true solar coordinates (already in tropical zodiac)
+  // Get ecliptic coordinates for the Sun
   const sunCoord = solar.true(jd);
+  // Convert to degrees for tropical zodiac
   const sunLongitude = (sunCoord.lon * 180 / Math.PI);
   const sunSign = getZodiacSign(sunLongitude);
   
@@ -62,8 +63,9 @@ const calculateSunSign = (jd: number): string => {
 const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   
-  // Get lunar position (already in tropical zodiac)
+  // Get ecliptic coordinates for the Moon
   const moonCoord = moonposition.position(jd);
+  // Convert to degrees for tropical zodiac
   const moonLongitude = (moonCoord.lon * 180 / Math.PI);
   const moonSign = getZodiacSign(moonLongitude);
   
@@ -86,23 +88,26 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
   const latRad = latitude * Math.PI / 180;
   const longRad = longitude * Math.PI / 180;
   
+  // Calculate GMST (Greenwich Mean Sidereal Time)
+  const T = (jd - 2451545.0) / 36525;
+  const gmst = (280.46061837 + 360.98564736629 * (jd - 2451545.0) +
+                T * T * (0.000387933 - T / 38710000)) % 360;
+  
   // Calculate Local Sidereal Time
-  const lst = sidereal.apparent(jd);
-  // Convert LST to degrees and adjust for location
-  const lstDeg = (lst * 180 / Math.PI * 15) + longitude;
+  const lst = (gmst + longitude) % 360;
   
   // Calculate Ascendant using obliquity of ecliptic
   const obliquity = 23.4367 * Math.PI / 180; // Mean obliquity for J2000
-  const ascendantRad = Math.atan2(
-    Math.cos(obliquity) * Math.sin(lstDeg * Math.PI / 180),
-    Math.cos(lstDeg * Math.PI / 180)
-  );
+  const tanAsc = Math.cos(obliquity) * Math.sin(lst * Math.PI / 180) / 
+                 (Math.cos(lst * Math.PI / 180) * Math.cos(latRad) - 
+                  Math.sin(latRad) * Math.tan(obliquity));
   
+  const ascendantRad = Math.atan(tanAsc);
   const ascendantDeg = (ascendantRad * 180 / Math.PI + 360) % 360;
   const risingSign = getZodiacSign(ascendantDeg);
   
   console.log("Output:", { 
-    localSiderealTime: lstDeg,
+    localSiderealTime: lst,
     ascendantLongitude: ascendantDeg,
     risingSign 
   });
