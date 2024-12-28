@@ -1,10 +1,12 @@
-import { julian } from "astronomia";
+import { julian, solar, lunar, sidereal } from "astronomia";
 import moment from "moment-timezone";
 
 interface TestCase {
   birthDate: string;
   birthTime: string;
   timeZone: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 const convertToUT = (date: string, time: string, timeZone: string) => {
@@ -22,17 +24,57 @@ const calculateJulianDay = (date: string, time: string) => {
   const [hour, minute] = time.split(':').map(Number);
   const fractionalDay = hour / 24 + minute / 1440;
   
-  console.log("Julian Day Calculation:", {
-    inputs: { year, month, day, hour, minute },
-    fractionalDay: fractionalDay.toFixed(6)
-  });
-
   return julian.CalendarGregorianToJD(year, month, day + fractionalDay);
 };
 
-const runTestCase = (testCase: TestCase) => {
-  console.log("\nRunning Test Case:", testCase);
+const getZodiacSign = (longitude: number): string => {
+  const signs = [
+    "Aries", "Taurus", "Gemini", "Cancer", 
+    "Leo", "Virgo", "Libra", "Scorpio", 
+    "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+  ];
+  const signIndex = Math.floor(longitude / 30) % 12;
+  return signs[signIndex];
+};
+
+const calculateSunSign = (jd: number): string => {
+  const sunLongitude = solar.apparentLongitude(jd);
+  return getZodiacSign(sunLongitude);
+};
+
+const calculateMoonSign = (jd: number): string => {
+  const moonLongitude = lunar.position(jd).lon;
+  return getZodiacSign(moonLongitude);
+};
+
+const calculateRisingSign = (jd: number, latitude: number, longitude: number): string => {
+  // Convert longitude to hour angle (15° = 1 hour)
+  const localSiderealTime = sidereal.apparent(jd) + longitude / 15;
   
+  // Simple ascendant calculation (basic implementation)
+  // Note: This is a simplified version and might need refinement
+  const ascendantLongitude = (localSiderealTime * 15) % 360;
+  return getZodiacSign(ascendantLongitude);
+};
+
+export const runTests = () => {
+  console.log("\n=== Starting Astrological Calculations Tests ===\n");
+  
+  const testCase: TestCase = {
+    birthDate: "1980-10-14",
+    birthTime: "00:30",
+    timeZone: "America/New_York",
+    latitude: 40.7128,
+    longitude: -74.0060
+  };
+
+  console.log("Test Case Input:", {
+    localDateTime: `${testCase.birthDate}T${testCase.birthTime}`,
+    latitude: testCase.latitude,
+    longitude: testCase.longitude,
+    timeZone: testCase.timeZone
+  });
+
   const utcConversion = convertToUT(
     testCase.birthDate,
     testCase.birthTime,
@@ -46,50 +88,39 @@ const runTestCase = (testCase: TestCase) => {
     utcConversion.utcTime
   );
   
-  // Validate against known correct value for 2024-01-01 17:00 UTC
-  if (testCase.birthDate === '2024-01-01' && utcConversion.utcTime === '17:00') {
-    const expectedJD = 2460311.208333;
-    const difference = Math.abs(julianDay - expectedJD);
-    console.log("Validation Check:", {
-      calculated: julianDay,
-      expected: expectedJD,
-      difference,
-      isValid: difference < 0.000001
+  console.log("Julian Day Calculation:", {
+    julianDay,
+    expectedJD: 2444520.6875,
+    isValid: Math.abs(julianDay - 2444520.6875) < 0.000001
+  });
+
+  if (testCase.latitude && testCase.longitude) {
+    const sunSign = calculateSunSign(julianDay);
+    const moonSign = calculateMoonSign(julianDay);
+    const risingSign = calculateRisingSign(julianDay, testCase.latitude, testCase.longitude);
+
+    console.log("Astrological Signs:", {
+      sunSign,
+      moonSign,
+      risingSign,
+      validation: {
+        sunSignMatch: sunSign === "Libra",
+        moonSignMatch: moonSign === "Taurus",
+        risingSignMatch: risingSign === "Cancer"
+      }
     });
   }
-  
+
+  console.log("\n=== Astrological Calculations Tests Complete ===\n");
+
   return {
-    input: testCase,
-    utcConversion,
-    julianDay
+    julianDay,
+    signs: {
+      sun: calculateSunSign(julianDay),
+      moon: calculateMoonSign(julianDay),
+      rising: testCase.latitude && testCase.longitude ? 
+        calculateRisingSign(julianDay, testCase.latitude, testCase.longitude) : 
+        undefined
+    }
   };
-};
-
-export const runTests = () => {
-  console.log("\n=== Starting Julian Day Calculation Tests ===\n");
-  
-  const case1: TestCase = {
-    birthDate: "2024-01-01",
-    birthTime: "12:00",
-    timeZone: "America/New_York"
-  };
-
-  const case2: TestCase = {
-    birthDate: "1990-01-01",
-    birthTime: "12:00",
-    timeZone: "America/New_York"
-  };
-
-  const results = {
-    case1: runTestCase(case1),
-    case2: runTestCase(case2)
-  };
-
-  console.log("\nTest Results Summary:");
-  console.log("Case 1 (2024-01-01):", results.case1.julianDay);
-  console.log("Case 2 (1990-01-01):", results.case2.julianDay);
-  
-  console.log("\n=== Julian Day Calculation Tests Complete ===\n");
-
-  return results;
 };

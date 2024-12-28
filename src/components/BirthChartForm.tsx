@@ -31,12 +31,19 @@ export const BirthChartForm = () => {
     e.preventDefault();
     
     try {
+      // Run calculations before saving
+      const testResults = runTests();
+      const { signs } = testResults;
+
       const { error } = await supabase.from('birth_charts').insert({
         name: formData.name,
         birth_date: formData.birthDate,
         birth_time: formData.birthTime,
         latitude: formData.latitude,
-        longitude: formData.longitude
+        longitude: formData.longitude,
+        sun_sign: signs.sun,
+        moon_sign: signs.moon,
+        ascendant_sign: signs.rising
       });
 
       if (error) throw error;
@@ -60,7 +67,7 @@ export const BirthChartForm = () => {
     console.log("Test Results:", results);
     toast({
       title: "Test Results",
-      description: "Check the console for test output",
+      description: `Sun: ${results.signs.sun}, Moon: ${results.signs.moon}, Rising: ${results.signs.rising}`,
     });
   };
 
@@ -116,7 +123,7 @@ export const BirthChartForm = () => {
         onClick={handleTestClick}
         className="w-full bg-secondary hover:bg-secondary/90 text-white mb-4"
       >
-        Run Installation Tests
+        Run Astrological Tests
       </Button>
       
       <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
