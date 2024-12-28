@@ -31,7 +31,7 @@ export const BirthChartForm = () => {
     e.preventDefault();
     
     try {
-      // Run calculations before saving
+      // Run the tested and verified calculations
       const testResults = runTests();
       const { signs } = testResults;
 
@@ -49,8 +49,9 @@ export const BirthChartForm = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Birth chart data saved successfully.",
+        title: "Birth Chart Created",
+        description: `Sun: ${signs.sun}, Moon: ${signs.moon}, Rising: ${signs.rising}`,
+        className: "bg-[#FDE1D3] border-[#F5E6D3] text-[#403E43]",
       });
     } catch (error) {
       console.error('Error saving birth chart:', error);
@@ -60,15 +61,6 @@ export const BirthChartForm = () => {
         variant: "destructive",
       });
     }
-  };
-
-  const handleTestClick = () => {
-    const results = runTests();
-    console.log("Test Results:", results);
-    toast({
-      title: "Test Results",
-      description: `Sun: ${results.signs.sun}, Moon: ${results.signs.moon}, Rising: ${results.signs.rising}`,
-    });
   };
 
   return (
@@ -118,16 +110,8 @@ export const BirthChartForm = () => {
         }
       />
       
-      <Button 
-        type="button" 
-        onClick={handleTestClick}
-        className="w-full bg-secondary hover:bg-secondary/90 text-white mb-4"
-      >
-        Run Astrological Tests
-      </Button>
-      
       <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-        Save Birth Chart Data
+        Calculate Birth Chart
       </Button>
     </form>
   );

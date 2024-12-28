@@ -1,14 +1,6 @@
 import { julian, solar, moonposition, sidereal } from "astronomia";
 import moment from "moment-timezone";
 
-interface TestCase {
-  birthDate: string;
-  birthTime: string;
-  timeZone: string;
-  latitude?: number;
-  longitude?: number;
-}
-
 const convertToUT = (date: string, time: string, timeZone: string) => {
   console.log("\n=== UTC Conversion Function ===");
   console.log("Input:", { date, time, timeZone });
@@ -50,7 +42,6 @@ const getZodiacSign = (longitude: number): string => {
 
 const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
-  console.log("Input Julian Day:", jd);
   
   const sunLongitude = solar.apparentLongitude(jd);
   const sunSign = getZodiacSign(sunLongitude);
@@ -64,7 +55,6 @@ const calculateSunSign = (jd: number): string => {
 
 const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
-  console.log("Input Julian Day:", jd);
   
   const moonData = moonposition.position(jd);
   const moonSign = getZodiacSign(moonData.lon);
@@ -99,7 +89,7 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
 export const runTests = () => {
   console.log("\n=== Starting Astrological Calculations Tests ===\n");
   
-  const testCase: TestCase = {
+  const testCase = {
     birthDate: "1980-10-14",
     birthTime: "00:30",
     timeZone: "Europe/London",
@@ -127,23 +117,7 @@ export const runTests = () => {
   
   const sunSign = calculateSunSign(julianDay);
   const moonSign = calculateMoonSign(julianDay);
-  const risingSign = testCase.latitude && testCase.longitude ? 
-    calculateRisingSign(julianDay, testCase.latitude, testCase.longitude) : 
-    undefined;
-
-  console.log("\n=== Final Results ===");
-  console.log("Astrological Signs:", {
-    sunSign,
-    moonSign,
-    risingSign,
-    validation: {
-      sunSignMatch: sunSign === "Libra",
-      moonSignMatch: moonSign === "Libra",
-      risingSignMatch: risingSign === "Leo"
-    }
-  });
-
-  console.log("\n=== Astrological Calculations Tests Complete ===\n");
+  const risingSign = calculateRisingSign(julianDay, testCase.latitude, testCase.longitude);
 
   return {
     julianDay,
