@@ -31,19 +31,24 @@ const calculateJulianDay = (date: string, time: string) => {
 };
 
 const getZodiacSign = (longitude: number): string => {
+  // Adjust longitude to ensure it's between 0 and 360
+  const adjustedLongitude = ((longitude % 360) + 360) % 360;
+  
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
     "Leo", "Virgo", "Libra", "Scorpio", 
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
-  const signIndex = Math.floor(longitude / 30) % 12;
+  
+  // Calculate sign index (0-11) based on 30-degree segments
+  const signIndex = Math.floor(adjustedLongitude / 30);
   return signs[signIndex];
 };
 
 const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   
-  const sunLongitude = solar.apparentLongitude(jd);
+  const sunLongitude = (solar.apparentLongitude(jd) * 180 / Math.PI) + 180;
   const sunSign = getZodiacSign(sunLongitude);
   
   console.log("Output:", { 
@@ -57,10 +62,11 @@ const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   
   const moonData = moonposition.position(jd);
-  const moonSign = getZodiacSign(moonData.lon);
+  const moonLongitude = (moonData.lon * 180 / Math.PI) + 180;
+  const moonSign = getZodiacSign(moonLongitude);
   
   console.log("Output:", { 
-    moonLongitude: moonData.lon,
+    moonLongitude,
     moonSign 
   });
   return moonSign;
@@ -74,8 +80,9 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
     longitude 
   });
   
-  const localSiderealTime = sidereal.apparent(jd) + longitude / 15;
-  const ascendantLongitude = (localSiderealTime * 15 + 180) % 360;
+  // Convert to proper units and adjust calculations
+  const localSiderealTime = (sidereal.apparent(jd) + longitude / 15) * 15;
+  const ascendantLongitude = (localSiderealTime + 180) % 360;
   const risingSign = getZodiacSign(ascendantLongitude);
   
   console.log("Output:", { 
