@@ -62,10 +62,9 @@ export const BirthChartForm = () => {
     }
   };
 
-  const handleTestClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleTestClick = () => {
     const results = runTests();
-    console.log("Test Results Passed to Toast:", results);
+    console.log("Test Results:", results);
     toast({
       title: "Test Results",
       description: `Sun: ${results.signs.sun}, Moon: ${results.signs.moon}, Rising: ${results.signs.rising}`,
@@ -73,67 +72,63 @@ export const BirthChartForm = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="birth-chart-form w-full max-w-md mx-auto space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-primary-dark">Full Name</label>
-          <Input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full"
-            placeholder="Enter your name"
-            required
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-primary-dark">Birth Date</label>
-          <Input
-            type="date"
-            value={formData.birthDate}
-            onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-            className="w-full"
-            required
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-primary-dark">Birth Time</label>
-          <Input
-            type="time"
-            value={formData.birthTime}
-            onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
-            className="w-full"
-            required
-          />
-        </div>
-        
-        <LocationSearch 
-          onLocationSelect={({ place, lat, lng }) => 
-            setFormData({ 
-              ...formData, 
-              birthPlace: place,
-              latitude: lat,
-              longitude: lng
-            })
-          }
+    <form onSubmit={handleSubmit} className="birth-chart-form w-full max-w-md mx-auto space-y-6">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-primary-dark">Full Name</label>
+        <Input
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          className="w-full"
+          placeholder="Enter your name"
+          required
         />
-        
-        <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-          Save Birth Chart Data
-        </Button>
-      </form>
-
-      <footer className="text-center text-sm text-primary-dark/60">
-        <a 
-          href="#" 
-          onClick={handleTestClick}
-          className="hover:text-primary-dark hover:underline transition-colors"
-        >
-          Run Astrological Test
-        </a>
-      </footer>
-    </div>
+      </div>
+      
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-primary-dark">Birth Date</label>
+        <Input
+          type="date"
+          value={formData.birthDate}
+          onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+          className="w-full"
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-primary-dark">Birth Time</label>
+        <Input
+          type="time"
+          value={formData.birthTime}
+          onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
+          className="w-full"
+          required
+        />
+      </div>
+      
+      <LocationSearch 
+        onLocationSelect={({ place, lat, lng }) => 
+          setFormData({ 
+            ...formData, 
+            birthPlace: place,
+            latitude: lat,
+            longitude: lng
+          })
+        }
+      />
+      
+      <Button 
+        type="button" 
+        onClick={handleTestClick}
+        className="w-full bg-secondary hover:bg-secondary/90 text-white mb-4"
+      >
+        Run Astrological Tests
+      </Button>
+      
+      <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
+        Save Birth Chart Data
+      </Button>
+    </form>
   );
 };

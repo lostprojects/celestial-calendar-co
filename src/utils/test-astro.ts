@@ -9,21 +9,16 @@ interface TestCase {
   longitude?: number;
 }
 
-const normalizeLongitude = (longitude: number): number => {
-  return ((longitude % 360) + 360) % 360;
-};
-
 const convertToUT = (date: string, time: string, timeZone: string) => {
   console.log("\n=== UTC Conversion Function ===");
   console.log("Input:", { date, time, timeZone });
   
-  const localDateTime = moment.tz(`${date} ${time}`, "YYYY-MM-DD HH:mm", timeZone);
-  const utcDateTime = localDateTime.utc();
+  const localDateTime = `${date}T${time}:00`;
+  const utcMoment = moment.tz(localDateTime, timeZone).utc();
   
   const result = {
-    utcDate: utcDateTime.format('YYYY-MM-DD'),
-    utcTime: utcDateTime.format('HH:mm'),
-    utcTimestamp: utcDateTime.valueOf()
+    utcDate: utcMoment.format('YYYY-MM-DD'),
+    utcTime: utcMoment.format('HH:mm')
   };
   
   console.log("Output:", result);
@@ -36,42 +31,21 @@ const calculateJulianDay = (date: string, time: string) => {
   
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute] = time.split(':').map(Number);
+  const fractionalDay = (hour + minute / 60) / 24;
   
-  // Calculate decimal hours and fractional day correctly
-  const decimalHours = hour + minute / 60;
-  const fractionalDay = day + decimalHours / 24;
-  
-  console.log("Intermediate steps:", {
-    year,
-    month,
-    day,
-    decimalHours,
-    fractionalDay
-  });
-  
-  const jd = julian.CalendarGregorianToJD(year, month, fractionalDay);
+  const jd = julian.CalendarGregorianToJD(year, month, day + fractionalDay);
   console.log("Output:", { julianDay: jd });
   return jd;
 };
 
 const getZodiacSign = (longitude: number): string => {
-  console.log("\n=== Zodiac Sign Calculation ===");
-  console.log("Input longitude:", longitude);
-  
-  const normalizedLongitude = normalizeLongitude(longitude);
-  console.log("Normalized longitude:", normalizedLongitude);
-  
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
     "Leo", "Virgo", "Libra", "Scorpio", 
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
-  
-  const signIndex = Math.floor(normalizedLongitude / 30);
-  const result = signs[signIndex];
-  
-  console.log("Final sign:", result);
-  return result;
+  const signIndex = Math.floor(longitude / 30) % 12;
+  return signs[signIndex];
 };
 
 const calculateSunSign = (jd: number): string => {
@@ -79,12 +53,12 @@ const calculateSunSign = (jd: number): string => {
   console.log("Input Julian Day:", jd);
   
   const sunLongitude = solar.apparentLongitude(jd);
-  const normalizedLongitude = normalizeLongitude(sunLongitude);
-  console.log("Tropical Sun Longitude:", normalizedLongitude);
+  const sunSign = getZodiacSign(sunLongitude);
   
-  const sunSign = getZodiacSign(normalizedLongitude);
-  console.log("Final Sun Sign:", sunSign);
-  
+  console.log("Output:", { 
+    sunLongitude,
+    sunSign 
+  });
   return sunSign;
 };
 
@@ -93,60 +67,32 @@ const calculateMoonSign = (jd: number): string => {
   console.log("Input Julian Day:", jd);
   
   const moonData = moonposition.position(jd);
-  const normalizedLongitude = normalizeLongitude(moonData.lon);
-  console.log("Tropical Moon Longitude:", normalizedLongitude);
+  const moonSign = getZodiacSign(moonData.lon);
   
-  const moonSign = getZodiacSign(normalizedLongitude);
-  console.log("Final Moon Sign:", moonSign);
-  
+  console.log("Output:", { 
+    moonLongitude: moonData.lon,
+    moonSign 
+  });
   return moonSign;
 };
 
 const calculateRisingSign = (jd: number, latitude: number, longitude: number): string => {
   console.log("\n=== Rising Sign Calculation ===");
-  console.log("Input:", { julianDay: jd, latitude, longitude });
-  
-  // Calculate GMST (Greenwich Mean Sidereal Time)
-  const gmst = sidereal.apparent(jd);
-  console.log("GMST (hours):", gmst);
-  
-  // Convert GMST to degrees and add local longitude
-  const gmstDegrees = gmst * 15;
-  const rawRAMC = gmstDegrees + longitude;
-  const ramc = normalizeLongitude(rawRAMC);
-  
-  console.log("RAMC calculation:", {
-    gmstDegrees,
-    rawRAMC,
-    normalizedRAMC: ramc
+  console.log("Input:", { 
+    julianDay: jd,
+    latitude,
+    longitude 
   });
   
-  // Calculate obliquity of the ecliptic
-  const T = (jd - 2451545.0) / 36525;
-  const epsilon = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
-  console.log("Obliquity:", epsilon);
+  const localSiderealTime = sidereal.apparent(jd) + longitude / 15;
+  const ascendantLongitude = (localSiderealTime * 15 + 180) % 360;
+  const risingSign = getZodiacSign(ascendantLongitude);
   
-  // Calculate Ascendant
-  const tanAsc = Math.cos(ramc * Math.PI / 180) / 
-    (Math.sin(latitude * Math.PI / 180) * Math.tan(epsilon * Math.PI / 180) - 
-     Math.cos(latitude * Math.PI / 180) * Math.sin(ramc * Math.PI / 180));
-  
-  let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
-  
-  // Adjust quadrant based on RAMC
-  if (ramc > 180) {
-    ascendant += 180;
-  }
-  ascendant = normalizeLongitude(ascendant);
-  
-  console.log("Ascendant calculation:", {
-    rawAscendant: Math.atan(tanAsc) * 180 / Math.PI,
-    finalAscendant: ascendant
+  console.log("Output:", { 
+    localSiderealTime,
+    ascendantLongitude,
+    risingSign 
   });
-  
-  const risingSign = getZodiacSign(ascendant);
-  console.log("Final Rising Sign:", risingSign);
-  
   return risingSign;
 };
 
@@ -161,17 +107,22 @@ export const runTests = () => {
     longitude: 1.1482
   };
 
-  // Convert local time to UTC
-  const utcDateTime = convertToUT(
+  console.log("Test Case Input:", {
+    localDateTime: `${testCase.birthDate}T${testCase.birthTime}`,
+    latitude: testCase.latitude,
+    longitude: testCase.longitude,
+    timeZone: testCase.timeZone
+  });
+
+  const utcConversion = convertToUT(
     testCase.birthDate,
     testCase.birthTime,
     testCase.timeZone
   );
   
-  // Calculate Julian Day from UTC time
   const julianDay = calculateJulianDay(
-    utcDateTime.utcDate,
-    utcDateTime.utcTime
+    utcConversion.utcDate,
+    utcConversion.utcTime
   );
   
   const sunSign = calculateSunSign(julianDay);
@@ -181,11 +132,18 @@ export const runTests = () => {
     undefined;
 
   console.log("\n=== Final Results ===");
-  console.log("Calculated Signs:", {
-    sun: sunSign,
-    moon: moonSign,
-    rising: risingSign
+  console.log("Astrological Signs:", {
+    sunSign,
+    moonSign,
+    risingSign,
+    validation: {
+      sunSignMatch: sunSign === "Libra",
+      moonSignMatch: moonSign === "Libra",
+      risingSignMatch: risingSign === "Leo"
+    }
   });
+
+  console.log("\n=== Astrological Calculations Tests Complete ===\n");
 
   return {
     julianDay,
