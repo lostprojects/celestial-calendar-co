@@ -17,79 +17,17 @@ const convertToUT = (date: string, time: string, timeZone: string) => {
   };
 };
 
-// Temporary manual calculation for validation
-const calculateManualJulianDay = (year: number, month: number, day: number, hour: number, minute: number) => {
-  if (month <= 2) {
-    year -= 1;
-    month += 12;
-  }
-  
-  const A = Math.floor(year / 100);
-  const B = 2 - A + Math.floor(A / 4);
-  const fractionalDay = hour / 24 + minute / 1440;
-  
-  return Math.floor(365.25 * (year + 4716)) +
-         Math.floor(30.6001 * (month + 1)) +
-         day + fractionalDay + B - 1524.5;
-};
-
 const calculateJulianDay = (date: string, time: string) => {
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute] = time.split(':').map(Number);
   const fractionalDay = hour / 24 + minute / 1440;
   
-  // Enhanced logging for 2024 case
-  if (year === 2024) {
-    console.log("Detailed 2024 Julian Day Calculation:", {
-      inputs: {
-        year,
-        month,
-        day,
-        hour,
-        minute,
-        fractionalDay: fractionalDay.toFixed(6),
-        dayPlusFraction: (day + fractionalDay).toFixed(6)
-      },
-      intermediateSteps: {
-        astronomiaInput: {
-          year,
-          month,
-          dayWithFraction: day + fractionalDay
-        },
-        manualInput: {
-          year,
-          month,
-          day,
-          hour,
-          minute
-        }
-      }
-    });
-  }
-
-  const astronomiaJD = julian.CalendarGregorianToJD(
-    year,
-    month,
-    day + fractionalDay
-  );
-  
-  const manualJD = calculateManualJulianDay(year, month, day, hour, minute);
-
-  console.log("Julian Day Results:", {
-    method: "Both calculations",
-    date: `${year}-${month}-${day} ${hour}:${minute}`,
-    results: {
-      astronomia: astronomiaJD,
-      manual: manualJD,
-      difference: Math.abs(astronomiaJD - manualJD),
-      expectedFor2024: year === 2024 ? 2462401.5 : null,
-      analysis: year === 2024 ? 
-        "Astronomia and manual calculations match. Discrepancy with expected value requires verification." : 
-        "Normal calculation"
-    }
+  console.log("Julian Day Calculation:", {
+    inputs: { year, month, day, hour, minute },
+    fractionalDay: fractionalDay.toFixed(6)
   });
 
-  return astronomiaJD;
+  return julian.CalendarGregorianToJD(year, month, day + fractionalDay);
 };
 
 const runTestCase = (testCase: TestCase) => {
@@ -107,6 +45,18 @@ const runTestCase = (testCase: TestCase) => {
     utcConversion.utcDate,
     utcConversion.utcTime
   );
+  
+  // Validate against known correct value for 2024-01-01 17:00 UTC
+  if (testCase.birthDate === '2024-01-01' && utcConversion.utcTime === '17:00') {
+    const expectedJD = 2460311.208333;
+    const difference = Math.abs(julianDay - expectedJD);
+    console.log("Validation Check:", {
+      calculated: julianDay,
+      expected: expectedJD,
+      difference,
+      isValid: difference < 0.000001
+    });
+  }
   
   return {
     input: testCase,
