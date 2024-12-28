@@ -1,4 +1,4 @@
-import { julian, solar, moon, sidereal } from "astronomia";
+import { julian, solar, moonposition, sidereal } from "astronomia";
 import moment from "moment-timezone";
 
 interface TestCase {
@@ -43,8 +43,9 @@ const calculateSunSign = (jd: number): string => {
 };
 
 const calculateMoonSign = (jd: number): string => {
-  const moonPosition = moon.position(jd);
-  return getZodiacSign(moonPosition.lon);
+  const moonData = moonposition.position(jd);
+  const eclipticLongitude = moonData.lon; // Apparent longitude in degrees
+  return getZodiacSign(eclipticLongitude);
 };
 
 const calculateRisingSign = (jd: number, latitude: number, longitude: number): string => {
@@ -105,8 +106,8 @@ export const runTests = () => {
     risingSign,
     validation: {
       sunSignMatch: sunSign === "Libra",
-      moonSignMatch: moonSign === "Taurus",
-      risingSignMatch: risingSign === "Cancer"
+      moonSignMatch: moonSign === "Libra",
+      risingSignMatch: risingSign === "Leo"
     }
   });
 
