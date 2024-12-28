@@ -8,26 +8,38 @@ const normalizeLongitude = (longitude: number): number => {
 };
 
 const getZodiacSign = (longitude: number): string => {
-  const normalizedLong = normalizeLongitude(longitude);
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
     "Leo", "Virgo", "Libra", "Scorpio", 
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
-  const signIndex = Math.floor(normalizedLong / 30);
-  return signs[signIndex];
+  
+  // Test mapping for debugging
+  console.log(`Mapping longitude ${longitude}° to zodiac sign...`);
+  
+  const signIndex = Math.floor(longitude / 30);
+  const sign = signs[signIndex];
+  console.log(`Longitude ${longitude}° maps to ${sign} (index: ${signIndex})`);
+  
+  return sign;
+};
+
+const testZodiacMapping = () => {
+  console.log("\n=== Testing Zodiac Mapping ===");
+  const testLongitudes = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];
+  testLongitudes.forEach((longitude) => {
+    console.log(`Longitude: ${longitude}°, Sign: ${getZodiacSign(longitude)}`);
+  });
 };
 
 const calculateJulianDay = (date: string, time: string, timeZone: string): number => {
   console.log("\n=== Julian Day Calculation ===");
   console.log("Input:", { date, time, timeZone });
   
-  // Convert to UTC
   const utcMoment = moment.tz(`${date}T${time}:00`, timeZone).utc();
   const utcDate = utcMoment.format('YYYY-MM-DD');
   const utcTime = utcMoment.format('HH:mm');
   
-  // Parse date components
   const [year, month, day] = utcDate.split('-').map(Number);
   const [hour, minute] = utcTime.split(':').map(Number);
   const fractionalDay = (hour + minute / 60) / 24;
@@ -40,17 +52,19 @@ const calculateJulianDay = (date: string, time: string, timeZone: string): numbe
 const calculateSunPosition = (jd: number) => {
   console.log("\n=== Sun Position Calculation ===");
   const sunLongitude = solar.apparentLongitude(jd);
-  const sunSign = getZodiacSign(sunLongitude);
-  console.log("Output:", { sunLongitude: normalizeLongitude(sunLongitude), sunSign });
-  return { longitude: sunLongitude, sign: sunSign };
+  const tropicalLongitude = normalizeLongitude(sunLongitude);
+  console.log("Tropical Sun Longitude (Degrees):", tropicalLongitude);
+  const sunSign = getZodiacSign(tropicalLongitude);
+  return { longitude: tropicalLongitude, sign: sunSign };
 };
 
 const calculateMoonPosition = (jd: number) => {
   console.log("\n=== Moon Position Calculation ===");
   const moonPos = moonposition.position(jd);
-  const moonSign = getZodiacSign(moonPos.lon);
-  console.log("Output:", { moonLongitude: normalizeLongitude(moonPos.lon), moonSign });
-  return { longitude: moonPos.lon, sign: moonSign };
+  const tropicalLongitude = normalizeLongitude(moonPos.lon);
+  console.log("Tropical Moon Longitude (Degrees):", tropicalLongitude);
+  const moonSign = getZodiacSign(tropicalLongitude);
+  return { longitude: tropicalLongitude, sign: moonSign };
 };
 
 const calculateAscendant = (jd: number, latitude: number, longitude: number) => {
@@ -73,16 +87,11 @@ const calculateAscendant = (jd: number, latitude: number, longitude: number) => 
                   Math.sin(latRad) * Math.tan(obliquity));
   
   const ascendantRad = Math.atan(tanAsc);
-  const ascendantDeg = (ascendantRad * 180 / Math.PI + 360) % 360;
-  const ascendantSign = getZodiacSign(ascendantRad);
+  const ascendantDeg = normalizeLongitude(ascendantRad);
+  const ascendantSign = getZodiacSign(ascendantDeg);
   
-  console.log("Output:", { 
-    localSiderealTime: lst,
-    ascendantLongitude: ascendantDeg,
-    ascendantSign 
-  });
-  
-  return { longitude: ascendantRad, sign: ascendantSign };
+  console.log("Ascendant Longitude (Degrees):", ascendantDeg);
+  return { longitude: ascendantDeg, sign: ascendantSign };
 };
 
 export const runTests = () => {
@@ -103,6 +112,9 @@ export const runTests = () => {
     timeZone: testCase.timeZone
   });
 
+  // Run zodiac mapping tests first
+  testZodiacMapping();
+
   const julianDay = calculateJulianDay(
     testCase.birthDate,
     testCase.birthTime,
@@ -112,6 +124,11 @@ export const runTests = () => {
   const sun = calculateSunPosition(julianDay);
   const moon = calculateMoonPosition(julianDay);
   const ascendant = calculateAscendant(julianDay, testCase.latitude, testCase.longitude);
+
+  console.log("\n=== Final Results ===");
+  console.log("Sun:", { longitude: sun.longitude, sign: sun.sign });
+  console.log("Moon:", { longitude: moon.longitude, sign: moon.sign });
+  console.log("Ascendant:", { longitude: ascendant.longitude, sign: ascendant.sign });
 
   return {
     julianDay,
