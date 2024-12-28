@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,10 +13,15 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
     const { name, birthDate, birthTime, latitude, longitude } = await req.json()
 
     // First, check if we have this calculation cached in our database
-    const { data: existingChart, error: fetchError } = await supabase
+    const { data: existingChart, error: fetchError } = await supabaseClient
       .from('birth_charts')
       .select('*')
       .eq('name', name)
@@ -68,7 +74,7 @@ serve(async (req) => {
     const result = await response.json()
 
     // Cache the result in our database
-    const { error: insertError } = await supabase
+    const { error: insertError } = await supabaseClient
       .from('birth_charts')
       .insert({
         name,
