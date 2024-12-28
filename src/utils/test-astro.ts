@@ -1,4 +1,4 @@
-import { julian, solar, moonposition, sidereal } from "astronomia";
+import { julian, solar, moonposition, sidereal, coord } from "astronomia";
 import moment from "moment-timezone";
 
 const convertToUT = (date: string, time: string, timeZone: string) => {
@@ -30,12 +30,9 @@ const calculateJulianDay = (date: string, time: string) => {
   return jd;
 };
 
-const normalizeAngle = (angle: number): number => {
-  return ((angle % 360) + 360) % 360;
-};
-
 const getZodiacSign = (longitude: number): string => {
-  const normalizedLongitude = normalizeAngle(longitude);
+  // Normalize to 0-360 range for tropical zodiac
+  const normalizedLong = ((longitude % 360) + 360) % 360;
   
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
@@ -43,14 +40,16 @@ const getZodiacSign = (longitude: number): string => {
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
   
-  const signIndex = Math.floor(normalizedLongitude / 30);
+  const signIndex = Math.floor(normalizedLong / 30);
   return signs[signIndex];
 };
 
 const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   
-  const sunLongitude = normalizeAngle((solar.apparentLongitude(jd) * 180 / Math.PI));
+  // Get true solar coordinates (already in tropical zodiac)
+  const sunCoord = solar.true(jd);
+  const sunLongitude = (sunCoord.lon * 180 / Math.PI);
   const sunSign = getZodiacSign(sunLongitude);
   
   console.log("Output:", { 
@@ -63,8 +62,9 @@ const calculateSunSign = (jd: number): string => {
 const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   
-  const moonData = moonposition.position(jd);
-  const moonLongitude = normalizeAngle((moonData.lon * 180 / Math.PI));
+  // Get true lunar position (already in tropical zodiac)
+  const moonCoord = moonposition.true(jd);
+  const moonLongitude = (moonCoord.lon * 180 / Math.PI);
   const moonSign = getZodiacSign(moonLongitude);
   
   console.log("Output:", { 
@@ -82,14 +82,28 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
     longitude 
   });
   
-  const siderealTime = sidereal.apparent(jd);
-  const localSiderealTime = normalizeAngle(siderealTime * 15 + longitude);
-  const ascendantLongitude = normalizeAngle(localSiderealTime + 180);
-  const risingSign = getZodiacSign(ascendantLongitude);
+  // Convert latitude/longitude to radians
+  const latRad = latitude * Math.PI / 180;
+  const longRad = longitude * Math.PI / 180;
+  
+  // Calculate Local Sidereal Time
+  const lst = sidereal.apparent(jd);
+  // Convert LST to degrees and adjust for location
+  const lstDeg = (lst * 180 / Math.PI * 15) + longitude;
+  
+  // Calculate Ascendant using obliquity of ecliptic
+  const obliquity = 23.4367 * Math.PI / 180; // Mean obliquity for J2000
+  const ascendantRad = Math.atan2(
+    Math.cos(obliquity) * Math.sin(lstDeg * Math.PI / 180),
+    Math.cos(lstDeg * Math.PI / 180)
+  );
+  
+  const ascendantDeg = (ascendantRad * 180 / Math.PI + 360) % 360;
+  const risingSign = getZodiacSign(ascendantDeg);
   
   console.log("Output:", { 
-    localSiderealTime,
-    ascendantLongitude,
+    localSiderealTime: lstDeg,
+    ascendantLongitude: ascendantDeg,
     risingSign 
   });
   return risingSign;
