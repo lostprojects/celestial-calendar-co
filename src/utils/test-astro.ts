@@ -30,9 +30,12 @@ const calculateJulianDay = (date: string, time: string) => {
   return jd;
 };
 
+const normalizeAngle = (angle: number): number => {
+  return ((angle % 360) + 360) % 360;
+};
+
 const getZodiacSign = (longitude: number): string => {
-  // Adjust longitude to ensure it's between 0 and 360
-  const adjustedLongitude = ((longitude % 360) + 360) % 360;
+  const normalizedLongitude = normalizeAngle(longitude);
   
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
@@ -40,15 +43,14 @@ const getZodiacSign = (longitude: number): string => {
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
   
-  // Calculate sign index (0-11) based on 30-degree segments
-  const signIndex = Math.floor(adjustedLongitude / 30);
+  const signIndex = Math.floor(normalizedLongitude / 30);
   return signs[signIndex];
 };
 
 const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   
-  const sunLongitude = (solar.apparentLongitude(jd) * 180 / Math.PI) + 180;
+  const sunLongitude = normalizeAngle((solar.apparentLongitude(jd) * 180 / Math.PI));
   const sunSign = getZodiacSign(sunLongitude);
   
   console.log("Output:", { 
@@ -62,7 +64,7 @@ const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   
   const moonData = moonposition.position(jd);
-  const moonLongitude = (moonData.lon * 180 / Math.PI) + 180;
+  const moonLongitude = normalizeAngle((moonData.lon * 180 / Math.PI));
   const moonSign = getZodiacSign(moonLongitude);
   
   console.log("Output:", { 
@@ -80,9 +82,9 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
     longitude 
   });
   
-  // Convert to proper units and adjust calculations
-  const localSiderealTime = (sidereal.apparent(jd) + longitude / 15) * 15;
-  const ascendantLongitude = (localSiderealTime + 180) % 360;
+  const siderealTime = sidereal.apparent(jd);
+  const localSiderealTime = normalizeAngle(siderealTime * 15 + longitude);
+  const ascendantLongitude = normalizeAngle(localSiderealTime + 180);
   const risingSign = getZodiacSign(ascendantLongitude);
   
   console.log("Output:", { 
