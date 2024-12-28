@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import opencage from 'opencage-api-client';
 import { useDebounce } from "@/hooks/use-debounce";
+import { supabase } from "@/integrations/supabase/client";
 
 const OPENCAGE_KEY_STORAGE = 'opencage_api_key';
 
@@ -13,8 +14,10 @@ export const BirthChartForm = () => {
     birthDate: "",
     birthTime: "",
     birthPlace: "",
+    latitude: 0,
+    longitude: 0
   });
-  const [suggestions, setSuggestions] = useState<Array<{ place_name: string }>>([]);
+  const [suggestions, setSuggestions] = useState<Array<{ place_name: string; lat: number; lng: number }>>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [apiKey, setApiKey] = useState<string>("");
   const { toast } = useToast();
@@ -24,7 +27,6 @@ export const BirthChartForm = () => {
     if (storedKey) {
       setApiKey(storedKey);
     } else {
-      // Prompt user to enter API key if not found
       const key = prompt("Please enter your OpenCage API key (this will be stored in your browser):");
       if (key) {
         localStorage.setItem(OPENCAGE_KEY_STORAGE, key);
@@ -48,7 +50,9 @@ export const BirthChartForm = () => {
 
       if (result.results) {
         setSuggestions(result.results.map(r => ({
-          place_name: r.formatted
+          place_name: r.formatted,
+          lat: r.geometry.lat,
+          lng: r.geometry.lng
         })));
         setShowSuggestions(true);
       }
@@ -68,17 +72,42 @@ export const BirthChartForm = () => {
     debouncedSearch(value);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setFormData({ ...formData, birthPlace: suggestion });
+  const handleSuggestionClick = (suggestion: { place_name: string; lat: number; lng: number }) => {
+    setFormData({
+      ...formData,
+      birthPlace: suggestion.place_name,
+      latitude: suggestion.lat,
+      longitude: suggestion.lng
+    });
     setShowSuggestions(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Birth Chart Request Received",
-      description: "We'll calculate your personal astrology chart shortly.",
-    });
+    
+    try {
+      const { error } = await supabase.from('birth_charts').insert({
+        name: formData.name,
+        birth_date: formData.birthDate,
+        birth_time: formData.birthTime,
+        latitude: formData.latitude,
+        longitude: formData.longitude
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Birth chart data saved successfully.",
+      });
+    } catch (error) {
+      console.error('Error saving birth chart:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save birth chart data",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -91,6 +120,7 @@ export const BirthChartForm = () => {
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full"
           placeholder="Enter your name"
+          required
         />
       </div>
       
@@ -101,6 +131,7 @@ export const BirthChartForm = () => {
           value={formData.birthDate}
           onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
           className="w-full"
+          required
         />
       </div>
       
@@ -111,6 +142,7 @@ export const BirthChartForm = () => {
           value={formData.birthTime}
           onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
           className="w-full"
+          required
         />
       </div>
       
@@ -122,6 +154,7 @@ export const BirthChartForm = () => {
           onChange={handlePlaceChange}
           className="w-full"
           placeholder="City, Country"
+          required
         />
         {showSuggestions && suggestions.length > 0 && (
           <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1">
@@ -129,7 +162,7 @@ export const BirthChartForm = () => {
               <div
                 key={index}
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleSuggestionClick(suggestion.place_name)}
+                onClick={() => handleSuggestionClick(suggestion)}
               >
                 {suggestion.place_name}
               </div>
@@ -139,7 +172,7 @@ export const BirthChartForm = () => {
       </div>
       
       <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-        Calculate My Birth Chart
+        Save Birth Chart Data
       </Button>
     </form>
   );

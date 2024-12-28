@@ -11,40 +11,40 @@ export type Database = {
     Tables: {
       birth_charts: {
         Row: {
-          ascendant_sign: string
+          ascendant_sign: string | null
           birth_date: string
           birth_time: string
           created_at: string
           id: string
           latitude: number
           longitude: number
-          moon_sign: string
+          moon_sign: string | null
           name: string
-          sun_sign: string
+          sun_sign: string | null
         }
         Insert: {
-          ascendant_sign: string
+          ascendant_sign?: string | null
           birth_date: string
           birth_time: string
           created_at?: string
           id?: string
           latitude: number
           longitude: number
-          moon_sign: string
+          moon_sign?: string | null
           name: string
-          sun_sign: string
+          sun_sign?: string | null
         }
         Update: {
-          ascendant_sign?: string
+          ascendant_sign?: string | null
           birth_date?: string
           birth_time?: string
           created_at?: string
           id?: string
           latitude?: number
           longitude?: number
-          moon_sign?: string
+          moon_sign?: string | null
           name?: string
-          sun_sign?: string
+          sun_sign?: string | null
         }
         Relationships: []
       }
