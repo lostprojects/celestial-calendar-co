@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { LocationSearch } from "./LocationSearch";
 import { BirthChartDisplay } from "./BirthChartDisplay";
 import moment from "moment-timezone";
@@ -19,7 +18,7 @@ export const BirthChartForm = () => {
     birthDate: "",
     birthTime: "",
     birthPlace: "",
-    timeZone: moment.tz.guess(), // Get user's local timezone as default
+    timeZone: moment.tz.guess(),
   });
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [birthChart, setBirthChart] = useState<BirthChartResult | null>(null);
@@ -28,6 +27,7 @@ export const BirthChartForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with data:', formData);
     
     if (!selectedLocation) {
       toast({
@@ -40,18 +40,36 @@ export const BirthChartForm = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('calculate-birth-chart', {
-        body: {
+      console.log('Calling calculate-birth-chart with:', {
+        name: formData.name,
+        birthDate: formData.birthDate,
+        birthTime: formData.birthTime,
+        latitude: selectedLocation.lat,
+        longitude: selectedLocation.lng,
+      });
+
+      const response = await fetch('https://qwpveubezldowcycifbh.supabase.co/functions/v1/calculate-birth-chart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
           name: formData.name,
           birthDate: formData.birthDate,
           birthTime: formData.birthTime,
           latitude: selectedLocation.lat,
           longitude: selectedLocation.lng,
-          timeZone: formData.timeZone,
-        },
+        }),
       });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to calculate birth chart');
+      }
+
+      const data = await response.json();
+      console.log('Received birth chart data:', data);
 
       setBirthChart(data);
       toast({
@@ -112,22 +130,6 @@ export const BirthChartForm = () => {
           onBirthPlaceChange={(value) => setFormData({ ...formData, birthPlace: value })}
           onLocationSelect={(location) => setSelectedLocation(location)}
         />
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-primary-dark">Time Zone</label>
-          <select
-            value={formData.timeZone}
-            onChange={(e) => setFormData({ ...formData, timeZone: e.target.value })}
-            className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
-            required
-          >
-            {moment.tz.names().map((zone) => (
-              <option key={zone} value={zone}>
-                {zone}
-              </option>
-            ))}
-          </select>
-        </div>
         
         <Button 
           type="submit" 
