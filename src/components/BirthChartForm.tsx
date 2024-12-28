@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { LocationSearch } from "./LocationSearch";
 import { BirthChartDisplay } from "./BirthChartDisplay";
 import moment from "moment-timezone";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BirthChartResult {
   sunSign: string;
@@ -40,35 +41,22 @@ export const BirthChartForm = () => {
 
     setIsLoading(true);
     try {
-      console.log('Calling calculate-birth-chart with:', {
+      const requestData = {
         name: formData.name,
         birthDate: formData.birthDate,
         birthTime: formData.birthTime,
         latitude: selectedLocation.lat,
         longitude: selectedLocation.lng,
+      };
+      
+      console.log('Calling calculate-birth-chart with:', requestData);
+
+      const { data, error } = await supabase.functions.invoke('calculate-birth-chart', {
+        body: JSON.stringify(requestData),
       });
 
-      const response = await fetch('https://qwpveubezldowcycifbh.supabase.co/functions/v1/calculate-birth-chart', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          birthDate: formData.birthDate,
-          birthTime: formData.birthTime,
-          latitude: selectedLocation.lat,
-          longitude: selectedLocation.lng,
-        }),
-      });
+      if (error) throw error;
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to calculate birth chart');
-      }
-
-      const data = await response.json();
       console.log('Received birth chart data:', data);
 
       setBirthChart(data);
