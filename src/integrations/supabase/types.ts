@@ -9,7 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      birth_charts: {
+        Row: {
+          ascendant_sign: string
+          birth_date: string
+          birth_time: string
+          created_at: string
+          id: string
+          latitude: number
+          longitude: number
+          moon_sign: string
+          name: string
+          sun_sign: string
+        }
+        Insert: {
+          ascendant_sign: string
+          birth_date: string
+          birth_time: string
+          created_at?: string
+          id?: string
+          latitude: number
+          longitude: number
+          moon_sign: string
+          name: string
+          sun_sign: string
+        }
+        Update: {
+          ascendant_sign?: string
+          birth_date?: string
+          birth_time?: string
+          created_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          moon_sign?: string
+          name?: string
+          sun_sign?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
