@@ -1,4 +1,4 @@
-import { julian, solar, moonposition, sidereal } from "astronomia";
+import { julian, solar, moonposition } from "astronomia";
 import moment from "moment-timezone";
 
 interface TestCase {
@@ -10,7 +10,6 @@ interface TestCase {
 }
 
 const normalizeLongitude = (longitude: number): number => {
-  // Only normalize at the end to ensure we keep the correct tropical longitude
   return (longitude % 360 + 360) % 360;
 };
 
@@ -47,9 +46,8 @@ const getZodiacSign = (longitude: number): string => {
   console.log("\n=== Zodiac Sign Calculation ===");
   console.log("Input longitude:", longitude);
   
-  // Normalize the longitude only at the final step
   const normalizedLongitude = normalizeLongitude(longitude);
-  console.log("Normalized longitude for zodiac:", normalizedLongitude);
+  console.log("Normalized longitude:", normalizedLongitude);
   
   const signs = [
     "Aries", "Taurus", "Gemini", "Cancer", 
@@ -60,12 +58,7 @@ const getZodiacSign = (longitude: number): string => {
   const signIndex = Math.floor(normalizedLongitude / 30);
   const result = signs[signIndex];
   
-  console.log("Zodiac calculation:", {
-    normalizedLongitude,
-    signIndex,
-    result
-  });
-  
+  console.log("Final sign:", result);
   return result;
 };
 
@@ -73,7 +66,7 @@ const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   console.log("Input Julian Day:", jd);
   
-  // solar.apparentLongitude() already returns tropical longitude
+  // Get tropical longitude directly
   const sunLongitude = solar.apparentLongitude(jd);
   console.log("Tropical Sun Longitude:", sunLongitude);
   
@@ -87,7 +80,7 @@ const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   console.log("Input Julian Day:", jd);
   
-  // moonposition.position() returns tropical coordinates
+  // Get tropical longitude directly from position()
   const moonData = moonposition.position(jd);
   console.log("Tropical Moon Longitude:", moonData.lon);
   
@@ -99,38 +92,37 @@ const calculateMoonSign = (jd: number): string => {
 
 const calculateRisingSign = (jd: number, latitude: number, longitude: number): string => {
   console.log("\n=== Rising Sign Calculation ===");
-  console.log("Input:", { 
-    julianDay: jd,
-    latitude,
-    longitude 
-  });
-  
-  // Calculate RAMC (Right Ascension of the Mid-Heaven)
-  const localSiderealTime = sidereal.apparent(jd);
-  const RAMC = localSiderealTime * 15; // Convert to degrees
+  console.log("Input:", { julianDay: jd, latitude, longitude });
   
   // Calculate obliquity of the ecliptic
   const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
   const epsilon = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
   
-  // Calculate ascendant using the standard formula for tropical calculations
-  const ascendantRadians = Math.atan2(
-    Math.cos(RAMC * Math.PI / 180),
-    -(Math.sin(RAMC * Math.PI / 180) * Math.cos(epsilon * Math.PI / 180) +
-      Math.tan(latitude * Math.PI / 180) * Math.sin(epsilon * Math.PI / 180))
-  );
+  // Calculate RAMC (Right Ascension of the Mid-Heaven)
+  // Convert local time to hour angle
+  const hourAngle = ((jd % 1) * 24 * 15) + longitude;
+  const RAMC = normalizeLongitude(hourAngle);
   
-  // Convert to degrees and normalize
-  let ascendantDegrees = ascendantRadians * 180 / Math.PI;
-  ascendantDegrees = normalizeLongitude(ascendantDegrees);
+  // Calculate Ascendant using the standard formula for tropical calculations
+  const tanAsc = Math.cos(RAMC * Math.PI / 180) / 
+    (Math.sin(latitude * Math.PI / 180) * Math.tan(epsilon * Math.PI / 180) - 
+     Math.cos(latitude * Math.PI / 180) * Math.sin(RAMC * Math.PI / 180));
+  
+  let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
+  
+  // Adjust quadrant based on RAMC
+  if (RAMC > 180) {
+    ascendant += 180;
+  }
+  ascendant = normalizeLongitude(ascendant);
   
   console.log("Calculated values:", {
-    RAMC,
     epsilon,
-    ascendantDegrees
+    RAMC,
+    ascendant
   });
   
-  const risingSign = getZodiacSign(ascendantDegrees);
+  const risingSign = getZodiacSign(ascendant);
   console.log("Final Rising Sign:", risingSign);
   
   return risingSign;
@@ -171,7 +163,7 @@ export const runTests = () => {
     rising: risingSign
   });
 
-  const results = {
+  return {
     julianDay,
     signs: {
       sun: sunSign,
@@ -179,7 +171,4 @@ export const runTests = () => {
       rising: risingSign
     }
   };
-
-  console.log("Final results object:", results);
-  return results;
 };
