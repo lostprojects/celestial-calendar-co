@@ -10,10 +10,8 @@ interface TestCase {
 }
 
 const normalizeLongitude = (longitude: number): number => {
-  console.log("Normalizing longitude:", longitude);
-  const normalized = (longitude % 360 + 360) % 360;
-  console.log("Normalized result:", normalized);
-  return normalized;
+  // Only normalize at the end to ensure we keep the correct tropical longitude
+  return (longitude % 360 + 360) % 360;
 };
 
 const convertToUT = (date: string, time: string, timeZone: string) => {
@@ -49,6 +47,7 @@ const getZodiacSign = (longitude: number): string => {
   console.log("\n=== Zodiac Sign Calculation ===");
   console.log("Input longitude:", longitude);
   
+  // Normalize the longitude only at the final step
   const normalizedLongitude = normalizeLongitude(longitude);
   console.log("Normalized longitude for zodiac:", normalizedLongitude);
   
@@ -58,7 +57,7 @@ const getZodiacSign = (longitude: number): string => {
     "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
   
-  const signIndex = Math.floor(normalizedLongitude / 30) % 12;
+  const signIndex = Math.floor(normalizedLongitude / 30);
   const result = signs[signIndex];
   
   console.log("Zodiac calculation:", {
@@ -74,10 +73,11 @@ const calculateSunSign = (jd: number): string => {
   console.log("\n=== Sun Sign Calculation ===");
   console.log("Input Julian Day:", jd);
   
-  const rawSunLongitude = solar.apparentLongitude(jd);
-  console.log("Raw Sun Longitude:", rawSunLongitude);
+  // solar.apparentLongitude() already returns tropical longitude
+  const sunLongitude = solar.apparentLongitude(jd);
+  console.log("Tropical Sun Longitude:", sunLongitude);
   
-  const sunSign = getZodiacSign(rawSunLongitude);
+  const sunSign = getZodiacSign(sunLongitude);
   console.log("Final Sun Sign:", sunSign);
   
   return sunSign;
@@ -87,8 +87,9 @@ const calculateMoonSign = (jd: number): string => {
   console.log("\n=== Moon Sign Calculation ===");
   console.log("Input Julian Day:", jd);
   
+  // moonposition.position() returns tropical coordinates
   const moonData = moonposition.position(jd);
-  console.log("Raw Moon Longitude:", moonData.lon);
+  console.log("Tropical Moon Longitude:", moonData.lon);
   
   const moonSign = getZodiacSign(moonData.lon);
   console.log("Final Moon Sign:", moonSign);
@@ -104,15 +105,32 @@ const calculateRisingSign = (jd: number, latitude: number, longitude: number): s
     longitude 
   });
   
-  // Calculate tropical ascendant using local sidereal time
+  // Calculate RAMC (Right Ascension of the Mid-Heaven)
   const localSiderealTime = sidereal.apparent(jd);
-  console.log("Local Sidereal Time:", localSiderealTime);
+  const RAMC = localSiderealTime * 15; // Convert to degrees
   
-  // Convert to tropical longitude (this is the key change)
-  const rawAscendantLongitude = (localSiderealTime * 15 + longitude + 180) % 360;
-  console.log("Raw Ascendant Longitude:", rawAscendantLongitude);
+  // Calculate obliquity of the ecliptic
+  const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const epsilon = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
   
-  const risingSign = getZodiacSign(rawAscendantLongitude);
+  // Calculate ascendant using the standard formula for tropical calculations
+  const ascendantRadians = Math.atan2(
+    Math.cos(RAMC * Math.PI / 180),
+    -(Math.sin(RAMC * Math.PI / 180) * Math.cos(epsilon * Math.PI / 180) +
+      Math.tan(latitude * Math.PI / 180) * Math.sin(epsilon * Math.PI / 180))
+  );
+  
+  // Convert to degrees and normalize
+  let ascendantDegrees = ascendantRadians * 180 / Math.PI;
+  ascendantDegrees = normalizeLongitude(ascendantDegrees);
+  
+  console.log("Calculated values:", {
+    RAMC,
+    epsilon,
+    ascendantDegrees
+  });
+  
+  const risingSign = getZodiacSign(ascendantDegrees);
   console.log("Final Rising Sign:", risingSign);
   
   return risingSign;
