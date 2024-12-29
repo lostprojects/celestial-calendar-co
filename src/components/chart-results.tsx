@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-
 interface ChartResultsProps {
   mainWestern?: {
     sunSign: string;
@@ -26,20 +24,8 @@ interface ChartResultsProps {
 }
 
 export const ChartResults = ({ mainWestern, mainVedic }: ChartResultsProps) => {
-  const generateTestData = () => {
-    // Test data generation logic here
-    console.log("Generating test data");
-  };
-
   return (
     <div className="space-y-6">
-      <Button 
-        onClick={generateTestData}
-        className="w-full bg-primary hover:bg-primary/90"
-      >
-        Generate Test Results
-      </Button>
-
       {mainWestern && mainVedic && (
         <div className="results-display space-y-4">
           <div className="western-results">

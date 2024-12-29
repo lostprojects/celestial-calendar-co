@@ -24,6 +24,10 @@ export default function BirthChartForm() {
   const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
   const [toast, setToast] = useState("");
 
+  const generateTestData = () => {
+    console.log("Generating test data");
+  };
+
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
     setFormData({
       ...formData,
@@ -85,6 +89,13 @@ export default function BirthChartForm() {
 
   return (
     <div className="birth-chart-form">
+      <Button 
+        onClick={generateTestData}
+        className="w-full bg-primary hover:bg-primary/90 mb-6"
+      >
+        Generate Test Results
+      </Button>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-primary-dark">Name</label>
