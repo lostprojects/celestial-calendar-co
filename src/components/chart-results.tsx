@@ -73,8 +73,7 @@ export function ChartResults({ mainWestern, mainVedic, showTest = false }: Chart
         <div className="mt-8 space-y-6">
           <Button 
             onClick={handleRunTest}
-            variant="outline"
-            className="w-full"
+            className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg shadow-sm"
           >
             Run Test (10/14/1980 00:30 Ipswich UK)
           </Button>
