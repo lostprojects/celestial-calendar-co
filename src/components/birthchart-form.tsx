@@ -9,6 +9,7 @@ import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
+import { useToast } from "@/hooks/use-toast";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -22,7 +23,7 @@ export default function BirthChartForm() {
 
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
   const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
-  const [toast, setToast] = useState("");
+  const { toast } = useToast();
 
   const generateTestData = () => {
     // Test data for Ipswich, UK 1980
@@ -34,17 +35,46 @@ export default function BirthChartForm() {
       latitude: 52.0567,
       longitude: 1.1482,
     };
+
+    const expectedResults = {
+      sunSign: "Libra",
+      moonSign: "Libra",
+      risingSign: "Leo"
+    };
     
     try {
       const wChart = calculateBirthChart(testData, "tropical");
       const sChart = calculateBirthChart(testData, "sidereal");
       
+      // Validate Western results
+      const isCorrect = 
+        wChart.sunSign === expectedResults.sunSign &&
+        wChart.moonSign === expectedResults.moonSign &&
+        wChart.risingSign === expectedResults.risingSign;
+
       setWesternResults(wChart);
       setVedicResults(sChart);
       
-      setToast("Test data calculated successfully!");
+      if (isCorrect) {
+        toast({
+          title: "Test Results Match Expected Values",
+          description: "Sun: Libra, Moon: Libra, Rising: Leo",
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: "Warning: Results Don't Match Expected Values",
+          description: `Expected: Sun in ${expectedResults.sunSign}, Moon in ${expectedResults.moonSign}, Rising in ${expectedResults.risingSign}
+           Got: Sun in ${wChart.sunSign}, Moon in ${wChart.moonSign}, Rising in ${wChart.risingSign}`,
+          variant: "destructive"
+        });
+      }
     } catch (err) {
-      setToast("Test calculation failed: " + (err as Error).message);
+      toast({
+        title: "Test Calculation Failed",
+        description: (err as Error).message,
+        variant: "destructive"
+      });
       console.error("Test calculation error:", err);
     }
   };
@@ -155,10 +185,6 @@ export default function BirthChartForm() {
           Calculate Birth Chart
         </Button>
       </form>
-
-      {toast && (
-        <p className="mt-4 text-sm text-primary-dark/80">{toast}</p>
-      )}
 
       {westernResults && vedicResults && (
         <div className="mt-8">
