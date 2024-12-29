@@ -1,4 +1,4 @@
-import { BirthChartForm } from "./BirthChartForm";
+import { default as BirthChartForm } from "./birthchart-form";
 
 export const BirthChartSection = () => {
   return (
