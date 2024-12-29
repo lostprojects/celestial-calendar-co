@@ -62,7 +62,7 @@ export function calculateBirthChart(
     zone: localTime.tz()
   });
 
-  const jdUT = toJulianDayUT(localTime);
+  const jdUT = julian.DateToJD(localTime.toDate());
   console.log("Julian Day (UT):", jdUT);
 
   // Calculate ΔT (sec), then get JD(TT)
@@ -71,7 +71,7 @@ export function calculateBirthChart(
   console.log("Delta T (seconds):", deltaTsec);
   console.log("Julian Day (TT):", jdTT);
 
-  // Calculate Sun & Moon positions (already in degrees from astronomia)
+  // Use astronomia's built-in functions (already in degrees)
   const sunLonTrop = wrap360(solar.apparentLongitude(jdTT));
   const moonLonTrop = wrap360(moonposition.position(jdTT).lon);
   
@@ -80,7 +80,7 @@ export function calculateBirthChart(
     moonLonTrop
   });
 
-  // Calculate Tropical Ascendant
+  // Calculate Tropical Ascendant using astronomia's sidereal time
   const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude);
   console.log("Tropical Ascendant:", ascLonTrop);
 
@@ -124,21 +124,13 @@ export function calculateBirthChart(
   };
 }
 
-/** Convert local date/time → JD(UT). We add ΔT separately. */
+/** Convert local date/time → JD(UT) using astronomia's built-in function */
 function toJulianDayUT(m: moment.Moment) {
-  const utc = m.clone().utc();
-  const year = Number(utc.format("YYYY"));
-  const month = Number(utc.format("MM"));
-  const day = Number(utc.format("DD"));
-  const hour = Number(utc.format("HH"));
-  const minute = Number(utc.format("mm"));
-  const fractionOfDay = (hour + minute / 60) / 24;
-  return julian.CalendarGregorianToJD(year, month, day + fractionOfDay);
+  return julian.DateToJD(m.toDate());
 }
 
 /** 
  * Rough ΔT approximation for modern (1900–2100) births. 
- * Real code might reference NASA data or more advanced polynomials.
  */
 function approximateDeltaT(year: number, month: number) {
   const yMid = 2020;
@@ -151,7 +143,6 @@ function approximateDeltaT(year: number, month: number) {
 
 /** 
  * Minimal Lahiri offset ~24° around 2020, shifting ~1° every 72 years.
- * Adjust as needed for real Vedic calc.
  */
 function approximateAyanamsa(year: number) {
   const baseYear = 2020;
@@ -161,7 +152,7 @@ function approximateAyanamsa(year: number) {
   return baseAyanamsa - shiftDeg;
 }
 
-/** Wrap degrees into 0..360. */
+/** Wrap degrees into 0..360 */
 function wrap360(deg: number) {
   return ((deg % 360) + 360) % 360;
 }
@@ -194,17 +185,16 @@ function extractSignDegrees(longitude: number) {
 }
 
 /** 
- * TDT + nutation approach → tropical Asc. 
- * We'll apply ayanamsa separately for sidereal. 
+ * Calculate tropical Ascendant using astronomia's sidereal time and nutation
  */
 function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): number {
   const { dpsi, deps } = nutation.nutation(jdTT);
   const eps0 = nutation.meanObliquity(jdTT);
   const eps = eps0 + deps;  // true obliquity
 
-  // GAST in hours
+  // Use astronomia's sidereal time function
   const gastH = sidereal.apparent(jdUT);
-  const gastDeg = wrap360(gastH * 15);
+  const gastDeg = wrap360(gastH * 15);  // convert hours to degrees
 
   let lstDeg = gastDeg + lon;
   lstDeg = wrap360(lstDeg);
@@ -213,7 +203,7 @@ function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): nu
   const latRad = (lat * Math.PI) / 180;
   const epsRad = eps;  // already in radians from astronomia
 
-  // Fixed ascendant formula
+  // Standard ascendant formula
   const ascRad = Math.atan2(
     Math.cos(lstRad),
     -Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad)
@@ -221,7 +211,3 @@ function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): nu
   
   return wrap360((ascRad * 180) / Math.PI);
 }
-
-/** 
- * Remaining helper functions...
- */
