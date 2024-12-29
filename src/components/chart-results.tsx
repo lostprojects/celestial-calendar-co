@@ -68,11 +68,10 @@ export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
         </div>
       </div>
 
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center">
         <Button 
           onClick={handleRunTest}
-          className="w-64 h-12 text-lg"
-          variant="default"
+          className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg font-medium rounded-md"
         >
           Run Test (10/14/1980 00:30 Ipswich UK)
         </Button>
