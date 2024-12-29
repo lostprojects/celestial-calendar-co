@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import opencage from 'opencage-api-client';
 import { useDebounce } from "@/hooks/use-debounce";
 import { useToast } from "@/hooks/use-toast";
-
-const OPENCAGE_KEY_STORAGE = 'opencage_api_key';
+import { supabase } from "@/integrations/supabase/client";
 
 interface LocationSearchProps {
   onLocationSelect: (location: { place: string; lat: number; lng: number }) => void;
@@ -14,32 +13,28 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Array<{ place_name: string; lat: number; lng: number }>>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [apiKey, setApiKey] = useState<string>("");
   const { toast } = useToast();
 
-  useEffect(() => {
-    const storedKey = localStorage.getItem(OPENCAGE_KEY_STORAGE);
-    if (storedKey) {
-      setApiKey(storedKey);
-    } else {
-      const key = prompt("Please enter your OpenCage API key (this will be stored in your browser):");
-      if (key) {
-        localStorage.setItem(OPENCAGE_KEY_STORAGE, key);
-        setApiKey(key);
-      }
-    }
-  }, []);
-
   const debouncedSearch = useDebounce(async (searchTerm: string) => {
-    if (searchTerm.length < 3 || !apiKey) {
+    if (searchTerm.length < 3) {
       setSuggestions([]);
       return;
     }
 
     try {
+      const { data: { OPENCAGE_API_KEY }, error } = await supabase
+        .from('secrets')
+        .select('value')
+        .eq('name', 'OPENCAGE_API_KEY')
+        .single();
+
+      if (error || !OPENCAGE_API_KEY) {
+        throw new Error('Failed to retrieve API key');
+      }
+
       const result = await opencage.geocode({
         q: searchTerm,
-        key: apiKey,
+        key: OPENCAGE_API_KEY,
         limit: 5,
       });
 
