@@ -68,14 +68,12 @@ export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
         </div>
       </div>
 
-      <div className="mt-8 flex justify-center">
-        <Button 
-          onClick={handleRunTest}
-          className="w-full max-w-md bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg shadow-lg transform transition-all hover:scale-105"
-        >
-          Run Test (10/14/1980 00:30 Ipswich UK)
-        </Button>
-      </div>
+      <Button 
+        onClick={handleRunTest}
+        variant="default"
+      >
+        Run Test (10/14/1980 00:30 Ipswich UK)
+      </Button>
 
       {testW && testS && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
