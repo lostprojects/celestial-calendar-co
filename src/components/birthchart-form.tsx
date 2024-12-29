@@ -4,7 +4,7 @@ import {
   calculateBirthChart,
   BirthChartData,
   BirthChartResult,
-} from "./astro-utils";
+} from "@/utils/astro-utils";
 import { ChartResults } from "./chart-results";
 
 export default function BirthChartForm() {
