@@ -25,7 +25,22 @@ export default function BirthChartForm() {
   const [toast, setToast] = useState("");
 
   const generateTestData = () => {
-    console.log("Generating test data");
+    const testData: BirthChartData = {
+      name: "Test User",
+      birthDate: "1990-01-01",
+      birthTime: "12:00",
+      birthPlace: "New York, USA",
+      latitude: 40.7128,
+      longitude: -74.0060,
+    };
+    setFormData(testData);
+    
+    // Calculate charts immediately
+    const wChart = calculateBirthChart(testData, "tropical");
+    const sChart = calculateBirthChart(testData, "sidereal");
+    
+    setWesternResults(wChart);
+    setVedicResults(sChart);
   };
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
