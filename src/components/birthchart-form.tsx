@@ -131,11 +131,12 @@ export default function BirthChartForm() {
       )}
 
       {westernResults && vedicResults && (
-        <ChartResults
-          mainWestern={westernResults}
-          mainVedic={vedicResults}
-          showTest={true}
-        />
+        <div className="mt-8">
+          <ChartResults
+            mainWestern={westernResults}
+            mainVedic={vedicResults}
+          />
+        </div>
       )}
     </div>
   );
