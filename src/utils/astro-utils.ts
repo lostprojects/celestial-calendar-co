@@ -30,7 +30,7 @@ export function calculateBirthChart(
 ): BirthChartResult {
   const { birthDate, birthTime, birthPlace, latitude, longitude } = data;
 
-  console.log("Input values:", {
+  console.log(`Calculating ${system} birth chart with:`, {
     birthDate, birthTime, birthPlace, latitude, longitude
   });
 
@@ -48,10 +48,11 @@ export function calculateBirthChart(
     zone: localTime.tz()
   });
 
-  // Get Julian Days (UT and TT)
+  // Get Julian Days (UT)
   const jdUT = julian.DateToJD(localTime.toDate());
   console.log("Julian Day (UT):", jdUT);
 
+  // Calculate Delta T and get TT
   const deltaTsec = approximateDeltaT(localTime.year(), localTime.month() + 1);
   const jdTT = jdUT + deltaTsec / 86400;
   console.log("Delta T (seconds):", deltaTsec);
@@ -60,36 +61,41 @@ export function calculateBirthChart(
   // Get tropical positions directly from astronomia
   const sunLonTrop = solar.apparentLongitude(jdTT);
   const moonLonTrop = moonposition.position(jdTT).lon;
-  
-  console.log("Initial calculations:", {
-    sunLonTrop,
-    moonLonTrop
-  });
-
-  // Calculate ascendant using sidereal time
   const ascLonTrop = calcAscendant(jdUT, latitude, longitude);
-  console.log("Tropical Ascendant:", ascLonTrop);
-
-  // Apply ayanamsa offset for sidereal if needed
-  const offsetDeg = system === "sidereal" ? approximateAyanamsa(localTime.year()) : 0;
-  const sunLon = wrap360(sunLonTrop - offsetDeg);
-  const moonLon = wrap360(moonLonTrop - offsetDeg);
-  const ascLon = wrap360(ascLonTrop - offsetDeg);
-
-  console.log("Final longitudes:", {
-    system,
-    offsetDeg,
-    sunLon,
-    moonLon,
-    ascLon
+  
+  console.log("Tropical positions:", {
+    sunLonTrop,
+    moonLonTrop,
+    ascLonTrop
   });
+
+  // For sidereal calculations, apply ayanamsa
+  let finalPositions;
+  if (system === "sidereal") {
+    const ayanamsa = approximateAyanamsa(localTime.year());
+    finalPositions = {
+      sunLon: wrap360(sunLonTrop - ayanamsa),
+      moonLon: wrap360(moonLonTrop - ayanamsa),
+      ascLon: wrap360(ascLonTrop - ayanamsa)
+    };
+    console.log("Sidereal positions after ayanamsa:", {
+      ayanamsa,
+      ...finalPositions
+    });
+  } else {
+    finalPositions = {
+      sunLon: sunLonTrop,
+      moonLon: moonLonTrop,
+      ascLon: ascLonTrop
+    };
+  }
 
   // Convert to signs and degrees
-  const sunObj = extractSignDegrees(sunLon);
-  const moonObj = extractSignDegrees(moonLon);
-  const ascObj = extractSignDegrees(ascLon);
+  const sunObj = extractSignDegrees(finalPositions.sunLon);
+  const moonObj = extractSignDegrees(finalPositions.moonLon);
+  const ascObj = extractSignDegrees(finalPositions.ascLon);
 
-  console.log("Final positions:", {
+  console.log(`Final ${system} positions:`, {
     sun: sunObj,
     moon: moonObj,
     asc: ascObj
