@@ -6,6 +6,24 @@ _Last Updated: March 19, 2024_
 
 ## File List
 
+### src/utils/astro-utils.ts
+- **Purpose**: Handles all astronomical calculations for birth chart positions
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial file creation with purpose documentation
+
+### src/components/birthchart-form.tsx
+- **Purpose**: Main React component for birth chart form and database logic
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial file creation with purpose documentation
+
+### src/components/chart-results.tsx
+- **Purpose**: Display component for birth chart calculation results
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial file creation with purpose documentation
+
 ### src/main.tsx
 - **Purpose**: Entry point of the application, renders the root App component
 - **Last Updated**: March 19, 2024
