@@ -31,47 +31,82 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
-/**
- * Main function:
- *  1) Convert birth time to JD(UT).
- *  2) Convert JD(UT) → JD(TT) via ΔT/86400.
- *  3) Calculate Sun & Moon (TT).
- *  4) Calculate Ascendant w/ nutation & obliquity (UT+TT).
- *  5) If sidereal, apply ayanāṃśa to Sun, Moon, Ascendant.
- *  6) Extract sign/deg/min for each.
- */
 export function calculateBirthChart(
   data: BirthChartData,
   system: AstroSystem
 ): BirthChartResult {
   const { birthDate, birthTime, birthPlace, latitude, longitude } = data;
 
-  // 1) Convert to JD(UT).
+  // Debug timezone handling
+  console.log("Input values:", {
+    birthDate,
+    birthTime,
+    birthPlace,
+    latitude,
+    longitude
+  });
+
+  // Check if timezone is recognized
+  console.log("Is timezone recognized?", !!moment.tz.zone(birthPlace));
+  
+  // 1) Convert to JD(UT)
   const zone = moment.tz.zone(birthPlace) ? birthPlace : "UTC";
   const localTime = moment.tz(`${birthDate}T${birthTime}`, zone);
-  const jdUT = toJulianDayUT(localTime);
+  
+  // Debug parsed time
+  console.log("Parsed Local Time:", {
+    formatted: localTime.format(),
+    utc: localTime.utc().format(),
+    jsDate: localTime.toDate(),
+    zone: localTime.tz()
+  });
 
-  // 2) Approx. ΔT (sec), then get JD(TT).
+  const jdUT = toJulianDayUT(localTime);
+  console.log("Julian Day (UT):", jdUT);
+
+  // 2) Approx. ΔT (sec), then get JD(TT)
   const deltaTsec = approximateDeltaT(localTime.year(), localTime.month() + 1);
   const jdTT = jdUT + deltaTsec / 86400;
+  console.log("Delta T (seconds):", deltaTsec);
+  console.log("Julian Day (TT):", jdTT);
 
-  // 3) Sun & Moon in ecliptic longitude (TT).
+  // 3) Sun & Moon in ecliptic longitude (TT)
   const sunLonTrop = solar.apparentLongitude(jdTT);
   const moonLonTrop = moonposition.position(jdTT).lon;
+  
+  console.log("Initial calculations:", {
+    sunLonTrop,
+    moonLonTrop
+  });
 
-  // 4) Tropical Ascendant (using nutation/obliquity).
+  // 4) Tropical Ascendant (using nutation/obliquity)
   const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude);
+  console.log("Tropical Ascendant:", ascLonTrop);
 
-  // 5) Sidereal offset if Vedic.
+  // 5) Sidereal offset if Vedic
   const offsetDeg = system === "sidereal" ? approximateAyanamsa(localTime.year()) : 0;
   const sunLon = wrap360(sunLonTrop - offsetDeg);
   const moonLon = wrap360(moonLonTrop - offsetDeg);
   const ascLon = wrap360(ascLonTrop - offsetDeg);
 
+  console.log("Final longitudes:", {
+    system,
+    offsetDeg,
+    sunLon,
+    moonLon,
+    ascLon
+  });
+
   // 6) Convert final longitudes → sign/deg/min
   const sunObj = extractSignDegrees(sunLon);
   const moonObj = extractSignDegrees(moonLon);
   const ascObj = extractSignDegrees(ascLon);
+
+  console.log("Final positions:", {
+    sun: sunObj,
+    moon: moonObj,
+    asc: ascObj
+  });
 
   return {
     sunSign: sunObj.sign,
