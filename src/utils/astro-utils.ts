@@ -71,9 +71,9 @@ export function calculateBirthChart(
   console.log("Delta T (seconds):", deltaTsec);
   console.log("Julian Day (TT):", jdTT);
 
-  // Calculate Sun & Moon positions
-  const sunLonTrop = wrap360(solar.apparentLongitude(jdTT) * 180 / Math.PI);
-  const moonLonTrop = wrap360(moonposition.position(jdTT).lon * 180 / Math.PI);
+  // Calculate Sun & Moon positions (already in degrees from astronomia)
+  const sunLonTrop = wrap360(solar.apparentLongitude(jdTT));
+  const moonLonTrop = wrap360(moonposition.position(jdTT).lon);
   
   console.log("Initial calculations:", {
     sunLonTrop,
@@ -197,9 +197,9 @@ function extractSignDegrees(longitude: number) {
  * TDT + nutation approach → tropical Asc. 
  * We'll apply ayanamsa separately for sidereal. 
  */
-function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number) {
-  const { dpsi, deps } = nutation.nutation(jdTT); // Fixed: using nutation directly
-  const eps0 = nutation.meanObliquity(jdTT);  // Fixed: using nutation for meanObliquity
+function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): number {
+  const { dpsi, deps } = nutation.nutation(jdTT);
+  const eps0 = nutation.meanObliquity(jdTT);
   const eps = eps0 + deps;  // true obliquity
 
   // GAST in hours
@@ -211,9 +211,17 @@ function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number) {
 
   const lstRad = (lstDeg * Math.PI) / 180;
   const latRad = (lat * Math.PI) / 180;
+  const epsRad = eps;  // already in radians from astronomia
+
+  // Fixed ascendant formula
   const ascRad = Math.atan2(
     Math.cos(lstRad),
-    Math.sin(lstRad) * Math.cos(eps) - Math.tan(latRad) * Math.sin(eps)
+    -Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad)
   );
+  
   return wrap360((ascRad * 180) / Math.PI);
 }
+
+/** 
+ * Remaining helper functions...
+ */
