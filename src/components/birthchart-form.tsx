@@ -8,6 +8,7 @@ import {
 import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { LocationSearch } from "./LocationSearch";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -22,6 +23,15 @@ export default function BirthChartForm() {
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
   const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
   const [toast, setToast] = useState("");
+
+  const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
+    setFormData({
+      ...formData,
+      birthPlace: location.place,
+      latitude: location.lat,
+      longitude: location.lng,
+    });
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,68 +85,41 @@ export default function BirthChartForm() {
 
   return (
     <div className="birth-chart-form">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-primary-dark">Name</label>
           <Input
-            placeholder="Name"
+            placeholder="Your Name"
             className="w-full"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
           />
         </div>
         
-        <div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-primary-dark">Birth Date</label>
           <Input
             type="date"
             className="w-full"
             value={formData.birthDate}
             onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+            required
           />
         </div>
         
-        <div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-primary-dark">Birth Time</label>
           <Input
             type="time"
             className="w-full"
             value={formData.birthTime}
             onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
+            required
           />
         </div>
         
-        <div>
-          <Input
-            placeholder="Birthplace (City/Timezone)"
-            className="w-full"
-            value={formData.birthPlace}
-            onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
-          />
-        </div>
-        
-        <div>
-          <Input
-            type="number"
-            step="0.0001"
-            placeholder="Latitude"
-            className="w-full"
-            value={formData.latitude}
-            onChange={(e) =>
-              setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })
-            }
-          />
-        </div>
-        
-        <div>
-          <Input
-            type="number"
-            step="0.0001"
-            placeholder="Longitude"
-            className="w-full"
-            value={formData.longitude}
-            onChange={(e) =>
-              setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })
-            }
-          />
-        </div>
+        <LocationSearch onLocationSelect={handleLocationSelect} />
         
         <Button type="submit" className="w-full bg-primary text-white">
           Calculate Birth Chart
