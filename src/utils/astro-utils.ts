@@ -1,4 +1,4 @@
-import { julian, solar, moonposition, precess, sidereal } from "astronomia";
+import { julian, solar, moonposition, nutation, sidereal } from "astronomia";
 import moment from "moment-timezone";
 
 /** 
@@ -162,8 +162,8 @@ function extractSignDegrees(longitude: number) {
  * We'll apply ayanamsa separately for sidereal. 
  */
 function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number) {
-  const { dpsi, deps } = precess.nutation(jdTT); // nutation
-  const eps0 = precess.meanObliquity(jdTT);
+  const { dpsi, deps } = nutation.nutation(jdTT); // Fixed: using nutation directly
+  const eps0 = nutation.meanObliquity(jdTT);  // Fixed: using nutation for meanObliquity
   const eps = eps0 + deps;  // true obliquity
 
   // GAST in hours
