@@ -9,7 +9,6 @@ import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
-import { useToast } from "@/hooks/use-toast";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -23,7 +22,6 @@ export default function BirthChartForm() {
 
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
   const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
-  const { toast } = useToast();
 
   const generateTestData = () => {
     // Test data for Ipswich, UK 1980
@@ -55,26 +53,17 @@ export default function BirthChartForm() {
       setWesternResults(wChart);
       setVedicResults(sChart);
       
-      if (isCorrect) {
-        toast({
-          title: "Test Results Match Expected Values",
-          description: "Sun: Libra, Moon: Libra, Rising: Leo",
-          variant: "default"
-        });
-      } else {
-        toast({
-          title: "Warning: Results Don't Match Expected Values",
-          description: `Expected: Sun in ${expectedResults.sunSign}, Moon in ${expectedResults.moonSign}, Rising in ${expectedResults.risingSign}
-           Got: Sun in ${wChart.sunSign}, Moon in ${wChart.moonSign}, Rising in ${wChart.risingSign}`,
-          variant: "destructive"
+      if (!isCorrect) {
+        console.error("Results don't match expected values:", {
+          expected: expectedResults,
+          got: {
+            sunSign: wChart.sunSign,
+            moonSign: wChart.moonSign,
+            risingSign: wChart.risingSign
+          }
         });
       }
     } catch (err) {
-      toast({
-        title: "Test Calculation Failed",
-        description: (err as Error).message,
-        variant: "destructive"
-      });
       console.error("Test calculation error:", err);
     }
   };
@@ -103,9 +92,8 @@ export default function BirthChartForm() {
       await supabaseInsert(formData, wChart, "tropical");
       await supabaseInsert(formData, sChart, "sidereal");
 
-      setToast("Birth chart calculated successfully!");
+      console.log("Birth chart calculated successfully!");
     } catch (err) {
-      setToast("Calculation failed: " + (err as Error).message);
       console.error("Calculation error:", err);
     }
   }
