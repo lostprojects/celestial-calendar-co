@@ -68,51 +68,53 @@ export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
         </div>
       </div>
 
-      <Button 
-        onClick={handleRunTest}
-        className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg shadow-md"
-      >
-        Run Test (10/14/1980 00:30 Ipswich UK)
-      </Button>
+      <div className="mt-8 flex justify-center">
+        <Button 
+          onClick={handleRunTest}
+          className="w-full max-w-md bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg shadow-lg transform transition-all hover:scale-105"
+        >
+          Run Test (10/14/1980 00:30 Ipswich UK)
+        </Button>
+      </div>
 
       {testW && testS && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
-                <h4 className="text-lg font-serif mb-4">Test Western</h4>
-                <div className="space-y-2">
-                  <p>
-                    <span className="font-medium">Sun:</span> {testW.sunSign} {testW.sunDeg}°
-                    {String(testW.sunMin).padStart(2, "0")}′
-                  </p>
-                  <p>
-                    <span className="font-medium">Moon:</span> {testW.moonSign} {testW.moonDeg}°
-                    {String(testW.moonMin).padStart(2, "0")}′
-                  </p>
-                  <p>
-                    <span className="font-medium">Rising:</span> {testW.risingSign} {testW.risingDeg}°
-                    {String(testW.risingMin).padStart(2, "0")}′
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
-                <h4 className="text-lg font-serif mb-4">Test Vedic</h4>
-                <div className="space-y-2">
-                  <p>
-                    <span className="font-medium">Sun:</span> {testS.sunSign} {testS.sunDeg}°
-                    {String(testS.sunMin).padStart(2, "0")}′
-                  </p>
-                  <p>
-                    <span className="font-medium">Moon:</span> {testS.moonSign} {testS.moonDeg}°
-                    {String(testS.moonMin).padStart(2, "0")}′
-                  </p>
-                  <p>
-                    <span className="font-medium">Rising:</span> {testS.risingSign} {testS.risingDeg}°
-                    {String(testS.risingMin).padStart(2, "0")}′
-                  </p>
-                </div>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
+            <h4 className="text-lg font-serif mb-4">Test Western</h4>
+            <div className="space-y-2">
+              <p>
+                <span className="font-medium">Sun:</span> {testW.sunSign} {testW.sunDeg}°
+                {String(testW.sunMin).padStart(2, "0")}′
+              </p>
+              <p>
+                <span className="font-medium">Moon:</span> {testW.moonSign} {testW.moonDeg}°
+                {String(testW.moonMin).padStart(2, "0")}′
+              </p>
+              <p>
+                <span className="font-medium">Rising:</span> {testW.risingSign} {testW.risingDeg}°
+                {String(testW.risingMin).padStart(2, "0")}′
+              </p>
+            </div>
           </div>
+
+          <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
+            <h4 className="text-lg font-serif mb-4">Test Vedic</h4>
+            <div className="space-y-2">
+              <p>
+                <span className="font-medium">Sun:</span> {testS.sunSign} {testS.sunDeg}°
+                {String(testS.sunMin).padStart(2, "0")}′
+              </p>
+              <p>
+                <span className="font-medium">Moon:</span> {testS.moonSign} {testS.moonDeg}°
+                {String(testS.moonMin).padStart(2, "0")}′
+              </p>
+              <p>
+                <span className="font-medium">Rising:</span> {testS.risingSign} {testS.risingDeg}°
+                {String(testS.risingMin).padStart(2, "0")}′
+              </p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
