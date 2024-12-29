@@ -1,19 +1,13 @@
 import React, { useState } from "react";
 import { BirthChartResult, calculateBirthChart, BirthChartData } from "@/utils/astro-utils";
+import { Button } from "./ui/button";
 
 interface ChartResultsProps {
-  // The "primary" results the user just calculated:
   mainWestern: BirthChartResult;
   mainVedic: BirthChartResult;
-
-  // Toggle block for side-by-side test of 10/14/1980 00:30 Ipswich UK
   showTest?: boolean;
 }
 
-/**
- * Displays both Western (Tropical) and Vedic (Sidereal) results,
- * plus an optional test block for 10/14/1980 00:30 Ipswich UK.
- */
 export function ChartResults({ mainWestern, mainVedic, showTest = false }: ChartResultsProps) {
   const [testW, setTestW] = useState<BirthChartResult | null>(null);
   const [testS, setTestS] = useState<BirthChartResult | null>(null);
@@ -28,7 +22,6 @@ export function ChartResults({ mainWestern, mainVedic, showTest = false }: Chart
       longitude: 1.1482,
     };
 
-    // Compute both Western & Vedic for test
     const wResult = calculateBirthChart(testData, "tropical");
     const sResult = calculateBirthChart(testData, "sidereal");
 
@@ -37,81 +30,91 @@ export function ChartResults({ mainWestern, mainVedic, showTest = false }: Chart
   }
 
   return (
-    <div style={{ marginTop: 10 }}>
-      {/* Primary user-chosen Western & Vedic */}
-      <div style={{ display: "flex", gap: "2rem" }}>
-        <div style={{ padding: "10px", border: "1px solid #ccc", flex: 1 }}>
-          <h3>Western (Tropical) Results</h3>
-          <p>
-            <strong>Sun:</strong> {mainWestern.sunSign} {mainWestern.sunDeg}°
-            {String(mainWestern.sunMin).padStart(2, "0")}′
-          </p>
-          <p>
-            <strong>Moon:</strong> {mainWestern.moonSign} {mainWestern.moonDeg}°
-            {String(mainWestern.moonMin).padStart(2, "0")}′
-          </p>
-          <p>
-            <strong>Rising:</strong> {mainWestern.risingSign} {mainWestern.risingDeg}°
-            {String(mainWestern.risingMin).padStart(2, "0")}′
-          </p>
+    <div className="mt-8 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
+          <h3 className="text-xl font-serif mb-4">Western (Tropical) Results</h3>
+          <div className="space-y-2">
+            <p>
+              <span className="font-medium">Sun:</span> {mainWestern.sunSign} {mainWestern.sunDeg}°
+              {String(mainWestern.sunMin).padStart(2, "0")}′
+            </p>
+            <p>
+              <span className="font-medium">Moon:</span> {mainWestern.moonSign} {mainWestern.moonDeg}°
+              {String(mainWestern.moonMin).padStart(2, "0")}′
+            </p>
+            <p>
+              <span className="font-medium">Rising:</span> {mainWestern.risingSign} {mainWestern.risingDeg}°
+              {String(mainWestern.risingMin).padStart(2, "0")}′
+            </p>
+          </div>
         </div>
 
-        <div style={{ padding: "10px", border: "1px solid #ccc", flex: 1 }}>
-          <h3>Vedic (Sidereal) Results</h3>
-          <p>
-            <strong>Sun:</strong> {mainVedic.sunSign} {mainVedic.sunDeg}°
-            {String(mainVedic.sunMin).padStart(2, "0")}′
-          </p>
-          <p>
-            <strong>Moon:</strong> {mainVedic.moonSign} {mainVedic.moonDeg}°
-            {String(mainVedic.moonMin).padStart(2, "0")}′
-          </p>
-          <p>
-            <strong>Rising:</strong> {mainVedic.risingSign} {mainVedic.risingDeg}°
-            {String(mainVedic.risingMin).padStart(2, "0")}′
-          </p>
+        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
+          <h3 className="text-xl font-serif mb-4">Vedic (Sidereal) Results</h3>
+          <div className="space-y-2">
+            <p>
+              <span className="font-medium">Sun:</span> {mainVedic.sunSign} {mainVedic.sunDeg}°
+              {String(mainVedic.sunMin).padStart(2, "0")}′
+            </p>
+            <p>
+              <span className="font-medium">Moon:</span> {mainVedic.moonSign} {mainVedic.moonDeg}°
+              {String(mainVedic.moonMin).padStart(2, "0")}′
+            </p>
+            <p>
+              <span className="font-medium">Rising:</span> {mainVedic.risingSign} {mainVedic.risingDeg}°
+              {String(mainVedic.risingMin).padStart(2, "0")}′
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Optional test block */}
       {showTest && (
-        <div style={{ marginTop: 20 }}>
-          <button onClick={handleRunTest}>
+        <div className="mt-8 space-y-6">
+          <Button 
+            onClick={handleRunTest}
+            variant="outline"
+            className="w-full"
+          >
             Run Test (10/14/1980 00:30 Ipswich UK)
-          </button>
+          </Button>
 
           {testW && testS && (
-            <div style={{ marginTop: 10, display: "flex", gap: "2rem" }}>
-              <div style={{ padding: "10px", border: "1px solid #ccc", flex: 1 }}>
-                <h4>Test Western</h4>
-                <p>
-                  <strong>Sun:</strong> {testW.sunSign} {testW.sunDeg}°
-                  {String(testW.sunMin).padStart(2, "0")}′
-                </p>
-                <p>
-                  <strong>Moon:</strong> {testW.moonSign} {testW.moonDeg}°
-                  {String(testW.moonMin).padStart(2, "0")}′
-                </p>
-                <p>
-                  <strong>Rising:</strong> {testW.risingSign} {testW.risingDeg}°
-                  {String(testW.risingMin).padStart(2, "0")}′
-                </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
+                <h4 className="text-lg font-serif mb-4">Test Western</h4>
+                <div className="space-y-2">
+                  <p>
+                    <span className="font-medium">Sun:</span> {testW.sunSign} {testW.sunDeg}°
+                    {String(testW.sunMin).padStart(2, "0")}′
+                  </p>
+                  <p>
+                    <span className="font-medium">Moon:</span> {testW.moonSign} {testW.moonDeg}°
+                    {String(testW.moonMin).padStart(2, "0")}′
+                  </p>
+                  <p>
+                    <span className="font-medium">Rising:</span> {testW.risingSign} {testW.risingDeg}°
+                    {String(testW.risingMin).padStart(2, "0")}′
+                  </p>
+                </div>
               </div>
 
-              <div style={{ padding: "10px", border: "1px solid #ccc", flex: 1 }}>
-                <h4>Test Vedic</h4>
-                <p>
-                  <strong>Sun:</strong> {testS.sunSign} {testS.sunDeg}°
-                  {String(testS.sunMin).padStart(2, "0")}′
-                </p>
-                <p>
-                  <strong>Moon:</strong> {testS.moonSign} {testS.moonDeg}°
-                  {String(testS.moonMin).padStart(2, "0")}′
-                </p>
-                <p>
-                  <strong>Rising:</strong> {testS.risingSign} {testS.risingDeg}°
-                  {String(testS.risingMin).padStart(2, "0")}′
-                </p>
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
+                <h4 className="text-lg font-serif mb-4">Test Vedic</h4>
+                <div className="space-y-2">
+                  <p>
+                    <span className="font-medium">Sun:</span> {testS.sunSign} {testS.sunDeg}°
+                    {String(testS.sunMin).padStart(2, "0")}′
+                  </p>
+                  <p>
+                    <span className="font-medium">Moon:</span> {testS.moonSign} {testS.moonDeg}°
+                    {String(testS.moonMin).padStart(2, "0")}′
+                  </p>
+                  <p>
+                    <span className="font-medium">Rising:</span> {testS.risingSign} {testS.risingDeg}°
+                    {String(testS.risingMin).padStart(2, "0")}′
+                  </p>
+                </div>
               </div>
             </div>
           )}

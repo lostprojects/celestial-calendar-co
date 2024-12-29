@@ -6,6 +6,8 @@ import {
   BirthChartResult,
 } from "@/utils/astro-utils";
 import { ChartResults } from "./chart-results";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -17,28 +19,25 @@ export default function BirthChartForm() {
     longitude: 0,
   });
 
-  // We'll store both Tropical (Western) and Sidereal (Vedic) results
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
   const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
-
   const [toast, setToast] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      // 1) Calculate Western
+      // Calculate Western
       const wChart = calculateBirthChart(formData, "tropical");
       setWesternResults(wChart);
 
-      // 2) Calculate Vedic
+      // Calculate Vedic
       const sChart = calculateBirthChart(formData, "sidereal");
       setVedicResults(sChart);
 
-      // 3) Insert to DB (optional): store both versions
+      // Store in DB
       await supabaseInsert(formData, wChart, "tropical");
       await supabaseInsert(formData, sChart, "sidereal");
 
-      // 4) Quick toast
       setToast(
         `W: Sun: ${wChart.sunSign} ${wChart.sunDeg}°${wChart.sunMin}′, ` +
         `V: Sun: ${sChart.sunSign} ${sChart.sunDeg}°${sChart.sunMin}′`
@@ -48,10 +47,6 @@ export default function BirthChartForm() {
     }
   }
 
-  /**
-   * Insert function storing each calculation separately.
-   * 'system_used' column could be "tropical" or "sidereal".
-   */
   async function supabaseInsert(
     data: BirthChartData,
     result: BirthChartResult,
@@ -64,17 +59,13 @@ export default function BirthChartForm() {
       birth_place: data.birthPlace,
       latitude: data.latitude,
       longitude: data.longitude,
-
       system_used: system,
-
       sun_sign: result.sunSign,
       sun_degrees: result.sunDeg,
       sun_minutes: result.sunMin,
-
       moon_sign: result.moonSign,
       moon_degrees: result.moonDeg,
       moon_minutes: result.moonMin,
-
       ascendant_sign: result.risingSign,
       ascendant_degrees: result.risingDeg,
       ascendant_minutes: result.risingMin,
@@ -83,61 +74,84 @@ export default function BirthChartForm() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Birth Chart Form (Tropical & Vedic, ~5 min accuracy)</h2>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-      >
-        <input
-          placeholder="Name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-        <input
-          type="date"
-          value={formData.birthDate}
-          onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-        />
-        <input
-          type="time"
-          value={formData.birthTime}
-          onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
-        />
-        <input
-          placeholder="Birthplace (City/Timezone)"
-          value={formData.birthPlace}
-          onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
-        />
-        <input
-          type="number"
-          step="0.0001"
-          placeholder="Latitude"
-          value={formData.latitude}
-          onChange={(e) =>
-            setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })
-          }
-        />
-        <input
-          type="number"
-          step="0.0001"
-          placeholder="Longitude"
-          value={formData.longitude}
-          onChange={(e) =>
-            setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })
-          }
-        />
-        <button type="submit">Calculate Both</button>
+    <div className="birth-chart-form">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <Input
+            placeholder="Name"
+            className="w-full"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
+        
+        <div>
+          <Input
+            type="date"
+            className="w-full"
+            value={formData.birthDate}
+            onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+          />
+        </div>
+        
+        <div>
+          <Input
+            type="time"
+            className="w-full"
+            value={formData.birthTime}
+            onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
+          />
+        </div>
+        
+        <div>
+          <Input
+            placeholder="Birthplace (City/Timezone)"
+            className="w-full"
+            value={formData.birthPlace}
+            onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
+          />
+        </div>
+        
+        <div>
+          <Input
+            type="number"
+            step="0.0001"
+            placeholder="Latitude"
+            className="w-full"
+            value={formData.latitude}
+            onChange={(e) =>
+              setFormData({ ...formData, latitude: parseFloat(e.target.value) || 0 })
+            }
+          />
+        </div>
+        
+        <div>
+          <Input
+            type="number"
+            step="0.0001"
+            placeholder="Longitude"
+            className="w-full"
+            value={formData.longitude}
+            onChange={(e) =>
+              setFormData({ ...formData, longitude: parseFloat(e.target.value) || 0 })
+            }
+          />
+        </div>
+        
+        <Button type="submit" className="w-full bg-primary text-white">
+          Calculate Birth Chart
+        </Button>
       </form>
 
-      {toast && <p style={{ marginTop: 10 }}>{toast}</p>}
+      {toast && (
+        <p className="mt-4 text-sm text-primary-dark/80">{toast}</p>
+      )}
 
-      {/* Show the results only if both sets are calculated */}
       {westernResults && vedicResults && (
         <ChartResults
           mainWestern={westernResults}
           mainVedic={vedicResults}
-          showTest={true} // Toggle the test block with 10/14/1980 Ipswich
+          showTest={true}
         />
       )}
     </div>
