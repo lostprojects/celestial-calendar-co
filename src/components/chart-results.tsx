@@ -8,7 +8,7 @@ interface ChartResultsProps {
   showTest?: boolean;
 }
 
-export function ChartResults({ mainWestern, mainVedic, showTest = false }: ChartResultsProps) {
+export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
   const [testW, setTestW] = useState<BirthChartResult | null>(null);
   const [testS, setTestS] = useState<BirthChartResult | null>(null);
 
@@ -69,17 +69,16 @@ export function ChartResults({ mainWestern, mainVedic, showTest = false }: Chart
         </div>
       </div>
 
-      {showTest && (
-        <div className="mt-8 space-y-6">
-          <Button 
-            onClick={handleRunTest}
-            className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg shadow-sm"
-          >
-            Run Test (10/14/1980 00:30 Ipswich UK)
-          </Button>
+      <div className="mt-8 space-y-6">
+        <Button 
+          onClick={handleRunTest}
+          className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg shadow-sm"
+        >
+          Run Test (10/14/1980 00:30 Ipswich UK)
+        </Button>
 
-          {testW && testS && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {testW && testS && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
                 <h4 className="text-lg font-serif mb-4">Test Western</h4>
                 <div className="space-y-2">
@@ -115,10 +114,9 @@ export function ChartResults({ mainWestern, mainVedic, showTest = false }: Chart
                   </p>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
