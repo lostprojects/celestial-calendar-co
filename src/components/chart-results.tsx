@@ -1,121 +1,62 @@
-import React, { useState } from "react";
-import { BirthChartResult, calculateBirthChart, BirthChartData } from "@/utils/astro-utils";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 interface ChartResultsProps {
-  mainWestern: BirthChartResult;
-  mainVedic: BirthChartResult;
+  mainWestern?: {
+    sunSign: string;
+    sunDeg: number;
+    sunMin: number;
+    moonSign: string;
+    moonDeg: number;
+    moonMin: number;
+    risingSign: string;
+    risingDeg: number;
+    risingMin: number;
+  };
+  mainVedic?: {
+    sunSign: string;
+    sunDeg: number;
+    sunMin: number;
+    moonSign: string;
+    moonDeg: number;
+    moonMin: number;
+    risingSign: string;
+    risingDeg: number;
+    risingMin: number;
+  };
 }
 
-export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
-  const [testW, setTestW] = useState<BirthChartResult | null>(null);
-  const [testS, setTestS] = useState<BirthChartResult | null>(null);
-
-  function handleRunTest() {
-    const testData: BirthChartData = {
-      name: "Test Person",
-      birthDate: "1980-10-14",
-      birthTime: "00:30",
-      birthPlace: "Ipswich, UK",
-      latitude: 52.0567,
-      longitude: 1.1482,
-    };
-
-    const wResult = calculateBirthChart(testData, "tropical");
-    const sResult = calculateBirthChart(testData, "sidereal");
-
-    setTestW(wResult);
-    setTestS(sResult);
-  }
+export const ChartResults = ({ mainWestern, mainVedic }: ChartResultsProps) => {
+  const generateTestData = () => {
+    // Test data generation logic here
+    console.log("Generating test data");
+  };
 
   return (
-    <div className="mt-8 space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
-          <h3 className="text-xl font-serif mb-4">Western (Tropical) Results</h3>
-          <div className="space-y-2">
-            <p>
-              <span className="font-medium">Sun:</span> {mainWestern.sunSign} {mainWestern.sunDeg}°
-              {String(mainWestern.sunMin).padStart(2, "0")}′
-            </p>
-            <p>
-              <span className="font-medium">Moon:</span> {mainWestern.moonSign} {mainWestern.moonDeg}°
-              {String(mainWestern.moonMin).padStart(2, "0")}′
-            </p>
-            <p>
-              <span className="font-medium">Rising:</span> {mainWestern.risingSign} {mainWestern.risingDeg}°
-              {String(mainWestern.risingMin).padStart(2, "0")}′
-            </p>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <Button 
+        onClick={generateTestData}
+        className="w-full bg-primary hover:bg-primary/90"
+      >
+        Generate Test Results
+      </Button>
 
-        <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
-          <h3 className="text-xl font-serif mb-4">Vedic (Sidereal) Results</h3>
-          <div className="space-y-2">
-            <p>
-              <span className="font-medium">Sun:</span> {mainVedic.sunSign} {mainVedic.sunDeg}°
-              {String(mainVedic.sunMin).padStart(2, "0")}′
-            </p>
-            <p>
-              <span className="font-medium">Moon:</span> {mainVedic.moonSign} {mainVedic.moonDeg}°
-              {String(mainVedic.moonMin).padStart(2, "0")}′
-            </p>
-            <p>
-              <span className="font-medium">Rising:</span> {mainVedic.risingSign} {mainVedic.risingDeg}°
-              {String(mainVedic.risingMin).padStart(2, "0")}′
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-center">
-        <Button 
-          onClick={handleRunTest}
-          className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg font-medium rounded-md"
-        >
-          Run Test (10/14/1980 00:30 Ipswich UK)
-        </Button>
-      </div>
-
-      {testW && testS && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
-            <h4 className="text-lg font-serif mb-4">Test Western</h4>
-            <div className="space-y-2">
-              <p>
-                <span className="font-medium">Sun:</span> {testW.sunSign} {testW.sunDeg}°
-                {String(testW.sunMin).padStart(2, "0")}′
-              </p>
-              <p>
-                <span className="font-medium">Moon:</span> {testW.moonSign} {testW.moonDeg}°
-                {String(testW.moonMin).padStart(2, "0")}′
-              </p>
-              <p>
-                <span className="font-medium">Rising:</span> {testW.risingSign} {testW.risingDeg}°
-                {String(testW.risingMin).padStart(2, "0")}′
-              </p>
-            </div>
+      {mainWestern && mainVedic && (
+        <div className="results-display space-y-4">
+          <div className="western-results">
+            <h3 className="text-lg font-semibold">Western (Tropical) Chart</h3>
+            <p>Sun: {mainWestern.sunSign} {mainWestern.sunDeg}°{mainWestern.sunMin}′</p>
+            <p>Moon: {mainWestern.moonSign} {mainWestern.moonDeg}°{mainWestern.moonMin}′</p>
+            <p>Rising: {mainWestern.risingSign} {mainWestern.risingDeg}°{mainWestern.risingMin}′</p>
           </div>
 
-          <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
-            <h4 className="text-lg font-serif mb-4">Test Vedic</h4>
-            <div className="space-y-2">
-              <p>
-                <span className="font-medium">Sun:</span> {testS.sunSign} {testS.sunDeg}°
-                {String(testS.sunMin).padStart(2, "0")}′
-              </p>
-              <p>
-                <span className="font-medium">Moon:</span> {testS.moonSign} {testS.moonDeg}°
-                {String(testS.moonMin).padStart(2, "0")}′
-              </p>
-              <p>
-                <span className="font-medium">Rising:</span> {testS.risingSign} {testS.risingDeg}°
-                {String(testS.risingMin).padStart(2, "0")}′
-              </p>
-            </div>
+          <div className="vedic-results">
+            <h3 className="text-lg font-semibold">Vedic (Sidereal) Chart</h3>
+            <p>Sun: {mainVedic.sunSign} {mainVedic.sunDeg}°{mainVedic.sunMin}′</p>
+            <p>Moon: {mainVedic.moonSign} {mainVedic.moonDeg}°{mainVedic.moonMin}′</p>
+            <p>Rising: {mainVedic.risingSign} {mainVedic.risingDeg}°{mainVedic.risingMin}′</p>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
