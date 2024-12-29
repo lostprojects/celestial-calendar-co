@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 interface ChartResultsProps {
   mainWestern: BirthChartResult;
   mainVedic: BirthChartResult;
-  showTest?: boolean;
 }
 
 export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
@@ -69,15 +68,14 @@ export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
         </div>
       </div>
 
-      <div className="mt-8 space-y-6">
-        <Button 
-          onClick={handleRunTest}
-          className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg shadow-sm"
-        >
-          Run Test (10/14/1980 00:30 Ipswich UK)
-        </Button>
+      <Button 
+        onClick={handleRunTest}
+        className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg shadow-md"
+      >
+        Run Test (10/14/1980 00:30 Ipswich UK)
+      </Button>
 
-        {testW && testS && (
+      {testW && testS && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white/50 backdrop-blur-sm rounded-lg p-6 border border-primary/10">
                 <h4 className="text-lg font-serif mb-4">Test Western</h4>
@@ -115,8 +113,7 @@ export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
                 </div>
               </div>
           </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
