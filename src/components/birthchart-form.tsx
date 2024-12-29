@@ -25,14 +25,14 @@ export default function BirthChartForm() {
   const [toast, setToast] = useState("");
 
   const generateTestData = () => {
-    // Calculate test charts immediately without setting form data
+    // Test data for Ipswich, UK 1980
     const testData: BirthChartData = {
-      name: "Test User",
-      birthDate: "1990-01-01",
-      birthTime: "12:00",
-      birthPlace: "New York, USA",
-      latitude: 40.7128,
-      longitude: -74.0060,
+      name: "Test Person",
+      birthDate: "1980-10-14",
+      birthTime: "00:30",
+      birthPlace: "Ipswich, UK",
+      latitude: 52.0567,
+      longitude: 1.1482,
     };
     
     try {
@@ -112,7 +112,7 @@ export default function BirthChartForm() {
         onClick={generateTestData}
         className="w-full bg-primary hover:bg-primary/90 mb-6"
       >
-        Generate Test Results
+        Generate Test Results (Ipswich 1980)
       </Button>
 
       <form onSubmit={handleSubmit} className="space-y-6">
