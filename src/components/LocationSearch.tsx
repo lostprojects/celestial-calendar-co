@@ -87,19 +87,20 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
         className="w-full"
         placeholder="City, Country"
         required
+        autoComplete="off"
       />
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1">
+        <ul className="absolute z-50 w-full bg-white/95 backdrop-blur-sm border border-primary/10 rounded-md shadow-lg mt-1 max-h-60 overflow-auto">
           {suggestions.map((suggestion, index) => (
-            <div
+            <li
               key={index}
-              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              className="px-4 py-2 hover:bg-accent-sage/20 cursor-pointer text-sm"
               onClick={() => handleSuggestionClick(suggestion)}
             >
               {suggestion.place_name}
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
