@@ -68,12 +68,15 @@ export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
         </div>
       </div>
 
-      <Button 
-        onClick={handleRunTest}
-        variant="default"
-      >
-        Run Test (10/14/1980 00:30 Ipswich UK)
-      </Button>
+      <div className="flex justify-center mt-4">
+        <Button 
+          onClick={handleRunTest}
+          className="w-64 h-12 text-lg"
+          variant="default"
+        >
+          Run Test (10/14/1980 00:30 Ipswich UK)
+        </Button>
+      </div>
 
       {testW && testS && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
