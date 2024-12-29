@@ -25,6 +25,7 @@ export default function BirthChartForm() {
   const [toast, setToast] = useState("");
 
   const generateTestData = () => {
+    // Calculate test charts immediately without setting form data
     const testData: BirthChartData = {
       name: "Test User",
       birthDate: "1990-01-01",
@@ -33,14 +34,19 @@ export default function BirthChartForm() {
       latitude: 40.7128,
       longitude: -74.0060,
     };
-    setFormData(testData);
     
-    // Calculate charts immediately
-    const wChart = calculateBirthChart(testData, "tropical");
-    const sChart = calculateBirthChart(testData, "sidereal");
-    
-    setWesternResults(wChart);
-    setVedicResults(sChart);
+    try {
+      const wChart = calculateBirthChart(testData, "tropical");
+      const sChart = calculateBirthChart(testData, "sidereal");
+      
+      setWesternResults(wChart);
+      setVedicResults(sChart);
+      
+      setToast("Test data calculated successfully!");
+    } catch (err) {
+      setToast("Test calculation failed: " + (err as Error).message);
+      console.error("Test calculation error:", err);
+    }
   };
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
@@ -67,12 +73,10 @@ export default function BirthChartForm() {
       await supabaseInsert(formData, wChart, "tropical");
       await supabaseInsert(formData, sChart, "sidereal");
 
-      setToast(
-        `W: Sun: ${wChart.sunSign} ${wChart.sunDeg}°${wChart.sunMin}′, ` +
-        `V: Sun: ${sChart.sunSign} ${sChart.sunDeg}°${sChart.sunMin}′`
-      );
+      setToast("Birth chart calculated successfully!");
     } catch (err) {
       setToast("Calculation failed: " + (err as Error).message);
+      console.error("Calculation error:", err);
     }
   }
 
