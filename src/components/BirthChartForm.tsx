@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { LocationSearch } from "./LocationSearch";
-import { runTests } from "@/utils/test-astro";
 
 interface FormData {
   name: string;
@@ -24,41 +22,23 @@ export const BirthChartForm = () => {
     latitude: 0,
     longitude: 0
   });
-  
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      const testResults = runTests();
-      const { signs } = testResults;
-
       const { error } = await supabase.from('birth_charts').insert({
         name: formData.name,
         birth_date: formData.birthDate,
         birth_time: formData.birthTime,
         latitude: formData.latitude,
-        longitude: formData.longitude,
-        sun_sign: signs.sun,
-        moon_sign: signs.moon,
-        ascendant_sign: signs.rising
+        longitude: formData.longitude
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Birth Chart Created",
-        description: `Sun: ${signs.sun}, Moon: ${signs.moon}, Rising: ${signs.rising}`,
-        className: "bg-[#FDE1D3] border-[#F5E6D3] text-[#403E43]",
-      });
     } catch (error) {
       console.error('Error saving birth chart:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save birth chart data",
-        variant: "destructive",
-      });
     }
   };
 
