@@ -22,19 +22,18 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
     }
 
     try {
-      const { data: { OPENCAGE_API_KEY }, error } = await supabase
-        .from('secrets')
-        .select('value')
-        .eq('name', 'OPENCAGE_API_KEY')
-        .single();
+      // Call the Supabase function to get the API key
+      const { data: config } = await supabase.functions.invoke('get-config', {
+        body: { key: 'OPENCAGE_API_KEY' }
+      });
 
-      if (error || !OPENCAGE_API_KEY) {
+      if (!config?.value) {
         throw new Error('Failed to retrieve API key');
       }
 
       const result = await opencage.geocode({
         q: searchTerm,
-        key: OPENCAGE_API_KEY,
+        key: config.value,
         limit: 5,
       });
 
