@@ -65,26 +65,26 @@ export function calculateBirthChart(
   const jdUT = toJulianDayUT(localTime);
   console.log("Julian Day (UT):", jdUT);
 
-  // 2) Approx. ΔT (sec), then get JD(TT)
+  // Calculate ΔT (sec), then get JD(TT)
   const deltaTsec = approximateDeltaT(localTime.year(), localTime.month() + 1);
   const jdTT = jdUT + deltaTsec / 86400;
   console.log("Delta T (seconds):", deltaTsec);
   console.log("Julian Day (TT):", jdTT);
 
-  // 3) Sun & Moon in ecliptic longitude (TT)
-  const sunLonTrop = solar.apparentLongitude(jdTT);
-  const moonLonTrop = moonposition.position(jdTT).lon;
+  // Calculate Sun & Moon positions
+  const sunLonTrop = wrap360(solar.apparentLongitude(jdTT) * 180 / Math.PI);
+  const moonLonTrop = wrap360(moonposition.position(jdTT).lon * 180 / Math.PI);
   
   console.log("Initial calculations:", {
     sunLonTrop,
     moonLonTrop
   });
 
-  // 4) Tropical Ascendant (using nutation/obliquity)
+  // Calculate Tropical Ascendant
   const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude);
   console.log("Tropical Ascendant:", ascLonTrop);
 
-  // 5) Sidereal offset if Vedic
+  // Apply Sidereal offset if needed
   const offsetDeg = system === "sidereal" ? approximateAyanamsa(localTime.year()) : 0;
   const sunLon = wrap360(sunLonTrop - offsetDeg);
   const moonLon = wrap360(moonLonTrop - offsetDeg);
@@ -98,7 +98,7 @@ export function calculateBirthChart(
     ascLon
   });
 
-  // 6) Convert final longitudes → sign/deg/min
+  // Convert longitudes to signs/degrees
   const sunObj = extractSignDegrees(sunLon);
   const moonObj = extractSignDegrees(moonLon);
   const ascObj = extractSignDegrees(ascLon);
@@ -203,7 +203,7 @@ function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number) {
   const eps = eps0 + deps;  // true obliquity
 
   // GAST in hours
-  const gastH = sidereal.apparent(jdUT, dpsi, eps);
+  const gastH = sidereal.apparent(jdUT);
   const gastDeg = wrap360(gastH * 15);
 
   let lstDeg = gastDeg + lon;
@@ -211,6 +211,9 @@ function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number) {
 
   const lstRad = (lstDeg * Math.PI) / 180;
   const latRad = (lat * Math.PI) / 180;
-  const ascRad = Math.atan2(-Math.cos(lstRad), Math.tan(latRad));
+  const ascRad = Math.atan2(
+    Math.cos(lstRad),
+    Math.sin(lstRad) * Math.cos(eps) - Math.tan(latRad) * Math.sin(eps)
+  );
   return wrap360((ascRad * 180) / Math.PI);
 }
