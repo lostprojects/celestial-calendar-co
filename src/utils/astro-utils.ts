@@ -46,12 +46,13 @@ export function calculateBirthChart(
     longitude
   });
 
-  // Check if timezone is recognized
-  console.log("Is timezone recognized?", !!moment.tz.zone(birthPlace));
+  // Use Europe/London for UK locations
+  const timezone = birthPlace.toLowerCase().includes("uk") 
+    ? "Europe/London" 
+    : birthPlace;
   
-  // 1) Convert to JD(UT)
-  const zone = moment.tz.zone(birthPlace) ? birthPlace : "UTC";
-  const localTime = moment.tz(`${birthDate}T${birthTime}`, zone);
+  // Create moment with correct timezone
+  const localTime = moment.tz(`${birthDate}T${birthTime}`, timezone);
   
   // Debug parsed time
   console.log("Parsed Local Time:", {
