@@ -1,7 +1,7 @@
 import { DateToJD } from "astronomia/julian";
 import * as solarCalc from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
-import { obliquity } from "astronomia/coord";
+import * as coord from "astronomia/coord";
 import * as base from "astronomia/base";
 
 export interface BirthChartData {
@@ -32,7 +32,7 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
   // Create base object for astronomia calculations
-  const t = new base.Julian(year, month, day, hour + minute/60);
+  const t = new base.julian(year, month, day, hour + minute/60);
   console.log("Time object created:", t);
   
   // Calculate Julian Day
@@ -79,7 +79,7 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   };
 }
 
-function calculateAscendant(t: base.Julian, lat: number, long: number): number {
+function calculateAscendant(t: base.julian, lat: number, long: number): number {
   // Local Sidereal Time calculation
   const jd = DateToJD(t);
   const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
@@ -91,7 +91,7 @@ function calculateAscendant(t: base.Julian, lat: number, long: number): number {
   console.log("Local Sidereal Time:", lst);
   
   // Calculate ascendant using Placidus house system
-  const obliq = obliquity(t);
+  const obliq = coord.obliquity(t);
   const tanAsc = Math.sin(lst * Math.PI / 180) /
                  (Math.cos(lst * Math.PI / 180) * Math.cos(obliq * Math.PI / 180) -
                   Math.tan(lat * Math.PI / 180) * Math.sin(obliq * Math.PI / 180));
@@ -108,7 +108,7 @@ function calculateAscendant(t: base.Julian, lat: number, long: number): number {
   return ascendant;
 }
 
-function calculateAyanamsa(t: base.Julian): number {
+function calculateAyanamsa(t: base.julian): number {
   // Lahiri ayanamsa calculation
   const jd = DateToJD(t);
   const T = (jd - 2451545.0) / 36525;
