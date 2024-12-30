@@ -5,10 +5,8 @@ const Hero = () => {
       
       <div className="container mx-auto px-4 py-24 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-12">
-          {/* Left Column */}
           <div className="flex-1 text-left space-y-6">
-            {/* Social Proof */}
-            <div className="flex items-center gap-3 mb-8 animate-fade-up">
+            <div className="flex items-center gap-3 mb-8">
               <div className="flex -space-x-3">
                 <img 
                   src="https://randomuser.me/api/portraits/women/17.jpg" 
@@ -29,16 +27,14 @@ const Hero = () => {
               <span className="text-primary font-mono text-sm">Join 10,000+ seekers of cosmic wisdom</span>
             </div>
 
-            {/* Main Content */}
-            <h1 className="text-5xl md:text-6xl font-serif font-medium mb-4 text-primary-dark leading-[1.1] max-w-xl animate-fade-up">
+            <h1 className="text-5xl md:text-6xl font-serif font-medium mb-4 text-primary-dark leading-[1.1] max-w-xl">
               Your Personal Cosmic Blueprint for Success
             </h1>
-            <p className="text-lg text-primary-dark/80 font-mono leading-relaxed max-w-lg mb-8 animate-fade-up">
+            <p className="text-lg text-primary-dark/80 font-mono leading-relaxed max-w-lg mb-8">
               Unlock the power of celestial intelligence to make confident decisions in your career, relationships, and personal growth.
             </p>
             
-            {/* Features List */}
-            <div className="flex flex-col space-y-4 mb-8 animate-fade-up">
+            <div className="flex flex-col space-y-4 mb-8">
               <div className="flex items-center gap-2">
                 <span className="text-sm">Google/Apple Calendar Sync</span>
               </div>
@@ -50,16 +46,11 @@ const Hero = () => {
               </div>
             </div>
             
-            {/* CTA */}
-            <button 
-              className="bg-[#FEC6A1] hover:bg-[#FEC6A1]/90 text-primary-dark px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
-            >
-              <span className="relative z-10">Get Your Cosmic Blueprint</span>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#FDE1D3] to-[#FEC6A1] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <button className="bg-[#FEC6A1] hover:bg-[#FEC6A1]/90 text-primary-dark px-8 py-6 text-lg rounded-lg font-mono">
+              Get Your Cosmic Blueprint
             </button>
           </div>
 
-          {/* Right Column - Image */}
           <div className="flex-1 relative">
             <div className="relative rounded-2xl overflow-hidden">
               <img 
