@@ -30,8 +30,8 @@ export function calculateBirthChart(
 ): BirthChartResult {
   const { birthDate, birthTime, birthPlace, latitude, longitude } = data;
 
-  console.log(`Calculating ${system} birth chart with:`, {
-    birthDate, birthTime, birthPlace, latitude, longitude
+  console.log(`[DEBUG] Starting birth chart calculation for:`, {
+    birthDate, birthTime, birthPlace, latitude, longitude, system
   });
 
   // Check for various UK location strings
@@ -40,41 +40,49 @@ export function calculateBirthChart(
     birthPlace.toLowerCase().includes(term)
   );
   
-  // Use Europe/London for UK locations, otherwise use birthPlace
   const timezone = isUKLocation ? "Europe/London" : birthPlace;
-  
   const localTime = moment.tz(`${birthDate}T${birthTime}`, timezone);
   
-  console.log("Parsed Local Time:", {
+  console.log("[DEBUG] Parsed Local Time:", {
     formatted: localTime.format(),
     utc: localTime.utc().format(),
     jsDate: localTime.toDate(),
-    zone: localTime.tz()
+    zone: localTime.tz(),
+    offset: localTime.utcOffset()
   });
 
   // Get Julian Days (UT) using direct calculation
   const year = localTime.year();
-  const month = localTime.month() + 1; // since moment months are 0-based
+  const month = localTime.month() + 1;
   const day = localTime.date();
   const hour = localTime.hour();
   const minute = localTime.minute();
   const fractionOfDay = (hour + minute / 60) / 24;
+
+  console.log("[DEBUG] Julian Day inputs:", {
+    year, month, day, hour, minute, fractionOfDay
+  });
+
   const jdUT = julian.CalendarGregorianToJD(year, month, day + fractionOfDay);
-  
-  console.log("Julian Day (UT):", jdUT);
+  console.log("[DEBUG] Julian Day (UT):", jdUT);
 
   // Calculate Delta T and get TT
   const deltaTsec = approximateDeltaT(year, month);
   const jdTT = jdUT + deltaTsec / 86400;
-  console.log("Delta T (seconds):", deltaTsec);
-  console.log("Julian Day (TT):", jdTT);
+  
+  console.log("[DEBUG] Time conversion:", {
+    deltaTsec,
+    jdUT,
+    jdTT,
+    difference: jdTT - jdUT
+  });
 
   // Get nutation parameters for ascendant calculation
   const { dpsi, deps } = nutation.nutation(jdTT);
   const meanEps = nutation.meanObliquity(jdTT);
   const epsTrue = meanEps + deps;
   
-  console.log("Nutation Parameters:", {
+  console.log("[DEBUG] Nutation Parameters:", {
     dpsi, deps, meanEps, epsTrue
   });
 
@@ -83,10 +91,12 @@ export function calculateBirthChart(
   const moonLonTrop = moonposition.position(jdTT).lon;
   const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude, dpsi, epsTrue);
   
-  console.log("Tropical positions:", {
+  console.log("[DEBUG] Raw tropical positions:", {
     sunLonTrop,
     moonLonTrop,
-    ascLonTrop
+    ascLonTrop,
+    sunLonDeg: sunLonTrop * 180 / Math.PI,
+    moonLonDeg: moonLonTrop * 180 / Math.PI,
   });
 
   // For sidereal calculations, apply ayanamsa
@@ -98,7 +108,7 @@ export function calculateBirthChart(
       moonLon: wrap360(moonLonTrop - ayanamsa),
       ascLon: wrap360(ascLonTrop - ayanamsa)
     };
-    console.log("Sidereal positions after ayanamsa:", {
+    console.log("[DEBUG] Sidereal positions after ayanamsa:", {
       ayanamsa,
       ...finalPositions
     });
@@ -115,7 +125,7 @@ export function calculateBirthChart(
   const moonObj = extractSignDegrees(finalPositions.moonLon);
   const ascObj = extractSignDegrees(finalPositions.ascLon);
 
-  console.log(`Final ${system} positions:`, {
+  console.log(`[DEBUG] Final ${system} positions:`, {
     sun: sunObj,
     moon: moonObj,
     asc: ascObj
@@ -140,9 +150,13 @@ function approximateDeltaT(year: number, month: number) {
   const slope = 0.2; // sec/yr
   const yearsOffset = (year + (month - 0.5) / 12) - yMid;
   const result = base + slope * yearsOffset;
-  console.log("Delta T calculation:", {
-    year, month, yearsOffset, result
+  
+  console.log("[DEBUG] Delta T calculation:", {
+    year, month, yearsOffset,
+    formula: `${base} + ${slope} * ${yearsOffset}`,
+    result
   });
+  
   return result;
 }
 
@@ -152,17 +166,25 @@ function approximateAyanamsa(year: number) {
   const yearsDiff = year - baseYear;
   const shiftDeg = yearsDiff / 72;
   const result = baseAyanamsa - shiftDeg;
-  console.log("Ayanamsa calculation:", {
-    year, yearsDiff, shiftDeg, result
+  
+  console.log("[DEBUG] Ayanamsa calculation:", {
+    year, yearsDiff, shiftDeg,
+    formula: `${baseAyanamsa} - (${yearsDiff} / 72)`,
+    result
   });
+  
   return result;
 }
 
 function wrap360(deg: number) {
-  return ((deg % 360) + 360) % 360;
+  const result = ((deg % 360) + 360) % 360;
+  console.log("[DEBUG] wrap360:", { input: deg, result });
+  return result;
 }
 
 function extractSignDegrees(longitude: number) {
+  console.log("[DEBUG] extractSignDegrees input:", longitude);
+  
   const normalized = wrap360(longitude);
   const signIndex = Math.floor(normalized / 30);
 
@@ -183,7 +205,7 @@ function extractSignDegrees(longitude: number) {
     minWhole = 0;
   }
 
-  console.log("Sign extraction:", {
+  console.log("[DEBUG] Sign extraction:", {
     longitude,
     normalized,
     signIndex,
@@ -204,7 +226,7 @@ function calcAscendant(
   dpsi: number,
   epsTrue: number
 ): number {
-  console.log("Ascendant calculation inputs:", {
+  console.log("[DEBUG] Ascendant calculation inputs:", {
     jdUT, jdTT, lat, lon, dpsi, epsTrue
   });
   
@@ -216,22 +238,37 @@ function calcAscendant(
   const lstRad = lstDeg * Math.PI / 180;
   const latRad = lat * Math.PI / 180;
   
-  console.log("Ascendant intermediate values:", {
+  console.log("[DEBUG] Ascendant intermediate values:", {
     gastH,
     lstDeg,
     lstRad,
-    latRad
+    latRad,
+    epsTrueRad: epsTrue * Math.PI / 180
   });
   
   // Calculate ascendant using true obliquity
-  const ascRad = Math.atan2(
-    Math.cos(lstRad),
-    -Math.sin(lstRad) * Math.cos(epsTrue) + Math.tan(latRad) * Math.sin(epsTrue)
-  );
+  const epsTrueRad = epsTrue * Math.PI / 180;
+  const cosLst = Math.cos(lstRad);
+  const sinLst = Math.sin(lstRad);
+  const cosEps = Math.cos(epsTrueRad);
+  const sinEps = Math.sin(epsTrueRad);
+  const tanLat = Math.tan(latRad);
   
+  console.log("[DEBUG] Ascendant trig values:", {
+    cosLst, sinLst, cosEps, sinEps, tanLat
+  });
+  
+  const numerator = cosLst;
+  const denominator = -sinLst * cosEps + tanLat * sinEps;
+  
+  console.log("[DEBUG] Ascendant atan2 inputs:", {
+    numerator, denominator
+  });
+  
+  const ascRad = Math.atan2(numerator, denominator);
   const ascDeg = wrap360(ascRad * 180 / Math.PI);
   
-  console.log("Ascendant final values:", {
+  console.log("[DEBUG] Ascendant final values:", {
     ascRad,
     ascDeg
   });
