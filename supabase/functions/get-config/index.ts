@@ -7,6 +7,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -14,28 +15,27 @@ serve(async (req) => {
   try {
     const { key } = await req.json()
     
-    // Create a Supabase client with the service role key
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    // For security, we'll only allow specific keys to be retrieved
+    const allowedKeys = ['OPENCAGE_API_KEY']
+    if (!allowedKeys.includes(key)) {
+      throw new Error('Invalid key requested')
+    }
 
-    const { data, error } = await supabaseClient
-      .from('secrets')
-      .select('value')
-      .eq('name', key)
-      .single()
-
-    if (error) throw error
+    // Instead of querying the database, get the secret directly from Deno.env
+    const value = Deno.env.get(key)
+    if (!value) {
+      throw new Error(`Secret ${key} not found`)
+    }
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify({ value }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       },
     )
   } catch (error) {
+    console.error('Error in get-config function:', error.message)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
