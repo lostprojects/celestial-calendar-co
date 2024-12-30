@@ -43,7 +43,7 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   // Calculate Moon position
   const moonLong = getMoonPosition(jde).lon;
   
-  // Calculate Ascendant (placeholder - actual calculation needed)
+  // Calculate Ascendant using Sidereal Time and local coordinates
   const ascendant = calculateAscendant(jde, data.latitude, data.longitude);
   
   // Convert to zodiac signs and degrees
@@ -65,9 +65,29 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
 }
 
 function calculateAscendant(jde: number, lat: number, long: number): number {
-  // Placeholder for ascendant calculation
-  // This needs proper implementation based on astronomical algorithms
-  return 0;
+  // Calculate Local Sidereal Time (LST)
+  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const theta0 = 280.46061837 + 360.98564736629 * (jde - 2451545.0) + 
+                 0.000387933 * T * T - T * T * T / 38710000;
+  
+  // Adjust for longitude
+  const lst = (theta0 + long) % 360;
+  
+  // Calculate ascendant using LST and latitude
+  const obliquity = 23.4393 - 0.013 * T; // Mean obliquity of the ecliptic
+  const tanAsc = Math.cos(lst * Math.PI / 180) / 
+                 (Math.sin(lst * Math.PI / 180) * Math.cos(obliquity * Math.PI / 180) - 
+                  Math.tan(lat * Math.PI / 180) * Math.sin(obliquity * Math.PI / 180));
+  
+  let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
+  
+  // Adjust quadrant
+  if (lst > 180) {
+    ascendant += 180;
+  }
+  
+  // Normalize to 0-360
+  return ((ascendant % 360) + 360) % 360;
 }
 
 function getZodiacPosition(longitude: number) {
