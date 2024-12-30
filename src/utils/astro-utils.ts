@@ -3,6 +3,7 @@ import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as coord from "astronomia/coord";
 import * as sidereal from "astronomia/sidereal";
+import * as base from "astronomia/base";
 import moment from 'moment-timezone';
 
 export interface BirthChartData {
@@ -24,6 +25,12 @@ export interface BirthChartResult {
   risingDeg: number;
   risingMin: number;
 }
+
+const ZODIAC_SIGNS = [
+  "Aries", "Taurus", "Gemini", "Cancer", 
+  "Leo", "Virgo", "Libra", "Scorpio", 
+  "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+];
 
 export function calculateBirthChart(data: BirthChartData, system: "tropical" | "sidereal"): BirthChartResult {
   // Parse input date/time
@@ -55,25 +62,40 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const deltaT = 67.2; // Approximate value for 1980
   const jde = jd + deltaT / 86400;
   
-  // Calculate Sun's apparent longitude (corrected)
-  const sunLong = solar.apparentLongitude(jde);
-  const sunLongDeg = (sunLong * 180 / Math.PI + 360) % 360;
+  // Calculate Sun's apparent longitude
+  const sunLongRad = solar.apparentLongitude(jde);
+  const sunLongDeg = normalizeDegrees(base.rad2deg(sunLongRad));
+  console.log("Sun longitude (degrees):", sunLongDeg);
   
-  // Calculate Moon's position (corrected)
+  // Calculate Moon's position
   const moonPos = getMoonPosition(jde);
-  const moonLong = (moonPos.lon * 180 / Math.PI + 360) % 360;
+  const moonLongDeg = normalizeDegrees(base.rad2deg(moonPos.lon));
+  console.log("Moon longitude (degrees):", moonLongDeg);
   
-  // Calculate RAMC (Right Ascension of Midheaven)
+  // Calculate obliquity of the ecliptic
+  const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
+  const epsRad = base.deg2rad(eps);
+  
+  // Calculate Local Sidereal Time and RAMC
   const lst = sidereal.apparent(jde);
-  const ramc = (lst * 180 / Math.PI + data.longitude + 360) % 360;
+  const ramc = normalizeDegrees(base.rad2deg(lst) + data.longitude);
+  console.log("RAMC (degrees):", ramc);
   
-  // Calculate Ascendant using corrected formula
-  const ascendant = calculateAscendant(ramc, data.latitude);
+  // Calculate Ascendant
+  const ascendant = calculateAscendant(ramc, data.latitude, epsRad);
+  console.log("Ascendant (degrees):", ascendant);
   
-  // Convert positions to zodiac signs
+  // Get zodiac positions
   const sunPosition = getZodiacPosition(sunLongDeg);
-  const moonPosition = getZodiacPosition(moonLong);
+  const moonPosition = getZodiacPosition(moonLongDeg);
   const ascPosition = getZodiacPosition(ascendant);
+  
+  console.log("Calculated positions:", {
+    sun: sunPosition,
+    moon: moonPosition,
+    asc: ascPosition
+  });
 
   return {
     sunSign: sunPosition.sign,
@@ -88,43 +110,38 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   };
 }
 
-function calculateAscendant(ramc: number, latitude: number): number {
-  // Convert to radians
-  const latRad = latitude * Math.PI / 180;
-  const ramcRad = ramc * Math.PI / 180;
-  const obliquityRad = 23.4367 * Math.PI / 180; // Mean obliquity for 1980
+function calculateAscendant(ramc: number, latitude: number, obliquity: number): number {
+  // Convert inputs to radians
+  const ramcRad = base.deg2rad(ramc);
+  const latRad = base.deg2rad(latitude);
   
   // Calculate ascendant using the correct spherical trigonometry formula
   const tanAsc = -Math.cos(ramcRad) / 
-                 (Math.sin(obliquityRad) * Math.tan(latRad) + 
-                  Math.cos(obliquityRad) * Math.sin(ramcRad));
+                 (Math.sin(obliquity) * Math.tan(latRad) + 
+                  Math.cos(obliquity) * Math.sin(ramcRad));
   
-  let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
+  let ascendant = base.rad2deg(Math.atan(tanAsc));
   
   // Adjust quadrant based on RAMC
   if (ramc >= 180) {
     ascendant += 180;
   }
   
-  // Normalize to 0-360 range
-  return (ascendant + 360) % 360;
+  return normalizeDegrees(ascendant);
+}
+
+function normalizeDegrees(degrees: number): number {
+  return ((degrees % 360) + 360) % 360;
 }
 
 function getZodiacPosition(longitude: number) {
-  const signs = [
-    "Aries", "Taurus", "Gemini", "Cancer", 
-    "Leo", "Virgo", "Libra", "Scorpio", 
-    "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-  ];
-  
-  const normalizedLong = ((longitude % 360) + 360) % 360;
-  const signIndex = Math.floor(normalizedLong / 30);
-  const totalDegrees = normalizedLong % 30;
+  const signIndex = Math.floor(longitude / 30);
+  const totalDegrees = longitude % 30;
   const degrees = Math.floor(totalDegrees);
   const minutes = Math.floor((totalDegrees - degrees) * 60);
   
   return {
-    sign: signs[signIndex],
+    sign: ZODIAC_SIGNS[signIndex],
     degrees,
     minutes
   };
