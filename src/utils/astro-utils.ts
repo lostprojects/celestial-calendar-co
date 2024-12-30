@@ -64,22 +64,22 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   
   // Calculate Sun's apparent longitude
   const sunLongRad = solar.apparentLongitude(jde);
-  const sunLongDeg = normalizeDegrees(base.rad2deg(sunLongRad));
+  const sunLongDeg = normalizeDegrees(rad2deg(sunLongRad));
   console.log("Sun longitude (degrees):", sunLongDeg);
   
   // Calculate Moon's position
   const moonPos = getMoonPosition(jde);
-  const moonLongDeg = normalizeDegrees(base.rad2deg(moonPos.lon));
+  const moonLongDeg = normalizeDegrees(rad2deg(moonPos.lon));
   console.log("Moon longitude (degrees):", moonLongDeg);
   
   // Calculate obliquity of the ecliptic
   const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
   const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
-  const epsRad = base.deg2rad(eps);
+  const epsRad = deg2rad(eps);
   
   // Calculate Local Sidereal Time and RAMC
   const lst = sidereal.apparent(jde);
-  const ramc = normalizeDegrees(base.rad2deg(lst) + data.longitude);
+  const ramc = normalizeDegrees(rad2deg(lst) + data.longitude);
   console.log("RAMC (degrees):", ramc);
   
   // Calculate Ascendant
@@ -112,15 +112,15 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
 
 function calculateAscendant(ramc: number, latitude: number, obliquity: number): number {
   // Convert inputs to radians
-  const ramcRad = base.deg2rad(ramc);
-  const latRad = base.deg2rad(latitude);
+  const ramcRad = deg2rad(ramc);
+  const latRad = deg2rad(latitude);
   
   // Calculate ascendant using the correct spherical trigonometry formula
   const tanAsc = -Math.cos(ramcRad) / 
                  (Math.sin(obliquity) * Math.tan(latRad) + 
                   Math.cos(obliquity) * Math.sin(ramcRad));
   
-  let ascendant = base.rad2deg(Math.atan(tanAsc));
+  let ascendant = rad2deg(Math.atan(tanAsc));
   
   // Adjust quadrant based on RAMC
   if (ramc >= 180) {
@@ -145,4 +145,13 @@ function getZodiacPosition(longitude: number) {
     degrees,
     minutes
   };
+}
+
+// Helper functions for angle conversions
+function deg2rad(degrees: number): number {
+  return degrees * Math.PI / 180;
+}
+
+function rad2deg(radians: number): number {
+  return radians * 180 / Math.PI;
 }
