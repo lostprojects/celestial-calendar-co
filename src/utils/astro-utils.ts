@@ -1,6 +1,6 @@
 import { DateToJD } from "astronomia/julian";
 import { trueVSOP87 } from "astronomia/solar";
-import { meanMoonLongitude } from "astronomia/moonposition";
+import { position as moonPosition } from "astronomia/moonposition";
 
 export interface BirthChartData {
   birthDate: string;
@@ -40,8 +40,8 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   // Calculate Sun position
   const sunLong = trueVSOP87(jde);
   
-  // Calculate Moon position using meanMoonLongitude instead of meanVSOP87
-  const moonLong = meanMoonLongitude(jde);
+  // Calculate Moon position using moonPosition function
+  const moonLong = moonPosition(jde).lon;
   
   // Calculate Ascendant (placeholder - actual calculation needed)
   const ascendant = calculateAscendant(jde, data.latitude, data.longitude);
