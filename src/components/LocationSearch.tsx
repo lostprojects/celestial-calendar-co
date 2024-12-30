@@ -98,3 +98,4 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
       )}
     </div>
   );
+};
