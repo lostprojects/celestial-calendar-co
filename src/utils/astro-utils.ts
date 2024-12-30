@@ -6,9 +6,9 @@ export type AstroSystem = "tropical" | "sidereal";
 
 export interface BirthChartData {
   name: string;
-  birthDate: string;   
-  birthTime: string;   
-  birthPlace: string;  
+  birthDate: string;
+  birthTime: string;
+  birthPlace: string;
   latitude: number;
   longitude: number;
 }
@@ -25,64 +25,75 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
+interface SignDegrees {
+  sign: string;
+  degrees: number;
+  minutes: number;
+}
+
+const SIGNS = [
+  "Aries", "Taurus", "Gemini", "Cancer",
+  "Leo", "Virgo", "Libra", "Scorpio",
+  "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+];
+
 export function calculateBirthChart(
   data: BirthChartData,
-  system: AstroSystem
+  system: AstroSystem = "tropical"
 ): BirthChartResult {
   const { birthDate, birthTime, birthPlace, latitude, longitude } = data;
 
-  console.log(`Calculating ${system} birth chart with:`, stringify({
-    birthDate, birthTime, birthPlace, latitude, longitude
-  }));
+  const inputData = {
+    birthDate,
+    birthTime,
+    birthPlace,
+    latitude,
+    longitude
+  };
+  console.log(`Calculating ${system} birth chart with:`, stringify(inputData));
 
-  // Use Europe/London for UK locations
   const timezone = birthPlace.toLowerCase().includes("uk") 
     ? "Europe/London" 
-    : birthPlace;
+    : moment.tz.guess();
   
   const localTime = moment.tz(`${birthDate}T${birthTime}`, timezone);
   
-  console.log("Parsed Local Time:", stringify({
+  const timeData = {
     formatted: localTime.format(),
     utc: localTime.utc().format(),
-    jsDate: localTime.toDate(),
+    jsDate: localTime.toDate().toISOString(),
     zone: localTime.tz()
-  }));
+  };
+  console.log("Parsed Local Time:", stringify(timeData));
 
-  // Get Julian Days (UT)
   const jdUT = julian.DateToJD(localTime.toDate());
-  console.log("Julian Day (UT):", jdUT);
+  const jdTT = jdUT + (37 + 32.184) / 86400;
 
-  // Calculate Delta T and get TT
-  const deltaTsec = approximateDeltaT(localTime.year(), localTime.month() + 1);
-  const jdTT = jdUT + deltaTsec / 86400;
-  console.log("Delta T (seconds):", deltaTsec);
-  console.log("Julian Day (TT):", jdTT);
-
-  // Get tropical positions directly from astronomia
   const sunLonTrop = solar.apparentLongitude(jdTT);
   const moonLonTrop = moonposition.position(jdTT).lon;
   const ascLonTrop = calcAscendant(jdUT, latitude, longitude);
   
-  console.log("Tropical positions:", stringify({
+  const tropicalData = {
     sunLonTrop,
     moonLonTrop,
     ascLonTrop
-  }));
+  };
+  console.log("Tropical positions:", stringify(tropicalData));
 
-  // For sidereal calculations, apply ayanamsa
   let finalPositions;
   if (system === "sidereal") {
-    const ayanamsa = approximateAyanamsa(localTime.year());
+    const ayanamsa = sidereal.krishnamurti(jdUT);
     finalPositions = {
       sunLon: wrap360(sunLonTrop - ayanamsa),
       moonLon: wrap360(moonLonTrop - ayanamsa),
       ascLon: wrap360(ascLonTrop - ayanamsa)
     };
-    console.log("Sidereal positions after ayanamsa:", stringify({
+    
+    const siderealData = {
       ayanamsa,
       ...finalPositions
-    }));
+    };
+    console.log("Sidereal positions after ayanamsa:", stringify(siderealData));
   } else {
     finalPositions = {
       sunLon: sunLonTrop,
@@ -91,90 +102,64 @@ export function calculateBirthChart(
     };
   }
 
-  // Convert to signs and degrees
   const sunObj = extractSignDegrees(finalPositions.sunLon);
   const moonObj = extractSignDegrees(finalPositions.moonLon);
   const ascObj = extractSignDegrees(finalPositions.ascLon);
 
-  console.log(`Final ${system} positions:`, stringify({
+  const finalData = {
     sun: sunObj,
     moon: moonObj,
     asc: ascObj
-  }));
+  };
+  console.log(`Final ${system} positions:`, stringify(finalData));
 
   return {
     sunSign: sunObj.sign,
-    sunDeg: sunObj.deg,
-    sunMin: sunObj.min,
+    sunDeg: sunObj.degrees,
+    sunMin: sunObj.minutes,
     moonSign: moonObj.sign,
-    moonDeg: moonObj.deg,
-    moonMin: moonObj.min,
+    moonDeg: moonObj.degrees,
+    moonMin: moonObj.minutes,
     risingSign: ascObj.sign,
-    risingDeg: ascObj.deg,
-    risingMin: ascObj.min,
+    risingDeg: ascObj.degrees,
+    risingMin: ascObj.minutes,
   };
 }
 
-function approximateDeltaT(year: number, month: number) {
-  const yMid = 2020;
-  const base = 69.4; // sec in 2020
-  const slope = 0.2; // sec/yr
-  const yearsOffset = (year + (month - 0.5) / 12) - yMid;
-  return base + slope * yearsOffset; 
+function wrap360(degrees: number): number {
+  degrees = degrees % 360;
+  return degrees < 0 ? degrees + 360 : degrees;
 }
 
-function approximateAyanamsa(year: number) {
-  const baseYear = 2020;
-  const baseAyanamsa = 24; 
-  const yearsDiff = year - baseYear;
-  const shiftDeg = yearsDiff / 72;
-  return baseAyanamsa - shiftDeg;
-}
-
-function wrap360(deg: number) {
-  return ((deg % 360) + 360) % 360;
-}
-
-function extractSignDegrees(longitude: number) {
-  const normalized = wrap360(longitude);
-  const signIndex = Math.floor(normalized / 30);
-
-  const signs = [
-    "Aries", "Taurus", "Gemini", "Cancer",
-    "Leo", "Virgo", "Libra", "Scorpio",
-    "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-  ];
+function extractSignDegrees(longitude: number): SignDegrees {
+  longitude = wrap360(longitude);
+  const signIndex = Math.floor(longitude / 30);
+  const degrees = Math.floor(longitude % 30);
+  const minutes = Math.floor((longitude % 1) * 60);
   
-  const sign = signs[signIndex];
-  const degreesIntoSign = normalized - signIndex * 30;
-  const degWhole = Math.floor(degreesIntoSign);
-  let minWhole = Math.round((degreesIntoSign - degWhole) * 60);
-
-  let finalDeg = degWhole;
-  if (minWhole === 60) {
-    finalDeg += 1;
-    minWhole = 0;
-  }
-
-  return { sign, deg: finalDeg, min: minWhole };
+  return {
+    sign: SIGNS[signIndex],
+    degrees,
+    minutes
+  };
 }
 
-function calcAscendant(jdUT: number, lat: number, lon: number): number {
-  // Get apparent sidereal time in hours
-  const gastH = sidereal.apparent(jdUT);
+function calcAscendant(jd: number, lat: number, lng: number): number {
+  const SIDEREAL_RATE = 360.98564736629;
+  const J2000 = 2451545.0;
   
-  // Convert to degrees and add longitude for local sidereal time
-  const lstDeg = wrap360(gastH * 15 + lon);
-  const lstRad = lstDeg * Math.PI / 180;
-  const latRad = lat * Math.PI / 180;
+  // Convert longitude to hour angle
+  const lst = (jd - J2000) * SIDEREAL_RATE;
+  const ha = wrap360(lst + lng);
   
-  // Get true obliquity (already in radians from astronomia)
-  const eps = nutation.meanObliquity(jdUT) + nutation.nutation(jdUT).deps;
-
   // Calculate ascendant
+  const latRad = lat * Math.PI / 180;
+  const haRad = ha * Math.PI / 180;
+  
   const ascRad = Math.atan2(
-    Math.cos(lstRad),
-    -Math.sin(lstRad) * Math.cos(eps) + Math.tan(latRad) * Math.sin(eps)
+    Math.cos(haRad),
+    -(Math.sin(haRad) * Math.cos(23.4393 * Math.PI / 180) +
+      Math.tan(latRad) * Math.sin(23.4393 * Math.PI / 180))
   );
   
   return wrap360(ascRad * 180 / Math.PI);

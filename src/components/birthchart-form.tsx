@@ -9,7 +9,7 @@ import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
-import { stringify, parse } from "flatted";
+import { stringify } from "flatted";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -55,17 +55,25 @@ export default function BirthChartForm() {
       setVedicResults(sChart);
       
       if (!isCorrect) {
-        console.error("Results don't match expected values:", stringify({
+        // Extract only the necessary data for comparison
+        const resultData = {
           expected: expectedResults,
           got: {
             sunSign: wChart.sunSign,
             moonSign: wChart.moonSign,
             risingSign: wChart.risingSign
           }
-        }));
+        };
+        console.error("Results don't match expected values:", stringify(resultData));
       }
     } catch (err) {
-      console.error("Test calculation error:", stringify(err));
+      // Extract error message and relevant properties
+      const errorData = err instanceof Error ? {
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      } : String(err);
+      console.error("Test calculation error:", stringify(errorData));
     }
   };
 
@@ -93,12 +101,28 @@ export default function BirthChartForm() {
       await supabaseInsert(formData, wChart, "tropical");
       await supabaseInsert(formData, sChart, "sidereal");
 
-      console.log("Birth chart calculated successfully!", stringify({
-        western: wChart,
-        vedic: sChart
-      }));
+      // Extract only the necessary chart data for logging
+      const logData = {
+        western: {
+          sunSign: wChart.sunSign,
+          moonSign: wChart.moonSign,
+          risingSign: wChart.risingSign
+        },
+        vedic: {
+          sunSign: sChart.sunSign,
+          moonSign: sChart.moonSign,
+          risingSign: sChart.risingSign
+        }
+      };
+      console.log("Birth chart calculated successfully!", stringify(logData));
     } catch (err) {
-      console.error("Calculation error:", stringify(err));
+      // Extract error message and relevant properties
+      const errorData = err instanceof Error ? {
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      } : String(err);
+      console.error("Calculation error:", stringify(errorData));
     }
   }
 
