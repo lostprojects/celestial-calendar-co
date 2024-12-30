@@ -31,8 +31,13 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  // Create base object for astronomia calculations
-  const t = base.julian(year, month, day, hour + minute/60);
+  // Create date object for astronomia calculations
+  const t = {
+    year,
+    month,
+    day,
+    hour: hour + minute/60,
+  };
   console.log("Time object created:", t);
   
   // Calculate Julian Day
