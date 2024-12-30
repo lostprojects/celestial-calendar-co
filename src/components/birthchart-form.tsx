@@ -13,9 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
-    name: "",
-    birthDate: "",
-    birthTime: "",
+    birthDate: "1980-10-14",
+    birthTime: "00:30",
     birthPlace: "",
     latitude: 0,
     longitude: 0,
@@ -25,43 +24,6 @@ export default function BirthChartForm() {
   const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const { toast } = useToast();
-
-  const generateTestData = async () => {
-    setIsCalculating(true);
-    // Test data for Ipswich, UK 1980
-    const testData: BirthChartData = {
-      name: "Test Person",
-      birthDate: "1980-10-14",
-      birthTime: "00:30",
-      birthPlace: "Ipswich, UK",
-      latitude: 52.0567,
-      longitude: 1.1482,
-    };
-    
-    try {
-      const wChart = calculateBirthChart(testData, "tropical");
-      setWesternResults(wChart);
-      console.log("Western calculation successful:", wChart);
-
-      const sChart = calculateBirthChart(testData, "sidereal");
-      setVedicResults(sChart);
-      console.log("Vedic calculation successful:", sChart);
-
-      toast({
-        title: "Test Data Generated",
-        description: "Birth chart calculations completed successfully",
-      });
-    } catch (err) {
-      console.error("Calculation error:", err);
-      toast({
-        title: "Calculation Error",
-        description: err instanceof Error ? err.message : "Failed to calculate birth chart",
-        variant: "destructive",
-      });
-    } finally {
-      setIsCalculating(false);
-    }
-  };
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
     setFormData({
@@ -111,7 +73,6 @@ export default function BirthChartForm() {
     system: "tropical" | "sidereal"
   ) {
     const { error } = await supabase.from("birth_charts").insert({
-      name: data.name,
       birth_date: data.birthDate,
       birth_time: data.birthTime,
       birth_place: data.birthPlace,
@@ -133,33 +94,7 @@ export default function BirthChartForm() {
 
   return (
     <div className="birth-chart-form">
-      <Button 
-        onClick={generateTestData}
-        className="w-full bg-primary hover:bg-primary/90 mb-6"
-        disabled={isCalculating}
-      >
-        {isCalculating ? (
-          <div className="flex items-center gap-2">
-            <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
-            <span>Calculating...</span>
-          </div>
-        ) : (
-          "Generate Test Results (Ipswich 1980)"
-        )}
-      </Button>
-
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-primary-dark">Name</label>
-          <Input
-            placeholder="Your Name"
-            className="w-full"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-          />
-        </div>
-        
         <div className="space-y-2">
           <label className="text-sm font-medium text-primary-dark">Birth Date</label>
           <Input
@@ -202,28 +137,8 @@ export default function BirthChartForm() {
 
       {(westernResults || vedicResults) && (
         <ChartResults
-          mainWestern={westernResults || {
-            sunSign: "Not calculated",
-            moonSign: "Not calculated",
-            risingSign: "Not calculated",
-            sunDeg: 0,
-            sunMin: 0,
-            moonDeg: 0,
-            moonMin: 0,
-            risingDeg: 0,
-            risingMin: 0
-          }}
-          mainVedic={vedicResults || {
-            sunSign: "Not calculated",
-            moonSign: "Not calculated",
-            risingSign: "Not calculated",
-            sunDeg: 0,
-            sunMin: 0,
-            moonDeg: 0,
-            moonMin: 0,
-            risingDeg: 0,
-            risingMin: 0
-          }}
+          mainWestern={westernResults}
+          mainVedic={vedicResults}
         />
       )}
     </div>

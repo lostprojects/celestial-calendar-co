@@ -1,7 +1,9 @@
-import { julian, nutation, sidereal } from "astronomia";
+import * as julian from "astronomia/lib/julian";
+import * as solar from "astronomia/lib/solar";
+import * as moonphase from "astronomia/lib/moonphase";
+import * as planetposition from "astronomia/lib/planetposition";
 
 export interface BirthChartData {
-  name: string;
   birthDate: string;
   birthTime: string;
   birthPlace: string;
@@ -21,65 +23,75 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
-function validateNumericValue(value: number | undefined, description: string) {
-  if (value === undefined || isNaN(value)) {
-    throw new Error(`Invalid ${description}: ${value}`);
-  }
-}
-
 export function calculateBirthChart(data: BirthChartData, system: "tropical" | "sidereal"): BirthChartResult {
-  console.log("[DEBUG] Starting birth chart calculation for:", {
-    birthDate: data.birthDate,
-    birthTime: data.birthTime,
-    birthPlace: data.birthPlace,
-    latitude: data.latitude,
-    longitude: data.longitude,
-    system
-  });
-
-  // Parse birth date and time
+  // Parse date and time
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  // Create a JavaScript Date object
-  const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
+  // Create a Date object for the birth date and time
+  const birthDate = new Date(year, month - 1, day, hour, minute);
   
-  console.log("[DEBUG] Created Date object:", date.toISOString());
-  
-  // Calculate Julian Day using the Date object
-  const jd = julian.DateToJD(date);
+  // Calculate Julian Day
+  const jd = julian.DateToJD(birthDate);
   
   // Calculate Julian Ephemeris Day (JDE)
-  const deltaT = 36.392465; // ΔT value for 1980 (example)
+  const deltaT = 67.2; // ΔT value for 1980
   const jde = jd + deltaT / 86400;
 
-  console.log("[DEBUG] Time conversion:", {
-    deltaTsec: deltaT,
-    jd,
-    jde,
-    difference: jde - jd
-  });
-
-  // Calculate nutation
-  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const { Δψ, Δε } = nutation.nutation(T);
-  const ε0 = nutation.meanObliquity(T); // mean obliquity
-  const ε = ε0 + Δε; // true obliquity
-
-  validateNumericValue(Δψ, "Nutation dpsi (radians)");
-  validateNumericValue(Δε, "Nutation deps (radians)");
-  validateNumericValue(ε, "Obliquity (radians)");
-
-  // For testing, return placeholder values
+  // Calculate Sun position
+  const sunLong = solar.trueVSOP87(jde);
+  
+  // Calculate Moon position
+  const moonLong = moonphase.meanVSOP87(jde);
+  
+  // Calculate Ascendant (placeholder - actual calculation needed)
+  const ascendant = calculateAscendant(jde, data.latitude, data.longitude);
+  
+  // Convert to zodiac signs and degrees
+  const sunPosition = getZodiacPosition(sunLong);
+  const moonPosition = getZodiacPosition(moonLong);
+  const ascPosition = getZodiacPosition(ascendant);
+  
   return {
-    sunSign: "Libra",
-    moonSign: "Taurus",
-    risingSign: "Cancer",
-    sunDeg: 15,
-    sunMin: 30,
-    moonDeg: 25,
-    moonMin: 45,
-    risingDeg: 5,
-    risingMin: 15
+    sunSign: sunPosition.sign,
+    moonSign: moonPosition.sign,
+    risingSign: ascPosition.sign,
+    sunDeg: sunPosition.degrees,
+    sunMin: sunPosition.minutes,
+    moonDeg: moonPosition.degrees,
+    moonMin: moonPosition.minutes,
+    risingDeg: ascPosition.degrees,
+    risingMin: ascPosition.minutes
+  };
+}
+
+function calculateAscendant(jde: number, lat: number, long: number): number {
+  // Placeholder for ascendant calculation
+  // This needs proper implementation based on astronomical algorithms
+  return 0;
+}
+
+function getZodiacPosition(longitude: number) {
+  const signs = [
+    "Aries", "Taurus", "Gemini", "Cancer", 
+    "Leo", "Virgo", "Libra", "Scorpio", 
+    "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+  ];
+  
+  // Normalize longitude to 0-360 range
+  const normalizedLong = ((longitude % 360) + 360) % 360;
+  
+  // Calculate sign index (0-11)
+  const signIndex = Math.floor(normalizedLong / 30);
+  
+  // Calculate degrees and minutes within sign
+  const totalDegrees = normalizedLong % 30;
+  const degrees = Math.floor(totalDegrees);
+  const minutes = Math.floor((totalDegrees - degrees) * 60);
+  
+  return {
+    sign: signs[signIndex],
+    degrees,
+    minutes
   };
 }
