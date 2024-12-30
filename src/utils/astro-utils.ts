@@ -37,8 +37,8 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const deltaT = 67.2; // ΔT value for 1980
   const jde = jd + deltaT / 86400;
   
-  // Calculate Sun position using solarCalc.true()
-  const sunLong = solarCalc.true(jde);
+  // Calculate Sun position using apparent longitude
+  const sunLong = solarCalc.apparentLongitude(jde);
   
   // Calculate Moon position
   const moonLong = getMoonPosition(jde).lon;
