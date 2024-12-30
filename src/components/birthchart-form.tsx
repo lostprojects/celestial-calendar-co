@@ -9,6 +9,7 @@ import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
+import { stringify, parse } from "flatted";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -54,17 +55,17 @@ export default function BirthChartForm() {
       setVedicResults(sChart);
       
       if (!isCorrect) {
-        console.error("Results don't match expected values:", {
+        console.error("Results don't match expected values:", stringify({
           expected: expectedResults,
           got: {
             sunSign: wChart.sunSign,
             moonSign: wChart.moonSign,
             risingSign: wChart.risingSign
           }
-        });
+        }));
       }
     } catch (err) {
-      console.error("Test calculation error:", err);
+      console.error("Test calculation error:", stringify(err));
     }
   };
 
@@ -92,9 +93,12 @@ export default function BirthChartForm() {
       await supabaseInsert(formData, wChart, "tropical");
       await supabaseInsert(formData, sChart, "sidereal");
 
-      console.log("Birth chart calculated successfully!");
+      console.log("Birth chart calculated successfully!", stringify({
+        western: wChart,
+        vedic: sChart
+      }));
     } catch (err) {
-      console.error("Calculation error:", err);
+      console.error("Calculation error:", stringify(err));
     }
   }
 

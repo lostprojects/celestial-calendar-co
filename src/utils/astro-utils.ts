@@ -1,5 +1,6 @@
 import { julian, solar, moonposition, nutation, sidereal } from "astronomia";
 import moment from "moment-timezone";
+import { stringify } from "flatted";
 
 export type AstroSystem = "tropical" | "sidereal";
 
@@ -30,9 +31,9 @@ export function calculateBirthChart(
 ): BirthChartResult {
   const { birthDate, birthTime, birthPlace, latitude, longitude } = data;
 
-  console.log(`Calculating ${system} birth chart with:`, {
+  console.log(`Calculating ${system} birth chart with:`, stringify({
     birthDate, birthTime, birthPlace, latitude, longitude
-  });
+  }));
 
   // Use Europe/London for UK locations
   const timezone = birthPlace.toLowerCase().includes("uk") 
@@ -41,12 +42,12 @@ export function calculateBirthChart(
   
   const localTime = moment.tz(`${birthDate}T${birthTime}`, timezone);
   
-  console.log("Parsed Local Time:", {
+  console.log("Parsed Local Time:", stringify({
     formatted: localTime.format(),
     utc: localTime.utc().format(),
     jsDate: localTime.toDate(),
     zone: localTime.tz()
-  });
+  }));
 
   // Get Julian Days (UT)
   const jdUT = julian.DateToJD(localTime.toDate());
@@ -63,11 +64,11 @@ export function calculateBirthChart(
   const moonLonTrop = moonposition.position(jdTT).lon;
   const ascLonTrop = calcAscendant(jdUT, latitude, longitude);
   
-  console.log("Tropical positions:", {
+  console.log("Tropical positions:", stringify({
     sunLonTrop,
     moonLonTrop,
     ascLonTrop
-  });
+  }));
 
   // For sidereal calculations, apply ayanamsa
   let finalPositions;
@@ -78,10 +79,10 @@ export function calculateBirthChart(
       moonLon: wrap360(moonLonTrop - ayanamsa),
       ascLon: wrap360(ascLonTrop - ayanamsa)
     };
-    console.log("Sidereal positions after ayanamsa:", {
+    console.log("Sidereal positions after ayanamsa:", stringify({
       ayanamsa,
       ...finalPositions
-    });
+    }));
   } else {
     finalPositions = {
       sunLon: sunLonTrop,
@@ -95,11 +96,11 @@ export function calculateBirthChart(
   const moonObj = extractSignDegrees(finalPositions.moonLon);
   const ascObj = extractSignDegrees(finalPositions.ascLon);
 
-  console.log(`Final ${system} positions:`, {
+  console.log(`Final ${system} positions:`, stringify({
     sun: sunObj,
     moon: moonObj,
     asc: ascObj
-  });
+  }));
 
   return {
     sunSign: sunObj.sign,
