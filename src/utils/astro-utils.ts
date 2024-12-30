@@ -1,6 +1,5 @@
 import { julian, solar, moonposition, nutation, sidereal } from "astronomia";
 import moment from "moment-timezone";
-import { stringify } from "flatted";
 
 export type AstroSystem = "tropical" | "sidereal";
 
@@ -43,14 +42,15 @@ export function calculateBirthChart(
 ): BirthChartResult {
   const { birthDate, birthTime, birthPlace, latitude, longitude } = data;
 
-  const inputData = {
-    birthDate,
-    birthTime,
-    birthPlace,
-    latitude,
-    longitude
+  const inputLog = {
+    system,
+    date: birthDate,
+    time: birthTime,
+    place: birthPlace,
+    lat: latitude,
+    lng: longitude
   };
-  console.log(`Calculating ${system} birth chart with:`, stringify(inputData));
+  console.log("Calculating birth chart with:", inputLog);
 
   const timezone = birthPlace.toLowerCase().includes("uk") 
     ? "Europe/London" 
@@ -58,13 +58,12 @@ export function calculateBirthChart(
   
   const localTime = moment.tz(`${birthDate}T${birthTime}`, timezone);
   
-  const timeData = {
+  const timeLog = {
     formatted: localTime.format(),
     utc: localTime.utc().format(),
-    jsDate: localTime.toDate().toISOString(),
     zone: localTime.tz()
   };
-  console.log("Parsed Local Time:", stringify(timeData));
+  console.log("Time information:", timeLog);
 
   const jdUT = julian.DateToJD(localTime.toDate());
   const jdTT = jdUT + (37 + 32.184) / 86400;
@@ -72,13 +71,6 @@ export function calculateBirthChart(
   const sunLonTrop = solar.apparentLongitude(jdTT);
   const moonLonTrop = moonposition.position(jdTT).lon;
   const ascLonTrop = calcAscendant(jdUT, latitude, longitude);
-  
-  const tropicalData = {
-    sunLonTrop,
-    moonLonTrop,
-    ascLonTrop
-  };
-  console.log("Tropical positions:", stringify(tropicalData));
 
   let finalPositions;
   if (system === "sidereal") {
@@ -88,12 +80,6 @@ export function calculateBirthChart(
       moonLon: wrap360(moonLonTrop - ayanamsa),
       ascLon: wrap360(ascLonTrop - ayanamsa)
     };
-    
-    const siderealData = {
-      ayanamsa,
-      ...finalPositions
-    };
-    console.log("Sidereal positions after ayanamsa:", stringify(siderealData));
   } else {
     finalPositions = {
       sunLon: sunLonTrop,
@@ -106,12 +92,13 @@ export function calculateBirthChart(
   const moonObj = extractSignDegrees(finalPositions.moonLon);
   const ascObj = extractSignDegrees(finalPositions.ascLon);
 
-  const finalData = {
+  const resultLog = {
+    system,
     sun: sunObj,
     moon: moonObj,
     asc: ascObj
   };
-  console.log(`Final ${system} positions:`, stringify(finalData));
+  console.log("Calculated positions:", resultLog);
 
   return {
     sunSign: sunObj.sign,

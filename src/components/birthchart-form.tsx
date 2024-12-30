@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  calculateBirthChart,
-  BirthChartData,
-  BirthChartResult,
-} from "@/utils/astro-utils";
+import { calculateBirthChart, BirthChartData } from "@/utils/astro-utils";
 import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
-import { stringify } from "flatted";
+import { BirthChartForm as BirthChartFormLogic } from "@/lib/birth-chart-form";
+import { useToast } from "@/hooks/use-toast";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -21,61 +18,13 @@ export default function BirthChartForm() {
     longitude: 0,
   });
 
-  const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
-  const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
-
-  const generateTestData = () => {
-    // Test data for Ipswich, UK 1980
-    const testData: BirthChartData = {
-      name: "Test Person",
-      birthDate: "1980-10-14",
-      birthTime: "00:30",
-      birthPlace: "Ipswich, UK",
-      latitude: 52.0567,
-      longitude: 1.1482,
-    };
-
-    const expectedResults = {
-      sunSign: "Libra",
-      moonSign: "Libra",
-      risingSign: "Leo"
-    };
-    
-    try {
-      const wChart = calculateBirthChart(testData, "tropical");
-      const sChart = calculateBirthChart(testData, "sidereal");
-      
-      // Validate Western results
-      const isCorrect = 
-        wChart.sunSign === expectedResults.sunSign &&
-        wChart.moonSign === expectedResults.moonSign &&
-        wChart.risingSign === expectedResults.risingSign;
-
-      setWesternResults(wChart);
-      setVedicResults(sChart);
-      
-      if (!isCorrect) {
-        // Extract only the necessary data for comparison
-        const resultData = {
-          expected: expectedResults,
-          got: {
-            sunSign: wChart.sunSign,
-            moonSign: wChart.moonSign,
-            risingSign: wChart.risingSign
-          }
-        };
-        console.error("Results don't match expected values:", stringify(resultData));
-      }
-    } catch (err) {
-      // Extract error message and relevant properties
-      const errorData = err instanceof Error ? {
-        message: err.message,
-        name: err.name,
-        stack: err.stack
-      } : String(err);
-      console.error("Test calculation error:", stringify(errorData));
-    }
-  };
+  const { toast } = useToast();
+  const { 
+    westernResults, 
+    vedicResults, 
+    handleSubmit: handleFormSubmit,
+    generateTestData: generateTest 
+  } = BirthChartFormLogic();
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
     setFormData({
@@ -86,76 +35,23 @@ export default function BirthChartForm() {
     });
   };
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Calculate Western
-      const wChart = calculateBirthChart(formData, "tropical");
-      setWesternResults(wChart);
-
-      // Calculate Vedic
-      const sChart = calculateBirthChart(formData, "sidereal");
-      setVedicResults(sChart);
-
-      // Store in DB
-      await supabaseInsert(formData, wChart, "tropical");
-      await supabaseInsert(formData, sChart, "sidereal");
-
-      // Extract only the necessary chart data for logging
-      const logData = {
-        western: {
-          sunSign: wChart.sunSign,
-          moonSign: wChart.moonSign,
-          risingSign: wChart.risingSign
-        },
-        vedic: {
-          sunSign: sChart.sunSign,
-          moonSign: sChart.moonSign,
-          risingSign: sChart.risingSign
-        }
-      };
-      console.log("Birth chart calculated successfully!", stringify(logData));
+      await handleFormSubmit(formData);
     } catch (err) {
-      // Extract error message and relevant properties
-      const errorData = err instanceof Error ? {
-        message: err.message,
-        name: err.name,
-        stack: err.stack
-      } : String(err);
-      console.error("Calculation error:", stringify(errorData));
+      toast({
+        title: "Error",
+        description: "Failed to calculate birth chart",
+        variant: "destructive",
+      });
     }
-  }
-
-  async function supabaseInsert(
-    data: BirthChartData,
-    result: BirthChartResult,
-    system: "tropical" | "sidereal"
-  ) {
-    const { error } = await supabase.from("birth_charts").insert({
-      name: data.name,
-      birth_date: data.birthDate,
-      birth_time: data.birthTime,
-      birth_place: data.birthPlace,
-      latitude: data.latitude,
-      longitude: data.longitude,
-      system_used: system,
-      sun_sign: result.sunSign,
-      sun_degrees: result.sunDeg,
-      sun_minutes: result.sunMin,
-      moon_sign: result.moonSign,
-      moon_degrees: result.moonDeg,
-      moon_minutes: result.moonMin,
-      ascendant_sign: result.risingSign,
-      ascendant_degrees: result.risingDeg,
-      ascendant_minutes: result.risingMin,
-    });
-    if (error) throw error;
-  }
+  };
 
   return (
     <div className="birth-chart-form">
       <Button 
-        onClick={generateTestData}
+        onClick={generateTest}
         className="w-full bg-primary hover:bg-primary/90 mb-6"
       >
         Generate Test Results (Ipswich 1980)
