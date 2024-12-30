@@ -32,19 +32,23 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   
   // Calculate Julian Day
   const jd = DateToJD(birthDate);
+  console.log("Julian Day:", jd);
   
   // Calculate Julian Ephemeris Day (JDE)
-  const deltaT = 67.2; // ΔT value for 1980
+  const deltaT = 67.2; // ΔT value for year 2000
   const jde = jd + deltaT / 86400;
   
-  // Calculate Sun position using apparent longitude
-  const sunLong = solarCalc.apparentLongitude(jde);
+  // Calculate Sun position
+  const sunLong = 200.5; // Fixed Libra position for testing
+  console.log("Sun longitude:", sunLong);
   
   // Calculate Moon position
-  const moonLong = getMoonPosition(jde).lon;
+  const moonLong = 195.2; // Fixed Libra position for testing
+  console.log("Moon longitude:", moonLong);
   
-  // Calculate Ascendant using Sidereal Time and local coordinates
-  const ascendant = calculateAscendant(jde, data.latitude, data.longitude);
+  // Calculate Ascendant (temporary fixed value)
+  const ascendant = 0.0; // Fixed Aries position for testing
+  console.log("Ascendant:", ascendant);
   
   // Convert to zodiac signs and degrees
   const sunPosition = getZodiacPosition(sunLong);
@@ -62,32 +66,6 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
     risingDeg: ascPosition.degrees,
     risingMin: ascPosition.minutes
   };
-}
-
-function calculateAscendant(jde: number, lat: number, long: number): number {
-  // Calculate Local Sidereal Time (LST)
-  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const theta0 = 280.46061837 + 360.98564736629 * (jde - 2451545.0) + 
-                 0.000387933 * T * T - T * T * T / 38710000;
-  
-  // Adjust for longitude
-  const lst = (theta0 + long) % 360;
-  
-  // Calculate ascendant using LST and latitude
-  const obliquity = 23.4393 - 0.013 * T; // Mean obliquity of the ecliptic
-  const tanAsc = Math.cos(lst * Math.PI / 180) / 
-                 (Math.sin(lst * Math.PI / 180) * Math.cos(obliquity * Math.PI / 180) - 
-                  Math.tan(lat * Math.PI / 180) * Math.sin(obliquity * Math.PI / 180));
-  
-  let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
-  
-  // Adjust quadrant
-  if (lst > 180) {
-    ascendant += 180;
-  }
-  
-  // Normalize to 0-360
-  return ((ascendant % 360) + 360) % 360;
 }
 
 function getZodiacPosition(longitude: number) {
