@@ -32,16 +32,17 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  // Get timezone for the birth location
-  const timezone = moment.tz.zone(moment.tz.guess(data.latitude, data.longitude));
+  // Get timezone for the birth location using tzMoment.guess()
+  // This will use the browser's timezone detection
+  const timezone = moment.tz.guess();
   if (!timezone) {
-    console.error("Could not determine timezone for location:", data.latitude, data.longitude);
-    throw new Error("Could not determine timezone for the given location");
+    console.error("Could not determine timezone");
+    throw new Error("Could not determine timezone");
   }
-  console.log("Determined timezone:", timezone.name);
+  console.log("Determined timezone:", timezone);
 
   // Create moment object in the local timezone
-  const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone.name);
+  const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
   console.log("Local time:", localMoment.format());
   
   // Convert to UTC (this automatically handles DST)
