@@ -114,50 +114,6 @@ export function calculateBirthChart(
   };
 }
 
-function approximateDeltaT(year: number, month: number) {
-  const yMid = 2020;
-  const base = 69.4; // sec in 2020
-  const slope = 0.2; // sec/yr
-  const yearsOffset = (year + (month - 0.5) / 12) - yMid;
-  return base + slope * yearsOffset; 
-}
-
-function approximateAyanamsa(year: number) {
-  const baseYear = 2020;
-  const baseAyanamsa = 24; 
-  const yearsDiff = year - baseYear;
-  const shiftDeg = yearsDiff / 72;
-  return baseAyanamsa - shiftDeg;
-}
-
-function wrap360(deg: number) {
-  return ((deg % 360) + 360) % 360;
-}
-
-function extractSignDegrees(longitude: number) {
-  const normalized = wrap360(longitude);
-  const signIndex = Math.floor(normalized / 30);
-
-  const signs = [
-    "Aries", "Taurus", "Gemini", "Cancer",
-    "Leo", "Virgo", "Libra", "Scorpio",
-    "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-  ];
-  
-  const sign = signs[signIndex];
-  const degreesIntoSign = normalized - signIndex * 30;
-  const degWhole = Math.floor(degreesIntoSign);
-  let minWhole = Math.round((degreesIntoSign - degWhole) * 60);
-
-  let finalDeg = degWhole;
-  if (minWhole === 60) {
-    finalDeg += 1;
-    minWhole = 0;
-  }
-
-  return { sign, deg: finalDeg, min: minWhole };
-}
-
 function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): number {
   // Get nutation parameters from TT (not UT)
   const { dpsi, deps } = nutation.nutation(jdTT);
