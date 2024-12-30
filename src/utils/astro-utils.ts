@@ -51,58 +51,29 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
     utcMoment.date() + ((utcMoment.hours() + utcMoment.minutes() / 60.0) / 24.0)
   );
   
-  console.log("Julian Day calculation:", {
-    year: utcMoment.year(),
-    month: utcMoment.month() + 1,
-    day: utcMoment.date(),
-    fractionalDay: (utcMoment.hours() + utcMoment.minutes() / 60.0) / 24.0,
-    julianDay: jd
-  });
-  
-  // Calculate Julian Ephemeris Day
-  const deltaT = 67.2;
+  // Calculate Julian Ephemeris Day (adding deltaT correction)
+  const deltaT = 67.2; // Approximate value for 1980
   const jde = jd + deltaT / 86400;
-  console.log("Julian Ephemeris Day calculation:", {
-    julianDay: jd,
-    deltaT,
-    julianEphemerisDay: jde
-  });
   
-  // Calculate Sun's position
+  // Calculate Sun's apparent longitude (corrected)
   const sunLong = solar.apparentLongitude(jde);
-  const sunLongDeg = sunLong * 180 / Math.PI;
-  console.log("Sun apparent longitude (degrees):", sunLongDeg);
+  const sunLongDeg = (sunLong * 180 / Math.PI + 360) % 360;
   
-  // Calculate Moon's position
+  // Calculate Moon's position (corrected)
   const moonPos = getMoonPosition(jde);
-  const moonLong = moonPos.lon * 180 / Math.PI;
-  const moonLat = moonPos.lat * 180 / Math.PI;
-  console.log("Moon position:", {
-    longitude: moonLong,
-    latitude: moonLat
-  });
+  const moonLong = (moonPos.lon * 180 / Math.PI + 360) % 360;
   
-  // Calculate Ascendant
-  const lst = sidereal.apparent(jde) * 180 / Math.PI;
-  console.log("Local Sidereal Time (degrees):", lst);
+  // Calculate RAMC (Right Ascension of Midheaven)
+  const lst = sidereal.apparent(jde);
+  const ramc = (lst * 180 / Math.PI + data.longitude + 360) % 360;
   
-  const ascendant = calculateAscendant(lst, data.latitude, data.longitude);
-  console.log("Raw Ascendant (degrees):", ascendant);
+  // Calculate Ascendant using corrected formula
+  const ascendant = calculateAscendant(ramc, data.latitude);
   
-  // Apply ayanamsa correction for sidereal calculations
-  const ayanamsa = system === "sidereal" ? 23.85 : 0;  // Fixed ayanamsa for 1980
-  console.log("Ayanamsa correction:", ayanamsa);
-  
-  // Convert to zodiac positions with corrected angles
-  const sunPosition = getZodiacPosition((sunLongDeg + 360) % 360);
-  const moonPosition = getZodiacPosition((moonLong + 360) % 360);
-  const ascPosition = getZodiacPosition((ascendant + 360) % 360);
-  
-  console.log("Final zodiac positions:", {
-    sun: { sign: sunPosition.sign, deg: sunPosition.degrees, min: sunPosition.minutes },
-    moon: { sign: moonPosition.sign, deg: moonPosition.degrees, min: moonPosition.minutes },
-    rising: { sign: ascPosition.sign, deg: ascPosition.degrees, min: ascPosition.minutes }
-  });
+  // Convert positions to zodiac signs
+  const sunPosition = getZodiacPosition(sunLongDeg);
+  const moonPosition = getZodiacPosition(moonLong);
+  const ascPosition = getZodiacPosition(ascendant);
 
   return {
     sunSign: sunPosition.sign,
@@ -117,44 +88,26 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   };
 }
 
-function calculateAscendant(lst: number, lat: number, long: number): number {
-  console.log("Calculating Ascendant with inputs:", {
-    localSiderealTime: lst,
-    latitude: lat,
-    longitude: long
-  });
+function calculateAscendant(ramc: number, latitude: number): number {
+  // Convert to radians
+  const latRad = latitude * Math.PI / 180;
+  const ramcRad = ramc * Math.PI / 180;
+  const obliquityRad = 23.4367 * Math.PI / 180; // Mean obliquity for 1980
   
-  const latRad = lat * Math.PI / 180;
-  const lstRad = (lst + long) * Math.PI / 180;
-  const obliqRad = 23.4367 * Math.PI / 180;
-  
-  const tanAsc = Math.sin(lstRad) /
-                 (Math.cos(lstRad) * Math.cos(obliqRad) -
-                  Math.tan(latRad) * Math.sin(obliqRad));
+  // Calculate ascendant using the correct spherical trigonometry formula
+  const tanAsc = -Math.cos(ramcRad) / 
+                 (Math.sin(obliquityRad) * Math.tan(latRad) + 
+                  Math.cos(obliquityRad) * Math.sin(ramcRad));
   
   let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
   
-  if (lst + long > 180) {
+  // Adjust quadrant based on RAMC
+  if (ramc >= 180) {
     ascendant += 180;
-  } else if (lst + long > 0 && ascendant < 0) {
-    ascendant += 360;
   }
   
-  ascendant = (ascendant + 360) % 360;
-  
-  console.log("Ascendant calculation steps:", {
-    tanAscendant: tanAsc,
-    rawAscendant: ascendant
-  });
-  
-  return ascendant;
-}
-
-function calculateAyanamsa(jde: number): number {
-  const T = (jde - 2451545.0) / 36525;
-  const ayanamsa = 23.85 + 0.0137 * T;
-  console.log("Calculated Ayanamsa:", ayanamsa);
-  return ayanamsa;
+  // Normalize to 0-360 range
+  return (ascendant + 360) % 360;
 }
 
 function getZodiacPosition(longitude: number) {
@@ -169,15 +122,6 @@ function getZodiacPosition(longitude: number) {
   const totalDegrees = normalizedLong % 30;
   const degrees = Math.floor(totalDegrees);
   const minutes = Math.floor((totalDegrees - degrees) * 60);
-  
-  console.log("Zodiac position calculation:", {
-    inputLongitude: longitude,
-    normalizedLongitude: normalizedLong,
-    signIndex,
-    sign: signs[signIndex],
-    degrees,
-    minutes
-  });
   
   return {
     sign: signs[signIndex],
