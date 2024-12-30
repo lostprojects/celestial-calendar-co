@@ -32,16 +32,11 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
   // Create date object for astronomia calculations
-  const t = {
-    year,
-    month,
-    day,
-    hour: hour + minute/60,
-  };
-  console.log("Time object created:", t);
+  const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
+  console.log("Date object created:", date);
   
   // Calculate Julian Day
-  const jd = DateToJD(t);
+  const jd = DateToJD(date);
   console.log("Julian Day:", jd);
   
   // Calculate Julian Ephemeris Day (JDE)
@@ -50,20 +45,20 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   console.log("Julian Ephemeris Day:", jde);
   
   // Calculate Sun position
-  const sunLong = solarCalc.apparentLongitude(t);
+  const sunLong = solarCalc.apparentLongitude(jde);
   console.log("Sun apparent longitude:", sunLong);
   
   // Calculate Moon position
-  const moonPos = getMoonPosition(t);
+  const moonPos = getMoonPosition(jde);
   const moonLong = moonPos.lon;
   console.log("Moon longitude:", moonLong);
   
   // Calculate Ascendant (Rising Sign)
-  const ascendant = calculateAscendant(t, data.latitude, data.longitude);
+  const ascendant = calculateAscendant(jde, data.latitude, data.longitude);
   console.log("Ascendant:", ascendant);
   
   // Apply ayanamsa correction for sidereal calculations
-  const ayanamsa = system === "sidereal" ? calculateAyanamsa(t) : 0;
+  const ayanamsa = system === "sidereal" ? calculateAyanamsa(jde) : 0;
   console.log("Ayanamsa correction:", ayanamsa);
   
   // Convert to zodiac positions
@@ -84,11 +79,10 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   };
 }
 
-function calculateAscendant(t: any, lat: number, long: number): number {
+function calculateAscendant(jde: number, lat: number, long: number): number {
   // Local Sidereal Time calculation
-  const jd = DateToJD(t);
-  const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const theta0 = 280.46061837 + 360.98564736629 * (jd - 2451545.0) +
+  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const theta0 = 280.46061837 + 360.98564736629 * (jde - 2451545.0) +
                  0.000387933 * T * T - T * T * T / 38710000;
   
   // Adjust for longitude
@@ -96,7 +90,7 @@ function calculateAscendant(t: any, lat: number, long: number): number {
   console.log("Local Sidereal Time:", lst);
   
   // Calculate ascendant using Placidus house system
-  const obliq = coord.obliquity(t);
+  const obliq = coord.obliquity(jde);
   const tanAsc = Math.sin(lst * Math.PI / 180) /
                  (Math.cos(lst * Math.PI / 180) * Math.cos(obliq * Math.PI / 180) -
                   Math.tan(lat * Math.PI / 180) * Math.sin(obliq * Math.PI / 180));
@@ -113,10 +107,9 @@ function calculateAscendant(t: any, lat: number, long: number): number {
   return ascendant;
 }
 
-function calculateAyanamsa(t: any): number {
+function calculateAyanamsa(jde: number): number {
   // Lahiri ayanamsa calculation
-  const jd = DateToJD(t);
-  const T = (jd - 2451545.0) / 36525;
+  const T = (jde - 2451545.0) / 36525;
   return 23.85 + 0.0137 * T; // Simplified Lahiri ayanamsa
 }
 
