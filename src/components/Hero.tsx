@@ -5,11 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 
 export const Hero = () => {
   const { toast } = useToast();
-  
-  const scrollToForm = () => {
-    const form = document.querySelector('#birth-chart-section');
-    form?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const showNewSignup = () => {
     toast({
@@ -80,7 +75,6 @@ export const Hero = () => {
             
             {/* CTA */}
             <Button 
-              onClick={scrollToForm}
               className="bg-[#FEC6A1] hover:bg-[#FEC6A1]/90 text-primary-dark px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
             >
               <span className="relative z-10">Get Your Cosmic Blueprint</span>
