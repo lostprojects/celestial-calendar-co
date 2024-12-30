@@ -34,10 +34,14 @@ export function calculateBirthChart(
     birthDate, birthTime, birthPlace, latitude, longitude
   });
 
-  // Use Europe/London for UK locations
-  const timezone = birthPlace.toLowerCase().includes("uk") 
-    ? "Europe/London" 
-    : birthPlace;
+  // Check for various UK location strings
+  const ukTerms = ["uk", "united kingdom", "england", "scotland", "wales", "northern ireland"];
+  const isUKLocation = ukTerms.some(term => 
+    birthPlace.toLowerCase().includes(term)
+  );
+  
+  // Use Europe/London for UK locations, otherwise use birthPlace
+  const timezone = isUKLocation ? "Europe/London" : birthPlace;
   
   const localTime = moment.tz(`${birthDate}T${birthTime}`, timezone);
   
