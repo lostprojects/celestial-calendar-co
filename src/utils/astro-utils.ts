@@ -69,10 +69,19 @@ export function calculateBirthChart(
   console.log("Delta T (seconds):", deltaTsec);
   console.log("Julian Day (TT):", jdTT);
 
+  // Get nutation parameters for ascendant calculation
+  const { dpsi, deps } = nutation.nutation(jdTT);
+  const meanEps = nutation.meanObliquity(jdTT);
+  const epsTrue = meanEps + deps;
+  
+  console.log("Nutation Parameters:", {
+    dpsi, deps, meanEps, epsTrue
+  });
+
   // Get tropical positions directly from astronomia
   const sunLonTrop = solar.apparentLongitude(jdTT);
   const moonLonTrop = moonposition.position(jdTT).lon;
-  const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude);
+  const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude, dpsi, epsTrue);
   
   console.log("Tropical positions:", {
     sunLonTrop,
@@ -130,7 +139,11 @@ function approximateDeltaT(year: number, month: number) {
   const base = 69.4; // sec in 2020
   const slope = 0.2; // sec/yr
   const yearsOffset = (year + (month - 0.5) / 12) - yMid;
-  return base + slope * yearsOffset; 
+  const result = base + slope * yearsOffset;
+  console.log("Delta T calculation:", {
+    year, month, yearsOffset, result
+  });
+  return result;
 }
 
 function approximateAyanamsa(year: number) {
@@ -138,7 +151,11 @@ function approximateAyanamsa(year: number) {
   const baseAyanamsa = 24; 
   const yearsDiff = year - baseYear;
   const shiftDeg = yearsDiff / 72;
-  return baseAyanamsa - shiftDeg;
+  const result = baseAyanamsa - shiftDeg;
+  console.log("Ayanamsa calculation:", {
+    year, yearsDiff, shiftDeg, result
+  });
+  return result;
 }
 
 function wrap360(deg: number) {
@@ -166,14 +183,30 @@ function extractSignDegrees(longitude: number) {
     minWhole = 0;
   }
 
+  console.log("Sign extraction:", {
+    longitude,
+    normalized,
+    signIndex,
+    sign,
+    degreesIntoSign,
+    finalDeg,
+    minWhole
+  });
+
   return { sign, deg: finalDeg, min: minWhole };
 }
 
-function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): number {
-  // Get nutation parameters from TT
-  const { dpsi, deps } = nutation.nutation(jdTT);
-  const meanEps = nutation.meanObliquity(jdTT);
-  const epsTrue = meanEps + deps;
+function calcAscendant(
+  jdUT: number, 
+  jdTT: number, 
+  lat: number, 
+  lon: number,
+  dpsi: number,
+  epsTrue: number
+): number {
+  console.log("Ascendant calculation inputs:", {
+    jdUT, jdTT, lat, lon, dpsi, epsTrue
+  });
   
   // Get apparent sidereal time in hours using nutation parameters
   const gastH = sidereal.apparent(jdUT, dpsi, epsTrue);
@@ -183,11 +216,25 @@ function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): nu
   const lstRad = lstDeg * Math.PI / 180;
   const latRad = lat * Math.PI / 180;
   
+  console.log("Ascendant intermediate values:", {
+    gastH,
+    lstDeg,
+    lstRad,
+    latRad
+  });
+  
   // Calculate ascendant using true obliquity
   const ascRad = Math.atan2(
     Math.cos(lstRad),
     -Math.sin(lstRad) * Math.cos(epsTrue) + Math.tan(latRad) * Math.sin(epsTrue)
   );
   
-  return wrap360(ascRad * 180 / Math.PI);
+  const ascDeg = wrap360(ascRad * 180 / Math.PI);
+  
+  console.log("Ascendant final values:", {
+    ascRad,
+    ascDeg
+  });
+  
+  return ascDeg;
 }
