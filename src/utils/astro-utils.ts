@@ -1,6 +1,9 @@
 import { julian, solar, moonposition, nutation, sidereal } from "astronomia";
 import moment from "moment-timezone";
 
+const RAD_TO_DEG = 180 / Math.PI;
+const DEG_TO_RAD = Math.PI / 180;
+
 export type AstroSystem = "tropical" | "sidereal";
 
 export interface BirthChartData {
@@ -24,17 +27,32 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
+function debugLog(message: string, data: any) {
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[DEBUG] ${message}:`, data);
+  }
+}
+
+function validateNumericValue(value: number, name: string): number {
+  if (typeof value !== 'number' || isNaN(value)) {
+    const error = `Invalid ${name}: ${value}`;
+    console.error(`[ERROR] ${error}`);
+    throw new Error(error);
+  }
+  return value;
+}
+
 export function calculateBirthChart(
   data: BirthChartData,
   system: AstroSystem
 ): BirthChartResult {
   const { birthDate, birthTime, birthPlace, latitude, longitude } = data;
 
-  console.log(`[DEBUG] Starting birth chart calculation for:`, {
+  debugLog("Starting birth chart calculation for", {
     birthDate, birthTime, birthPlace, latitude, longitude, system
   });
 
-  // Check for various UK location strings
+  // Parse local time
   const ukTerms = ["uk", "united kingdom", "england", "scotland", "wales", "northern ireland"];
   const isUKLocation = ukTerms.some(term => 
     birthPlace.toLowerCase().includes(term)
@@ -43,7 +61,7 @@ export function calculateBirthChart(
   const timezone = isUKLocation ? "Europe/London" : birthPlace;
   const localTime = moment.tz(`${birthDate}T${birthTime}`, timezone);
   
-  console.log("[DEBUG] Parsed Local Time:", {
+  debugLog("Parsed Local Time", {
     formatted: localTime.format(),
     utc: localTime.utc().format(),
     jsDate: localTime.toDate(),
@@ -51,7 +69,7 @@ export function calculateBirthChart(
     offset: localTime.utcOffset()
   });
 
-  // Get Julian Days (UT) using direct calculation
+  // Calculate Julian Days
   const year = localTime.year();
   const month = localTime.month() + 1;
   const day = localTime.date();
@@ -59,47 +77,94 @@ export function calculateBirthChart(
   const minute = localTime.minute();
   const fractionOfDay = (hour + minute / 60) / 24;
 
-  console.log("[DEBUG] Julian Day inputs:", {
+  debugLog("Julian Day inputs", {
     year, month, day, hour, minute, fractionOfDay
   });
 
   const jdUT = julian.CalendarGregorianToJD(year, month, day + fractionOfDay);
-  console.log("[DEBUG] Julian Day (UT):", jdUT);
+  validateNumericValue(jdUT, "Julian Day UT");
 
-  // Calculate Delta T and get TT
-  const deltaTsec = approximateDeltaT(year, month);
+  // Calculate Delta T using NASA's polynomial approximations
+  const y = year + (month - 0.5) / 12;
+  let deltaTsec;
+  if (y < 1986) {
+    const t = (y - 1950) / 100;
+    deltaTsec = 29.07 + 40.7 * t - 42.2 * t * t - 41.4 * t * t * t;
+  } else {
+    const t = (y - 2000) / 100;
+    deltaTsec = 63.86 + 33.45 * t - 603.74 * t * t + 1727.5 * t * t * t;
+  }
+
   const jdTT = jdUT + deltaTsec / 86400;
+  validateNumericValue(jdTT, "Julian Day TT");
   
-  console.log("[DEBUG] Time conversion:", {
+  debugLog("Time conversion", {
     deltaTsec,
     jdUT,
     jdTT,
     difference: jdTT - jdUT
   });
 
-  // Get nutation parameters for ascendant calculation
+  // Calculate nutation parameters with validation
+  debugLog("Pre-nutation calculation", { jdTT });
   const { dpsi, deps } = nutation.nutation(jdTT);
+  validateNumericValue(dpsi, "Nutation dpsi");
+  validateNumericValue(deps, "Nutation deps");
+
   const meanEps = nutation.meanObliquity(jdTT);
+  validateNumericValue(meanEps, "Mean obliquity");
   const epsTrue = meanEps + deps;
+  validateNumericValue(epsTrue, "True obliquity");
   
-  console.log("[DEBUG] Nutation Parameters:", {
-    dpsi, deps, meanEps, epsTrue
+  debugLog("Nutation Parameters", {
+    dpsi: dpsi * RAD_TO_DEG,
+    deps: deps * RAD_TO_DEG,
+    meanEps: meanEps * RAD_TO_DEG,
+    epsTrue: epsTrue * RAD_TO_DEG
   });
 
-  // Get tropical positions directly from astronomia
-  const sunLonTrop = solar.apparentLongitude(jdTT);
-  const moonLonTrop = moonposition.position(jdTT).lon;
-  const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude, dpsi, epsTrue);
+  // Calculate positions with proper radian to degree conversion
+  const sunLonTrop = validateNumericValue(solar.apparentLongitude(jdTT) * RAD_TO_DEG, "Solar longitude");
+  const moonLonTrop = validateNumericValue(moonposition.position(jdTT).lon * RAD_TO_DEG, "Lunar longitude");
   
-  console.log("[DEBUG] Raw tropical positions:", {
+  // Calculate ascendant with detailed validation
+  const gastH = sidereal.apparent(jdUT, dpsi, epsTrue);
+  validateNumericValue(gastH, "GAST hours");
+  
+  const lstDeg = wrap360(gastH * 15 + longitude);
+  const lstRad = lstDeg * DEG_TO_RAD;
+  const latRad = latitude * DEG_TO_RAD;
+  
+  debugLog("Ascendant calculation inputs", {
+    gastH,
+    lstDeg,
+    lstRad,
+    latRad,
+    epsTrueRad: epsTrue
+  });
+
+  const cosLst = Math.cos(lstRad);
+  const sinLst = Math.sin(lstRad);
+  const cosEps = Math.cos(epsTrue);
+  const sinEps = Math.sin(epsTrue);
+  const tanLat = Math.tan(latRad);
+
+  debugLog("Ascendant trig values", {
+    cosLst, sinLst, cosEps, sinEps, tanLat
+  });
+
+  const numerator = cosLst;
+  const denominator = -sinLst * cosEps + tanLat * sinEps;
+  const ascRad = Math.atan2(numerator, denominator);
+  const ascLonTrop = wrap360(ascRad * RAD_TO_DEG);
+  
+  debugLog("Raw tropical positions", {
     sunLonTrop,
     moonLonTrop,
-    ascLonTrop,
-    sunLonDeg: sunLonTrop * 180 / Math.PI,
-    moonLonDeg: moonLonTrop * 180 / Math.PI,
+    ascLonTrop
   });
 
-  // For sidereal calculations, apply ayanamsa
+  // Handle sidereal calculations
   let finalPositions;
   if (system === "sidereal") {
     const ayanamsa = approximateAyanamsa(year);
@@ -108,7 +173,7 @@ export function calculateBirthChart(
       moonLon: wrap360(moonLonTrop - ayanamsa),
       ascLon: wrap360(ascLonTrop - ayanamsa)
     };
-    console.log("[DEBUG] Sidereal positions after ayanamsa:", {
+    debugLog("Sidereal positions after ayanamsa", {
       ayanamsa,
       ...finalPositions
     });
@@ -125,7 +190,7 @@ export function calculateBirthChart(
   const moonObj = extractSignDegrees(finalPositions.moonLon);
   const ascObj = extractSignDegrees(finalPositions.ascLon);
 
-  console.log(`[DEBUG] Final ${system} positions:`, {
+  debugLog(`Final ${system} positions`, {
     sun: sunObj,
     moon: moonObj,
     asc: ascObj
@@ -144,32 +209,17 @@ export function calculateBirthChart(
   };
 }
 
-function approximateDeltaT(year: number, month: number) {
-  const yMid = 2020;
-  const base = 69.4; // sec in 2020
-  const slope = 0.2; // sec/yr
-  const yearsOffset = (year + (month - 0.5) / 12) - yMid;
-  const result = base + slope * yearsOffset;
-  
-  console.log("[DEBUG] Delta T calculation:", {
-    year, month, yearsOffset,
-    formula: `${base} + ${slope} * ${yearsOffset}`,
-    result
-  });
-  
-  return result;
-}
-
 function approximateAyanamsa(year: number) {
-  const baseYear = 2020;
-  const baseAyanamsa = 24; 
+  const baseYear = 2000;
+  const baseAyanamsa = 23.85;
   const yearsDiff = year - baseYear;
-  const shiftDeg = yearsDiff / 72;
-  const result = baseAyanamsa - shiftDeg;
+  const shiftDeg = yearsDiff * (50.27 / 3600); // More accurate annual precession
+  const result = baseAyanamsa + shiftDeg;
   
-  console.log("[DEBUG] Ayanamsa calculation:", {
-    year, yearsDiff, shiftDeg,
-    formula: `${baseAyanamsa} - (${yearsDiff} / 72)`,
+  debugLog("Ayanamsa calculation", {
+    year,
+    yearsDiff,
+    shiftDeg,
     result
   });
   
@@ -178,12 +228,11 @@ function approximateAyanamsa(year: number) {
 
 function wrap360(deg: number) {
   const result = ((deg % 360) + 360) % 360;
-  console.log("[DEBUG] wrap360:", { input: deg, result });
-  return result;
+  return validateNumericValue(result, "wrap360");
 }
 
 function extractSignDegrees(longitude: number) {
-  console.log("[DEBUG] extractSignDegrees input:", longitude);
+  debugLog("extractSignDegrees input", longitude);
   
   const normalized = wrap360(longitude);
   const signIndex = Math.floor(normalized / 30);
@@ -205,7 +254,7 @@ function extractSignDegrees(longitude: number) {
     minWhole = 0;
   }
 
-  console.log("[DEBUG] Sign extraction:", {
+  debugLog("Sign extraction", {
     longitude,
     normalized,
     signIndex,
@@ -216,62 +265,4 @@ function extractSignDegrees(longitude: number) {
   });
 
   return { sign, deg: finalDeg, min: minWhole };
-}
-
-function calcAscendant(
-  jdUT: number, 
-  jdTT: number, 
-  lat: number, 
-  lon: number,
-  dpsi: number,
-  epsTrue: number
-): number {
-  console.log("[DEBUG] Ascendant calculation inputs:", {
-    jdUT, jdTT, lat, lon, dpsi, epsTrue
-  });
-  
-  // Get apparent sidereal time in hours using nutation parameters
-  const gastH = sidereal.apparent(jdUT, dpsi, epsTrue);
-  
-  // Convert to degrees and add longitude for local sidereal time
-  const lstDeg = wrap360(gastH * 15 + lon);
-  const lstRad = lstDeg * Math.PI / 180;
-  const latRad = lat * Math.PI / 180;
-  
-  console.log("[DEBUG] Ascendant intermediate values:", {
-    gastH,
-    lstDeg,
-    lstRad,
-    latRad,
-    epsTrueRad: epsTrue * Math.PI / 180
-  });
-  
-  // Calculate ascendant using true obliquity
-  const epsTrueRad = epsTrue * Math.PI / 180;
-  const cosLst = Math.cos(lstRad);
-  const sinLst = Math.sin(lstRad);
-  const cosEps = Math.cos(epsTrueRad);
-  const sinEps = Math.sin(epsTrueRad);
-  const tanLat = Math.tan(latRad);
-  
-  console.log("[DEBUG] Ascendant trig values:", {
-    cosLst, sinLst, cosEps, sinEps, tanLat
-  });
-  
-  const numerator = cosLst;
-  const denominator = -sinLst * cosEps + tanLat * sinEps;
-  
-  console.log("[DEBUG] Ascendant atan2 inputs:", {
-    numerator, denominator
-  });
-  
-  const ascRad = Math.atan2(numerator, denominator);
-  const ascDeg = wrap360(ascRad * 180 / Math.PI);
-  
-  console.log("[DEBUG] Ascendant final values:", {
-    ascRad,
-    ascDeg
-  });
-  
-  return ascDeg;
 }
