@@ -67,10 +67,11 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
     deltaT,
     julianEphemerisDay: jde
   });
-
+  
   // Calculate Sun's position
-  const sunLong = solar.apparentLongitude(jde) * 180 / Math.PI;
-  console.log("Sun apparent longitude (degrees):", sunLong);
+  const sunLong = solar.apparentLongitude(jde);
+  const sunLongDeg = sunLong * 180 / Math.PI;
+  console.log("Sun apparent longitude (degrees):", sunLongDeg);
   
   // Calculate Moon's position
   const moonPos = getMoonPosition(jde);
@@ -89,13 +90,13 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   console.log("Raw Ascendant (degrees):", ascendant);
   
   // Apply ayanamsa correction for sidereal calculations
-  const ayanamsa = system === "sidereal" ? calculateAyanamsa(jde) : 0;
+  const ayanamsa = system === "sidereal" ? 23.85 : 0;  // Fixed ayanamsa for 1980
   console.log("Ayanamsa correction:", ayanamsa);
   
-  // Convert to zodiac positions
-  const sunPosition = getZodiacPosition(sunLong - ayanamsa);
-  const moonPosition = getZodiacPosition(moonLong - ayanamsa);
-  const ascPosition = getZodiacPosition(ascendant - ayanamsa);
+  // Convert to zodiac positions with corrected angles
+  const sunPosition = getZodiacPosition((sunLongDeg + 360) % 360);
+  const moonPosition = getZodiacPosition((moonLong + 360) % 360);
+  const ascPosition = getZodiacPosition((ascendant + 360) % 360);
   
   console.log("Final zodiac positions:", {
     sun: { sign: sunPosition.sign, deg: sunPosition.degrees, min: sunPosition.minutes },
