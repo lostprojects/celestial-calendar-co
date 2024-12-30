@@ -114,29 +114,6 @@ export function calculateBirthChart(
   };
 }
 
-function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): number {
-  // Get nutation parameters from TT (not UT)
-  const { dpsi, deps } = nutation.nutation(jdTT);
-  const meanEps = nutation.meanObliquity(jdTT);  // Use TT for mean obliquity
-  const epsTrue = meanEps + deps;
-  
-  // Use UT for sidereal time but with TT-based nutation parameters
-  const gastH = sidereal.apparent(jdUT, dpsi, epsTrue);
-  
-  // Convert to degrees and add longitude for local sidereal time
-  const lstDeg = wrap360(gastH * 15 + lon);
-  const lstRad = lstDeg * Math.PI / 180;
-  const latRad = lat * Math.PI / 180;
-  
-  // Calculate ascendant using true obliquity from TT
-  const ascRad = Math.atan2(
-    Math.cos(lstRad),
-    -Math.sin(lstRad) * Math.cos(epsTrue) + Math.tan(latRad) * Math.sin(epsTrue)
-  );
-  
-  return wrap360(ascRad * 180 / Math.PI);
-}
-
 function approximateDeltaT(year: number, month: number) {
   const yMid = 2020;
   const base = 69.4; // sec in 2020
@@ -179,4 +156,27 @@ function extractSignDegrees(longitude: number) {
   }
 
   return { sign, deg: finalDeg, min: minWhole };
+}
+
+function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): number {
+  // Get nutation parameters from TT
+  const { dpsi, deps } = nutation.nutation(jdTT);
+  const meanEps = nutation.meanObliquity(jdTT);
+  const epsTrue = meanEps + deps;
+  
+  // Get apparent sidereal time in hours using nutation parameters
+  const gastH = sidereal.apparent(jdUT, dpsi, epsTrue);
+  
+  // Convert to degrees and add longitude for local sidereal time
+  const lstDeg = wrap360(gastH * 15 + lon);
+  const lstRad = lstDeg * Math.PI / 180;
+  const latRad = lat * Math.PI / 180;
+  
+  // Calculate ascendant using true obliquity
+  const ascRad = Math.atan2(
+    Math.cos(lstRad),
+    -Math.sin(lstRad) * Math.cos(epsTrue) + Math.tan(latRad) * Math.sin(epsTrue)
+  );
+  
+  return wrap360(ascRad * 180 / Math.PI);
 }
