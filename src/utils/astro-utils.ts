@@ -41,15 +41,13 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  // Calculate fraction of day
-  const fractionOfDay = (hour + minute / 60) / 24;
+  // Create a JavaScript Date object
+  const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
   
-  console.log("[DEBUG] Julian Day inputs:", {
-    year, month, day, hour, minute, fractionOfDay
-  });
-
-  // Calculate Julian Day
-  const jd = julian.DateToJD(year, month, day + fractionOfDay);
+  console.log("[DEBUG] Created Date object:", date.toISOString());
+  
+  // Calculate Julian Day using the Date object
+  const jd = julian.DateToJD(date);
   
   // Calculate Julian Ephemeris Day (JDE)
   const deltaT = 36.392465; // ΔT value for 1980 (example)
