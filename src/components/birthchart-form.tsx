@@ -37,30 +37,19 @@ export default function BirthChartForm() {
     try {
       const wChart = calculateBirthChart(testData, "tropical");
       setWesternResults(wChart);
-      
+      console.log("Western calculation successful:", wChart);
+    } catch (err) {
+      console.error("Western calculation error:", err);
+      setWesternResults(null);
+    }
+
+    try {
       const sChart = calculateBirthChart(testData, "sidereal");
       setVedicResults(sChart);
-      
-      console.log("Test Results:", {
-        western: wChart,
-        vedic: sChart
-      });
+      console.log("Vedic calculation successful:", sChart);
     } catch (err) {
-      console.error("Test calculation error:", err);
-      // Set at least one result to show partial calculations
-      if (westernResults) {
-        setVedicResults({
-          sunSign: "Error",
-          moonSign: "Error",
-          risingSign: "Error",
-          sunDeg: 0,
-          sunMin: 0,
-          moonDeg: 0,
-          moonMin: 0,
-          risingDeg: 0,
-          risingMin: 0
-        });
-      }
+      console.error("Vedic calculation error:", err);
+      setVedicResults(null);
     }
   };
 
@@ -91,20 +80,6 @@ export default function BirthChartForm() {
       console.log("Birth chart calculated successfully!");
     } catch (err) {
       console.error("Calculation error:", err);
-      // Ensure at least one result shows
-      if (westernResults) {
-        setVedicResults({
-          sunSign: "Error",
-          moonSign: "Error",
-          risingSign: "Error",
-          sunDeg: 0,
-          sunMin: 0,
-          moonDeg: 0,
-          moonMin: 0,
-          risingDeg: 0,
-          risingMin: 0
-        });
-      }
     }
   }
 
@@ -184,11 +159,31 @@ export default function BirthChartForm() {
         </Button>
       </form>
 
-      {westernResults && vedicResults && (
+      {(westernResults || vedicResults) && (
         <div className="mt-8">
           <ChartResults
-            mainWestern={westernResults}
-            mainVedic={vedicResults}
+            mainWestern={westernResults || {
+              sunSign: "Error",
+              moonSign: "Error",
+              risingSign: "Error",
+              sunDeg: 0,
+              sunMin: 0,
+              moonDeg: 0,
+              moonMin: 0,
+              risingDeg: 0,
+              risingMin: 0
+            }}
+            mainVedic={vedicResults || {
+              sunSign: "Error",
+              moonSign: "Error",
+              risingSign: "Error",
+              sunDeg: 0,
+              sunMin: 0,
+              moonDeg: 0,
+              moonMin: 0,
+              risingDeg: 0,
+              risingMin: 0
+            }}
           />
         </div>
       )}
