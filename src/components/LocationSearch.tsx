@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import opencage from 'opencage-api-client';
 import { useDebounce } from "@/hooks/use-debounce";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LocationSearchProps {
   onLocationSelect: (location: { place: string; lat: number; lng: number }) => void;
@@ -23,9 +24,18 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
 
     setIsLoading(true);
     try {
+      // Get the OpenCage API key from Supabase secrets
+      const { data: secretData, error: secretError } = await supabase.functions.invoke('get-config', {
+        body: { key: 'OPENCAGE_API_KEY' }
+      });
+
+      if (secretError || !secretData?.value) {
+        throw new Error('Failed to retrieve OpenCage API key');
+      }
+
       const result = await opencage.geocode({
         q: searchTerm,
-        key: "9cd783e89d3c498bb6e56b2c45c91b6c", // Using a temporary API key for testing
+        key: secretData.value,
         limit: 5,
       });
 
