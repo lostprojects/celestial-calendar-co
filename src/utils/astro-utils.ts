@@ -107,20 +107,21 @@ export function calculateBirthChart(
 
   // Calculate nutation parameters with validation
   debugLog("Pre-nutation calculation", { jdTT });
-  const { dpsi, deps } = nutation.nutation(jdTT);
-  validateNumericValue(dpsi, "Nutation dpsi");
-  validateNumericValue(deps, "Nutation deps");
+  
+  // Fix: Properly handle astronomia nutation outputs
+  const nutResult = nutation.nutation(jdTT);
+  const dpsi = validateNumericValue(nutResult.dpsi * RAD_TO_DEG, "Nutation dpsi");
+  const deps = validateNumericValue(nutResult.deps * RAD_TO_DEG, "Nutation deps");
 
-  const meanEps = nutation.meanObliquity(jdTT);
-  validateNumericValue(meanEps, "Mean obliquity");
+  const meanEps = validateNumericValue(nutation.meanObliquity(jdTT) * RAD_TO_DEG, "Mean obliquity");
   const epsTrue = meanEps + deps;
   validateNumericValue(epsTrue, "True obliquity");
   
   debugLog("Nutation Parameters", {
-    dpsi: dpsi * RAD_TO_DEG,
-    deps: deps * RAD_TO_DEG,
-    meanEps: meanEps * RAD_TO_DEG,
-    epsTrue: epsTrue * RAD_TO_DEG
+    dpsi,
+    deps,
+    meanEps,
+    epsTrue
   });
 
   // Calculate positions with proper radian to degree conversion
@@ -128,7 +129,7 @@ export function calculateBirthChart(
   const moonLonTrop = validateNumericValue(moonposition.position(jdTT).lon * RAD_TO_DEG, "Lunar longitude");
   
   // Calculate ascendant with detailed validation
-  const gastH = sidereal.apparent(jdUT, dpsi, epsTrue);
+  const gastH = sidereal.apparent(jdUT);
   validateNumericValue(gastH, "GAST hours");
   
   const lstDeg = wrap360(gastH * 15 + longitude);
@@ -140,13 +141,13 @@ export function calculateBirthChart(
     lstDeg,
     lstRad,
     latRad,
-    epsTrueRad: epsTrue
+    epsTrueRad: epsTrue * DEG_TO_RAD
   });
 
   const cosLst = Math.cos(lstRad);
   const sinLst = Math.sin(lstRad);
-  const cosEps = Math.cos(epsTrue);
-  const sinEps = Math.sin(epsTrue);
+  const cosEps = Math.cos(epsTrue * DEG_TO_RAD);
+  const sinEps = Math.sin(epsTrue * DEG_TO_RAD);
   const tanLat = Math.tan(latRad);
 
   debugLog("Ascendant trig values", {
