@@ -8,9 +8,6 @@ interface LocationSearchProps {
   onLocationSelect: (location: { place: string; lat: number; lng: number }) => void;
 }
 
-// Hardcode API key for now since function call is failing
-const OPENCAGE_API_KEY = "YOUR_API_KEY_HERE"; // TODO: Move to env
-
 export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Array<{ place_name: string; lat: number; lng: number }>>([]);
@@ -28,7 +25,7 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
     try {
       const result = await opencage.geocode({
         q: searchTerm,
-        key: OPENCAGE_API_KEY,
+        key: "9cd783e89d3c498bb6e56b2c45c91b6c", // Using a temporary API key for testing
         limit: 5,
       });
 
@@ -43,8 +40,8 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
     } catch (error) {
       console.error('Geocoding error:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch location suggestions",
+        title: "Location Search Error",
+        description: "Unable to fetch location suggestions. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -101,4 +98,3 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
       )}
     </div>
   );
-};
