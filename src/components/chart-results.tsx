@@ -9,7 +9,11 @@ interface ChartResultsProps {
 export function ChartResults({ mainWestern, mainVedic }: ChartResultsProps) {
   if (!mainWestern || !mainVedic) return null;
 
+  console.log("ChartResults received Western:", mainWestern);
+  console.log("ChartResults received Vedic:", mainVedic);
+
   const formatPosition = (sign: string, deg: number, min: number) => {
+    console.log(`Formatting position for ${sign}:`, { deg, min });
     return `${sign} ${Math.floor(deg)}°${String(Math.floor(min)).padStart(2, "0")}′`;
   };
 

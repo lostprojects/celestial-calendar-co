@@ -41,10 +41,12 @@ export default function BirthChartForm() {
     try {
       // Calculate Western
       const wChart = calculateBirthChart(formData, "tropical");
+      console.log("Western Chart Results:", wChart);
       setWesternResults(wChart);
 
       // Calculate Vedic
       const sChart = calculateBirthChart(formData, "sidereal");
+      console.log("Vedic Chart Results:", sChart);
       setVedicResults(sChart);
 
       // Store in DB
@@ -73,7 +75,7 @@ export default function BirthChartForm() {
     system: "tropical" | "sidereal"
   ) {
     const { error } = await supabase.from("birth_charts").insert({
-      name: "Anonymous", // Add default name since it's required
+      name: "Anonymous",
       birth_date: data.birthDate,
       birth_time: data.birthTime,
       birth_place: data.birthPlace,
