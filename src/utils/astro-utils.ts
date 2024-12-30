@@ -26,7 +26,7 @@ export interface BirthChartResult {
 }
 
 export function calculateBirthChart(data: BirthChartData, system: "tropical" | "sidereal"): BirthChartResult {
-  // Detailed timezone logging
+  // Parse input date/time
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
@@ -36,7 +36,7 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
     rawInputs: { year, month, day, hour, minute }
   });
 
-  // Create moment object in local timezone
+  // Create moment in local timezone (Europe/London)
   const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
   console.log("Local time (BST):", localMoment.format());
   
@@ -44,28 +44,18 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const utcMoment = localMoment.utc();
   console.log("Converted UTC time:", utcMoment.format());
   
-  // Calculate fractional day
-  const utcHour = utcMoment.hours();
-  const utcMinute = utcMoment.minutes();
-  const fractionalDay = (utcHour + utcMinute / 60.0) / 24.0;
-  console.log("UTC time components:", {
-    hour: utcHour,
-    minute: utcMinute,
-    fractionalDay
-  });
-
-  // Calculate Julian Day
+  // Calculate Julian Day using UTC components
   const jd = CalendarGregorianToJD(
     utcMoment.year(),
     utcMoment.month() + 1,
-    utcMoment.date() + fractionalDay
+    utcMoment.date() + ((utcMoment.hours() + utcMoment.minutes() / 60.0) / 24.0)
   );
   
   console.log("Julian Day calculation:", {
     year: utcMoment.year(),
     month: utcMoment.month() + 1,
     day: utcMoment.date(),
-    fractionalDay,
+    fractionalDay: (utcMoment.hours() + utcMoment.minutes() / 60.0) / 24.0,
     julianDay: jd
   });
   
@@ -111,15 +101,6 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
     sun: { sign: sunPosition.sign, deg: sunPosition.degrees, min: sunPosition.minutes },
     moon: { sign: moonPosition.sign, deg: moonPosition.degrees, min: moonPosition.minutes },
     rising: { sign: ascPosition.sign, deg: ascPosition.degrees, min: ascPosition.minutes }
-  });
-
-  // Add logging for final positions
-  console.log("Final calculated positions:", {
-    sun: { sign: sunPosition.sign, deg: sunPosition.degrees, min: sunPosition.minutes },
-    moon: { sign: moonPosition.sign, deg: moonPosition.degrees, min: moonPosition.minutes },
-    asc: { sign: ascPosition.sign, deg: ascPosition.degrees, min: ascPosition.minutes },
-    system,
-    ayanamsa: system === "sidereal" ? calculateAyanamsa(jde) : 0
   });
 
   return {
