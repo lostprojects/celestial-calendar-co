@@ -108,16 +108,25 @@ export function calculateBirthChart(
   // Calculate nutation parameters with validation
   debugLog("Pre-nutation calculation", { jdTT });
   
-  // Fix: Properly handle astronomia nutation outputs
+  // Fix: Get raw nutation values first, validate, then convert to degrees
   const nutResult = nutation.nutation(jdTT);
-  const dpsi = validateNumericValue(nutResult.dpsi * RAD_TO_DEG, "Nutation dpsi");
-  const deps = validateNumericValue(nutResult.deps * RAD_TO_DEG, "Nutation deps");
+  
+  // Validate raw radian values before conversion
+  const dpsiRad = validateNumericValue(nutResult.dpsi, "Nutation dpsi (radians)");
+  const depsRad = validateNumericValue(nutResult.deps, "Nutation deps (radians)");
+  
+  // Convert to degrees after validation
+  const dpsi = dpsiRad * RAD_TO_DEG;
+  const deps = depsRad * RAD_TO_DEG;
 
-  const meanEps = validateNumericValue(nutation.meanObliquity(jdTT) * RAD_TO_DEG, "Mean obliquity");
+  const meanEpsRad = validateNumericValue(nutation.meanObliquity(jdTT), "Mean obliquity (radians)");
+  const meanEps = meanEpsRad * RAD_TO_DEG;
   const epsTrue = meanEps + deps;
   validateNumericValue(epsTrue, "True obliquity");
   
   debugLog("Nutation Parameters", {
+    dpsiRad,
+    depsRad,
     dpsi,
     deps,
     meanEps,
@@ -125,8 +134,11 @@ export function calculateBirthChart(
   });
 
   // Calculate positions with proper radian to degree conversion
-  const sunLonTrop = validateNumericValue(solar.apparentLongitude(jdTT) * RAD_TO_DEG, "Solar longitude");
-  const moonLonTrop = validateNumericValue(moonposition.position(jdTT).lon * RAD_TO_DEG, "Lunar longitude");
+  const sunLonRad = validateNumericValue(solar.apparentLongitude(jdTT), "Solar longitude (radians)");
+  const sunLonTrop = sunLonRad * RAD_TO_DEG;
+  
+  const moonLonRad = validateNumericValue(moonposition.position(jdTT).lon, "Lunar longitude (radians)");
+  const moonLonTrop = moonLonRad * RAD_TO_DEG;
   
   // Calculate ascendant with detailed validation
   const gastH = sidereal.apparent(jdUT);
