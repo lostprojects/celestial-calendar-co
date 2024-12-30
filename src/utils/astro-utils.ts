@@ -31,31 +31,37 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  // Create date object for astronomia calculations
+  // Create UTC date object for astronomia calculations
+  // Note: We use UTC to avoid timezone issues, as astronomia expects UTC
   const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
   console.log("Date object created:", date);
   
-  // Calculate Julian Day
+  // Calculate Julian Day (JD)
+  // JD is the continuous count of days since noon UTC on January 1, 4713 BCE
   const jd = DateToJD(date);
   console.log("Julian Day:", jd);
   
   // Calculate Julian Ephemeris Day (JDE)
-  const deltaT = 67.2; // ΔT value for year 2000 (should be calculated based on year)
+  // JDE accounts for ΔT (difference between UT1 and TT)
+  const deltaT = 67.2; // ΔT value for year 2000 (approximate)
   const jde = jd + deltaT / 86400;
   console.log("Julian Ephemeris Day:", jde);
   
-  // Calculate Sun position
-  const sunLong = solarCalc.apparentLongitude(jde);
-  console.log("Sun apparent longitude:", sunLong);
+  // Calculate Sun's apparent longitude (in radians)
+  const sunLongRad = solarCalc.apparentLongitude(jde);
+  // Convert to degrees
+  const sunLong = base.rad2deg(sunLongRad);
+  console.log("Sun apparent longitude (degrees):", sunLong);
   
-  // Calculate Moon position
+  // Calculate Moon's position (returns position in radians)
   const moonPos = getMoonPosition(jde);
-  const moonLong = moonPos.lon;
-  console.log("Moon longitude:", moonLong);
+  // Convert to degrees
+  const moonLong = base.rad2deg(moonPos.lon);
+  console.log("Moon longitude (degrees):", moonLong);
   
   // Calculate Ascendant (Rising Sign)
   const ascendant = calculateAscendant(jde, data.latitude, data.longitude);
-  console.log("Ascendant:", ascendant);
+  console.log("Ascendant (degrees):", ascendant);
   
   // Apply ayanamsa correction for sidereal calculations
   const ayanamsa = system === "sidereal" ? calculateAyanamsa(jde) : 0;
@@ -80,22 +86,30 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
 }
 
 function calculateAscendant(jde: number, lat: number, long: number): number {
-  // Local Sidereal Time calculation
+  // Calculate Local Sidereal Time (LST)
+  // LST is the hour angle of the vernal equinox
   const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
   const theta0 = 280.46061837 + 360.98564736629 * (jde - 2451545.0) +
                  0.000387933 * T * T - T * T * T / 38710000;
   
-  // Adjust for longitude
+  // Adjust for longitude (east positive)
   const lst = (theta0 + long) % 360;
   console.log("Local Sidereal Time:", lst);
   
-  // Calculate ascendant using Placidus house system
-  const obliq = coord.obliquity(jde);
-  const tanAsc = Math.sin(lst * Math.PI / 180) /
-                 (Math.cos(lst * Math.PI / 180) * Math.cos(obliq * Math.PI / 180) -
-                  Math.tan(lat * Math.PI / 180) * Math.sin(obliq * Math.PI / 180));
+  // Calculate obliquity of the ecliptic
+  const obliqRad = coord.obliquity(jde);
+  const obliq = base.rad2deg(obliqRad);
   
-  let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
+  // Convert latitude to radians for trig functions
+  const latRad = base.deg2rad(lat);
+  const lstRad = base.deg2rad(lst);
+  
+  // Calculate ascendant using spherical trigonometry
+  const tanAsc = Math.sin(lstRad) /
+                 (Math.cos(lstRad) * Math.cos(obliqRad) -
+                  Math.tan(latRad) * Math.sin(obliqRad));
+  
+  let ascendant = base.rad2deg(Math.atan(tanAsc));
   
   // Adjust quadrant based on LST
   if (lst > 180) {
