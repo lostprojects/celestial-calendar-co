@@ -3,6 +3,7 @@ import * as solarCalc from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as coord from "astronomia/coord";
 import * as base from "astronomia/base";
+import moment from 'moment-timezone';
 
 export interface BirthChartData {
   birthDate: string;
@@ -27,17 +28,31 @@ export interface BirthChartResult {
 export function calculateBirthChart(data: BirthChartData, system: "tropical" | "sidereal"): BirthChartResult {
   console.log("Calculating birth chart with data:", data);
   
-  // Parse date and time
+  // Parse date and time from local input
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
+  // Get timezone for the birth location
+  const timezone = moment.tz.zone(moment.tz.guess(data.latitude, data.longitude));
+  if (!timezone) {
+    console.error("Could not determine timezone for location:", data.latitude, data.longitude);
+    throw new Error("Could not determine timezone for the given location");
+  }
+  console.log("Determined timezone:", timezone.name);
+
+  // Create moment object in the local timezone
+  const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone.name);
+  console.log("Local time:", localMoment.format());
+  
+  // Convert to UTC (this automatically handles DST)
+  const utcMoment = localMoment.utc();
+  console.log("UTC time:", utcMoment.format());
+  
   // Create UTC date object for astronomia calculations
-  // Note: We use UTC to avoid timezone issues, as astronomia expects UTC
-  const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
-  console.log("Date object created:", date);
+  const date = utcMoment.toDate();
+  console.log("UTC Date object:", date);
   
   // Calculate Julian Day (JD)
-  // JD is the continuous count of days since noon UTC on January 1, 4713 BCE
   const jd = DateToJD(date);
   console.log("Julian Day:", jd);
   
