@@ -26,49 +26,58 @@ export interface BirthChartResult {
 }
 
 export function calculateBirthChart(data: BirthChartData, system: "tropical" | "sidereal"): BirthChartResult {
-  console.log("Starting birth chart calculation with input data:", {
-    date: data.birthDate,
-    time: data.birthTime,
-    place: data.birthPlace,
-    lat: data.latitude,
-    lng: data.longitude,
-    system
-  });
-  
-  // Parse date and time
+  // Detailed timezone logging
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  // Get timezone and handle UTC conversion
-  const timezone = moment.tz.guess();
-  console.log("Detected timezone:", timezone);
+  console.log("Input date/time:", {
+    date: `${year}-${month}-${day}`,
+    time: `${hour}:${minute}`,
+    rawInputs: { year, month, day, hour, minute }
+  });
 
   // Create moment object in local timezone
-  const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
-  console.log("Local time:", localMoment.format());
+  const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
+  console.log("Local time (BST):", localMoment.format());
   
   // Convert to UTC
   const utcMoment = localMoment.utc();
-  console.log("UTC time:", utcMoment.format());
+  console.log("Converted UTC time:", utcMoment.format());
   
-  // Create UTC date object for calculations
-  const date = utcMoment.toDate();
-  
+  // Calculate fractional day
+  const utcHour = utcMoment.hours();
+  const utcMinute = utcMoment.minutes();
+  const fractionalDay = (utcHour + utcMinute / 60.0) / 24.0;
+  console.log("UTC time components:", {
+    hour: utcHour,
+    minute: utcMinute,
+    fractionalDay
+  });
+
   // Calculate Julian Day
   const jd = CalendarGregorianToJD(
-    date.getUTCFullYear(),
-    date.getUTCMonth() + 1,
-    date.getUTCDate() + 
-    (date.getUTCHours() + 
-    date.getUTCMinutes() / 60.0) / 24.0
+    utcMoment.year(),
+    utcMoment.month() + 1,
+    utcMoment.date() + fractionalDay
   );
-  console.log("Julian Day calculated:", jd);
+  
+  console.log("Julian Day calculation:", {
+    year: utcMoment.year(),
+    month: utcMoment.month() + 1,
+    day: utcMoment.date(),
+    fractionalDay,
+    julianDay: jd
+  });
   
   // Calculate Julian Ephemeris Day
   const deltaT = 67.2;
   const jde = jd + deltaT / 86400;
-  console.log("Julian Ephemeris Day:", jde);
-  
+  console.log("Julian Ephemeris Day calculation:", {
+    julianDay: jd,
+    deltaT,
+    julianEphemerisDay: jde
+  });
+
   // Calculate Sun's position
   const sunLong = solar.apparentLongitude(jde) * 180 / Math.PI;
   console.log("Sun apparent longitude (degrees):", sunLong);
@@ -103,7 +112,16 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
     moon: { sign: moonPosition.sign, deg: moonPosition.degrees, min: moonPosition.minutes },
     rising: { sign: ascPosition.sign, deg: ascPosition.degrees, min: ascPosition.minutes }
   });
-  
+
+  // Add logging for final positions
+  console.log("Final calculated positions:", {
+    sun: { sign: sunPosition.sign, deg: sunPosition.degrees, min: sunPosition.minutes },
+    moon: { sign: moonPosition.sign, deg: moonPosition.degrees, min: moonPosition.minutes },
+    asc: { sign: ascPosition.sign, deg: ascPosition.degrees, min: ascPosition.minutes },
+    system,
+    ayanamsa: system === "sidereal" ? calculateAyanamsa(jde) : 0
+  });
+
   return {
     sunSign: sunPosition.sign,
     moonSign: moonPosition.sign,
