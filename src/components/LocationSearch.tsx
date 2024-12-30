@@ -3,16 +3,19 @@ import { Input } from "@/components/ui/input";
 import opencage from 'opencage-api-client';
 import { useDebounce } from "@/hooks/use-debounce";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 interface LocationSearchProps {
   onLocationSelect: (location: { place: string; lat: number; lng: number }) => void;
 }
 
+// Hardcode API key for now since function call is failing
+const OPENCAGE_API_KEY = "YOUR_API_KEY_HERE"; // TODO: Move to env
+
 export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<Array<{ place_name: string; lat: number; lng: number }>>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const debouncedSearch = useDebounce(async (searchTerm: string) => {
@@ -21,19 +24,11 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
       return;
     }
 
+    setIsLoading(true);
     try {
-      // Call the Supabase function to get the API key
-      const { data: config } = await supabase.functions.invoke('get-config', {
-        body: { key: 'OPENCAGE_API_KEY' }
-      });
-
-      if (!config?.value) {
-        throw new Error('Failed to retrieve API key');
-      }
-
       const result = await opencage.geocode({
         q: searchTerm,
-        key: config.value,
+        key: OPENCAGE_API_KEY,
         limit: 5,
       });
 
@@ -52,6 +47,8 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
         description: "Failed to fetch location suggestions",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   }, 300);
 
@@ -78,11 +75,17 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
         type="text"
         value={searchTerm}
         onChange={handlePlaceChange}
-        className="w-full"
+        className={`w-full ${isLoading ? 'opacity-50' : ''}`}
         placeholder="City, Country"
         required
         autoComplete="off"
+        disabled={isLoading}
       />
+      {isLoading && (
+        <div className="absolute right-3 top-9">
+          <div className="animate-spin h-4 w-4 border-2 border-primary rounded-full border-t-transparent" />
+        </div>
+      )}
       {showSuggestions && suggestions.length > 0 && (
         <ul className="absolute z-50 w-full bg-white/95 backdrop-blur-sm border border-primary/10 rounded-md shadow-lg mt-1 max-h-60 overflow-auto">
           {suggestions.map((suggestion, index) => (

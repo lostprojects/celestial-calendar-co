@@ -9,6 +9,7 @@ import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
+import { useToast } from "@/hooks/use-toast";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -22,8 +23,11 @@ export default function BirthChartForm() {
 
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
   const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const { toast } = useToast();
 
-  const generateTestData = () => {
+  const generateTestData = async () => {
+    setIsCalculating(true);
     // Test data for Ipswich, UK 1980
     const testData: BirthChartData = {
       name: "Test Person",
@@ -38,38 +42,24 @@ export default function BirthChartForm() {
       const wChart = calculateBirthChart(testData, "tropical");
       setWesternResults(wChart);
       console.log("Western calculation successful:", wChart);
-    } catch (err) {
-      console.error("Western calculation error:", err);
-      setWesternResults({
-        sunSign: "Error",
-        moonSign: "Error",
-        risingSign: "Error",
-        sunDeg: 0,
-        sunMin: 0,
-        moonDeg: 0,
-        moonMin: 0,
-        risingDeg: 0,
-        risingMin: 0
-      });
-    }
 
-    try {
       const sChart = calculateBirthChart(testData, "sidereal");
       setVedicResults(sChart);
       console.log("Vedic calculation successful:", sChart);
-    } catch (err) {
-      console.error("Vedic calculation error:", err);
-      setVedicResults({
-        sunSign: "Error",
-        moonSign: "Error",
-        risingSign: "Error",
-        sunDeg: 0,
-        sunMin: 0,
-        moonDeg: 0,
-        moonMin: 0,
-        risingDeg: 0,
-        risingMin: 0
+
+      toast({
+        title: "Test Data Generated",
+        description: "Birth chart calculations completed successfully",
       });
+    } catch (err) {
+      console.error("Calculation error:", err);
+      toast({
+        title: "Calculation Error",
+        description: err instanceof Error ? err.message : "Failed to calculate birth chart",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCalculating(false);
     }
   };
 
@@ -84,6 +74,8 @@ export default function BirthChartForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsCalculating(true);
+    
     try {
       // Calculate Western
       const wChart = calculateBirthChart(formData, "tropical");
@@ -97,9 +89,19 @@ export default function BirthChartForm() {
       await supabaseInsert(formData, wChart, "tropical");
       await supabaseInsert(formData, sChart, "sidereal");
 
-      console.log("Birth chart calculated successfully!");
+      toast({
+        title: "Success",
+        description: "Birth chart calculated and saved successfully!",
+      });
     } catch (err) {
       console.error("Calculation error:", err);
+      toast({
+        title: "Error",
+        description: err instanceof Error ? err.message : "Failed to calculate birth chart",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCalculating(false);
     }
   }
 
@@ -134,8 +136,16 @@ export default function BirthChartForm() {
       <Button 
         onClick={generateTestData}
         className="w-full bg-primary hover:bg-primary/90 mb-6"
+        disabled={isCalculating}
       >
-        Generate Test Results (Ipswich 1980)
+        {isCalculating ? (
+          <div className="flex items-center gap-2">
+            <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
+            <span>Calculating...</span>
+          </div>
+        ) : (
+          "Generate Test Results (Ipswich 1980)"
+        )}
       </Button>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -174,17 +184,28 @@ export default function BirthChartForm() {
         
         <LocationSearch onLocationSelect={handleLocationSelect} />
         
-        <Button type="submit" className="w-full bg-primary text-white">
-          Calculate Birth Chart
+        <Button 
+          type="submit" 
+          className="w-full bg-primary text-white"
+          disabled={isCalculating}
+        >
+          {isCalculating ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
+              <span>Calculating...</span>
+            </div>
+          ) : (
+            "Calculate Birth Chart"
+          )}
         </Button>
       </form>
 
-      <div className="mt-8">
+      {(westernResults || vedicResults) && (
         <ChartResults
           mainWestern={westernResults || {
-            sunSign: "Error",
-            moonSign: "Error",
-            risingSign: "Error",
+            sunSign: "Not calculated",
+            moonSign: "Not calculated",
+            risingSign: "Not calculated",
             sunDeg: 0,
             sunMin: 0,
             moonDeg: 0,
@@ -193,9 +214,9 @@ export default function BirthChartForm() {
             risingMin: 0
           }}
           mainVedic={vedicResults || {
-            sunSign: "Error",
-            moonSign: "Error",
-            risingSign: "Error",
+            sunSign: "Not calculated",
+            moonSign: "Not calculated",
+            risingSign: "Not calculated",
             sunDeg: 0,
             sunMin: 0,
             moonDeg: 0,
@@ -204,7 +225,7 @@ export default function BirthChartForm() {
             risingMin: 0
           }}
         />
-      </div>
+      )}
     </div>
   );
 }
