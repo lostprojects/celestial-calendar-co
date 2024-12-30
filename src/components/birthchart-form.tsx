@@ -40,7 +40,17 @@ export default function BirthChartForm() {
       console.log("Western calculation successful:", wChart);
     } catch (err) {
       console.error("Western calculation error:", err);
-      setWesternResults(null);
+      setWesternResults({
+        sunSign: "Error",
+        moonSign: "Error",
+        risingSign: "Error",
+        sunDeg: 0,
+        sunMin: 0,
+        moonDeg: 0,
+        moonMin: 0,
+        risingDeg: 0,
+        risingMin: 0
+      });
     }
 
     try {
@@ -49,7 +59,17 @@ export default function BirthChartForm() {
       console.log("Vedic calculation successful:", sChart);
     } catch (err) {
       console.error("Vedic calculation error:", err);
-      setVedicResults(null);
+      setVedicResults({
+        sunSign: "Error",
+        moonSign: "Error",
+        risingSign: "Error",
+        sunDeg: 0,
+        sunMin: 0,
+        moonDeg: 0,
+        moonMin: 0,
+        risingDeg: 0,
+        risingMin: 0
+      });
     }
   };
 
@@ -159,34 +179,32 @@ export default function BirthChartForm() {
         </Button>
       </form>
 
-      {(westernResults || vedicResults) && (
-        <div className="mt-8">
-          <ChartResults
-            mainWestern={westernResults || {
-              sunSign: "Error",
-              moonSign: "Error",
-              risingSign: "Error",
-              sunDeg: 0,
-              sunMin: 0,
-              moonDeg: 0,
-              moonMin: 0,
-              risingDeg: 0,
-              risingMin: 0
-            }}
-            mainVedic={vedicResults || {
-              sunSign: "Error",
-              moonSign: "Error",
-              risingSign: "Error",
-              sunDeg: 0,
-              sunMin: 0,
-              moonDeg: 0,
-              moonMin: 0,
-              risingDeg: 0,
-              risingMin: 0
-            }}
-          />
-        </div>
-      )}
+      <div className="mt-8">
+        <ChartResults
+          mainWestern={westernResults || {
+            sunSign: "Error",
+            moonSign: "Error",
+            risingSign: "Error",
+            sunDeg: 0,
+            sunMin: 0,
+            moonDeg: 0,
+            moonMin: 0,
+            risingDeg: 0,
+            risingMin: 0
+          }}
+          mainVedic={vedicResults || {
+            sunSign: "Error",
+            moonSign: "Error",
+            risingSign: "Error",
+            sunDeg: 0,
+            sunMin: 0,
+            moonDeg: 0,
+            moonMin: 0,
+            risingDeg: 0,
+            risingMin: 0
+          }}
+        />
+      </div>
     </div>
   );
 }
