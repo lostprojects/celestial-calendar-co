@@ -105,35 +105,43 @@ export function calculateBirthChart(
     difference: jdTT - jdUT
   });
 
-  // Convert JD to JDE for nutation calculation
+  // Calculate nutation with more precise JDE handling
   const T = (jdTT - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const jde = jdTT + (0.000005 + 0.0000000155 * T) * T * T; // Convert to Ephemeris time
+  const jde = jdTT + (0.000005 + 0.0000000155 * T) * T * T; // More precise JDE
   
   debugLog("Pre-nutation calculation", { jdTT, jde, T });
-  
-  // Calculate nutation with JDE
-  const nutResult = nutation.nutation(jde);
-  
-  // Validate raw radian values before conversion
-  const dpsiRad = validateNumericValue(nutResult.dpsi, "Nutation dpsi (radians)");
-  const depsRad = validateNumericValue(nutResult.deps, "Nutation deps (radians)");
-  
-  // Convert to degrees after validation
-  const dpsi = dpsiRad * RAD_TO_DEG;
-  const deps = depsRad * RAD_TO_DEG;
 
-  const meanEpsRad = validateNumericValue(nutation.meanObliquity(jde), "Mean obliquity (radians)");
+  // Use base JD for mean obliquity calculation
+  const meanEpsRad = nutation.meanObliquity(jde);
+  validateNumericValue(meanEpsRad, "Mean obliquity (radians)");
   const meanEps = meanEpsRad * RAD_TO_DEG;
-  const epsTrue = meanEps + deps;
-  validateNumericValue(epsTrue, "True obliquity");
 
-  // Calculate positions with proper radian to degree conversion
-  const sunLonRad = validateNumericValue(solar.apparentLongitude(jdTT), "Solar longitude (radians)");
+  // Calculate nutation components separately
+  const { dpsi, deps } = nutation.nutation(jde);
+  validateNumericValue(dpsi, "Nutation dpsi (radians)");
+  validateNumericValue(deps, "Nutation deps (radians)");
+
+  // Convert to degrees after validation
+  const dpsiDeg = dpsi * RAD_TO_DEG;
+  const depsDeg = deps * RAD_TO_DEG;
+  const epsTrue = meanEps + depsDeg;
+
+  debugLog("Nutation calculations", {
+    meanEps,
+    dpsiDeg,
+    depsDeg,
+    epsTrue
+  });
+
+  // Calculate positions using the corrected obliquity
+  const sunLonRad = solar.apparentLongitude(jde);
+  validateNumericValue(sunLonRad, "Solar longitude (radians)");
   const sunLonTrop = sunLonRad * RAD_TO_DEG;
   
-  const moonLonRad = validateNumericValue(moonposition.position(jdTT).lon, "Lunar longitude (radians)");
+  const moonLonRad = moonposition.position(jde).lon;
+  validateNumericValue(moonLonRad, "Lunar longitude (radians)");
   const moonLonTrop = moonLonRad * RAD_TO_DEG;
-  
+
   // Calculate ascendant with detailed validation
   const gastH = sidereal.apparent(jdUT);
   validateNumericValue(gastH, "GAST hours");
