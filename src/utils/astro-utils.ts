@@ -52,12 +52,19 @@ export function calculateBirthChart(
     zone: localTime.tz()
   });
 
-  // Get Julian Days (UT)
-  const jdUT = julian.DateToJD(localTime.toDate());
+  // Get Julian Days (UT) using direct calculation
+  const year = localTime.year();
+  const month = localTime.month() + 1; // since moment months are 0-based
+  const day = localTime.date();
+  const hour = localTime.hour();
+  const minute = localTime.minute();
+  const fractionOfDay = (hour + minute / 60) / 24;
+  const jdUT = julian.CalendarGregorianToJD(year, month, day + fractionOfDay);
+  
   console.log("Julian Day (UT):", jdUT);
 
   // Calculate Delta T and get TT
-  const deltaTsec = approximateDeltaT(localTime.year(), localTime.month() + 1);
+  const deltaTsec = approximateDeltaT(year, month);
   const jdTT = jdUT + deltaTsec / 86400;
   console.log("Delta T (seconds):", deltaTsec);
   console.log("Julian Day (TT):", jdTT);
@@ -76,7 +83,7 @@ export function calculateBirthChart(
   // For sidereal calculations, apply ayanamsa
   let finalPositions;
   if (system === "sidereal") {
-    const ayanamsa = approximateAyanamsa(localTime.year());
+    const ayanamsa = approximateAyanamsa(year);
     finalPositions = {
       sunLon: wrap360(sunLonTrop - ayanamsa),
       moonLon: wrap360(moonLonTrop - ayanamsa),
