@@ -1,8 +1,8 @@
-import { DateToJD } from "astronomia/julian";
-import * as solarCalc from "astronomia/solar";
+import { CalendarGregorianToJD } from "astronomia/julian";
+import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as coord from "astronomia/coord";
-import * as base from "astronomia/base";
+import * as sidereal from "astronomia/sidereal";
 import moment from 'moment-timezone';
 
 export interface BirthChartData {
@@ -53,30 +53,33 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const date = utcMoment.toDate();
   console.log("UTC Date object:", date);
   
-  // Calculate Julian Day (JD)
-  const jd = DateToJD(date);
+  // Calculate Julian Day using CalendarGregorianToJD
+  const jd = CalendarGregorianToJD(
+    date.getUTCFullYear(),
+    date.getUTCMonth() + 1,
+    date.getUTCDate() + 
+    (date.getUTCHours() + 
+    date.getUTCMinutes() / 60.0) / 24.0
+  );
   console.log("Julian Day:", jd);
   
   // Calculate Julian Ephemeris Day (JDE)
-  // JDE accounts for ΔT (difference between UT1 and TT)
   const deltaT = 67.2; // ΔT value for year 2000 (approximate)
   const jde = jd + deltaT / 86400;
   console.log("Julian Ephemeris Day:", jde);
   
-  // Calculate Sun's apparent longitude (in radians)
-  const sunLongRad = solarCalc.apparentLongitude(jde);
-  // Convert to degrees
-  const sunLong = base.rad2deg(sunLongRad);
+  // Calculate Sun's apparent longitude
+  const sunLong = solar.apparentLongitude(jde) * 180 / Math.PI;
   console.log("Sun apparent longitude (degrees):", sunLong);
   
-  // Calculate Moon's position (returns position in radians)
+  // Calculate Moon's position
   const moonPos = getMoonPosition(jde);
-  // Convert to degrees
-  const moonLong = base.rad2deg(moonPos.lon);
+  const moonLong = moonPos.lon * 180 / Math.PI;
   console.log("Moon longitude (degrees):", moonLong);
   
-  // Calculate Ascendant (Rising Sign)
-  const ascendant = calculateAscendant(jde, data.latitude, data.longitude);
+  // Calculate Ascendant using sidereal time and geographic coordinates
+  const lst = sidereal.apparent(jde) * 180 / Math.PI;
+  const ascendant = calculateAscendant(lst, data.latitude, data.longitude);
   console.log("Ascendant (degrees):", ascendant);
   
   // Apply ayanamsa correction for sidereal calculations
@@ -101,46 +104,35 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   };
 }
 
-function calculateAscendant(jde: number, lat: number, long: number): number {
-  // Calculate Local Sidereal Time (LST)
-  // LST is the hour angle of the vernal equinox
-  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const theta0 = 280.46061837 + 360.98564736629 * (jde - 2451545.0) +
-                 0.000387933 * T * T - T * T * T / 38710000;
-  
-  // Adjust for longitude (east positive)
-  const lst = (theta0 + long) % 360;
-  console.log("Local Sidereal Time:", lst);
+function calculateAscendant(lst: number, lat: number, long: number): number {
+  // Convert to radians for trigonometric calculations
+  const latRad = lat * Math.PI / 180;
+  const lstRad = (lst + long) * Math.PI / 180;
   
   // Calculate obliquity of the ecliptic
-  const obliqRad = coord.obliquity(jde);
-  const obliq = base.rad2deg(obliqRad);
-  
-  // Convert latitude to radians for trig functions
-  const latRad = base.deg2rad(lat);
-  const lstRad = base.deg2rad(lst);
+  const obliqRad = 23.4367 * Math.PI / 180; // Mean obliquity for J2000.0
   
   // Calculate ascendant using spherical trigonometry
   const tanAsc = Math.sin(lstRad) /
                  (Math.cos(lstRad) * Math.cos(obliqRad) -
                   Math.tan(latRad) * Math.sin(obliqRad));
   
-  let ascendant = base.rad2deg(Math.atan(tanAsc));
+  let ascendant = Math.atan(tanAsc) * 180 / Math.PI;
   
   // Adjust quadrant based on LST
-  if (lst > 180) {
+  if (lst + long > 180) {
     ascendant += 180;
-  } else if (lst > 0 && ascendant < 0) {
+  } else if (lst + long > 0 && ascendant < 0) {
     ascendant += 360;
   }
   
-  return ascendant;
+  return (ascendant + 360) % 360;
 }
 
 function calculateAyanamsa(jde: number): number {
   // Lahiri ayanamsa calculation
   const T = (jde - 2451545.0) / 36525;
-  return 23.85 + 0.0137 * T; // Simplified Lahiri ayanamsa
+  return 23.85 + 0.0137 * T;
 }
 
 function getZodiacPosition(longitude: number) {
