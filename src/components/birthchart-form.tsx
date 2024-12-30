@@ -21,7 +21,6 @@ export default function BirthChartForm() {
   });
 
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
-  const [vedicResults, setVedicResults] = useState<BirthChartResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const { toast } = useToast();
 
@@ -41,21 +40,14 @@ export default function BirthChartForm() {
     console.log("Form submitted with data:", formData);
     
     try {
-      // Calculate Western
+      // Calculate Western only
       console.log("Calculating Western chart...");
-      const wChart = calculateBirthChart(formData, "tropical");
+      const wChart = calculateBirthChart(formData);
       console.log("Western Chart Results:", wChart);
       setWesternResults(wChart);
 
-      // Calculate Vedic
-      console.log("Calculating Vedic chart...");
-      const sChart = calculateBirthChart(formData, "sidereal");
-      console.log("Vedic Chart Results:", sChart);
-      setVedicResults(sChart);
-
       // Store in DB
-      await supabaseInsert(formData, wChart, "tropical");
-      await supabaseInsert(formData, sChart, "sidereal");
+      await supabaseInsert(formData, wChart);
 
       toast({
         title: "Success",
@@ -76,7 +68,6 @@ export default function BirthChartForm() {
   async function supabaseInsert(
     data: BirthChartData,
     result: BirthChartResult,
-    system: "tropical" | "sidereal"
   ) {
     const { error } = await supabase.from("birth_charts").insert({
       name: "Anonymous",
@@ -85,7 +76,7 @@ export default function BirthChartForm() {
       birth_place: data.birthPlace,
       latitude: data.latitude,
       longitude: data.longitude,
-      system_used: system,
+      system_used: "tropical",
       sun_sign: result.sunSign,
       sun_degrees: result.sunDeg,
       sun_minutes: result.sunMin,
@@ -148,10 +139,10 @@ export default function BirthChartForm() {
         </Button>
       </form>
 
-      {(westernResults || vedicResults) && (
+      {westernResults && (
         <ChartResults
           mainWestern={westernResults}
-          mainVedic={vedicResults}
+          mainVedic={null}
         />
       )}
     </div>

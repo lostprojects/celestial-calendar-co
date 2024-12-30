@@ -1,9 +1,7 @@
 import { CalendarGregorianToJD } from "astronomia/julian";
 import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
-import * as coord from "astronomia/coord";
 import * as sidereal from "astronomia/sidereal";
-import * as base from "astronomia/base";
 import moment from 'moment-timezone';
 
 export interface BirthChartData {
@@ -32,24 +30,26 @@ const ZODIAC_SIGNS = [
   "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
-export function calculateBirthChart(data: BirthChartData, system: "tropical" | "sidereal"): BirthChartResult {
+export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   // Parse input date/time
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  console.log("Input date/time:", {
+  console.log("Input data:", {
     date: `${year}-${month}-${day}`,
     time: `${hour}:${minute}`,
-    rawInputs: { year, month, day, hour, minute }
+    place: data.birthPlace,
+    lat: data.latitude,
+    lng: data.longitude
   });
 
   // Create moment in local timezone (Europe/London)
   const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
-  console.log("Local time (BST):", localMoment.format());
+  console.log("Local time:", localMoment.format());
   
   // Convert to UTC
   const utcMoment = localMoment.utc();
-  console.log("Converted UTC time:", utcMoment.format());
+  console.log("UTC time:", utcMoment.format());
   
   // Calculate Julian Day using UTC components
   const jd = CalendarGregorianToJD(
@@ -61,16 +61,20 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   // Calculate Julian Ephemeris Day (adding deltaT correction)
   const deltaT = 67.2; // Approximate value for 1980
   const jde = jd + deltaT / 86400;
+  console.log("Julian Day:", jd);
+  console.log("Julian Ephemeris Day:", jde);
   
-  // Calculate Sun's apparent longitude
+  // Calculate Sun's apparent longitude (tropical)
   const sunLongRad = solar.apparentLongitude(jde);
-  const sunLongDeg = normalizeDegrees(rad2deg(sunLongRad));
-  console.log("Sun longitude (degrees):", sunLongDeg);
+  const sunLongDeg = rad2deg(sunLongRad);
+  const normalizedSunLong = normalizeDegrees(sunLongDeg);
+  console.log("Sun longitude (tropical):", normalizedSunLong);
   
-  // Calculate Moon's position
+  // Calculate Moon's position (tropical)
   const moonPos = getMoonPosition(jde);
-  const moonLongDeg = normalizeDegrees(rad2deg(moonPos.lon));
-  console.log("Moon longitude (degrees):", moonLongDeg);
+  const moonLongDeg = rad2deg(moonPos.lon);
+  const normalizedMoonLong = normalizeDegrees(moonLongDeg);
+  console.log("Moon longitude (tropical):", normalizedMoonLong);
   
   // Calculate obliquity of the ecliptic
   const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
@@ -80,18 +84,18 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   // Calculate Local Sidereal Time and RAMC
   const lst = sidereal.apparent(jde);
   const ramc = normalizeDegrees(rad2deg(lst) + data.longitude);
-  console.log("RAMC (degrees):", ramc);
+  console.log("RAMC:", ramc);
   
   // Calculate Ascendant
   const ascendant = calculateAscendant(ramc, data.latitude, epsRad);
-  console.log("Ascendant (degrees):", ascendant);
+  console.log("Ascendant:", ascendant);
   
   // Get zodiac positions
-  const sunPosition = getZodiacPosition(sunLongDeg);
-  const moonPosition = getZodiacPosition(moonLongDeg);
+  const sunPosition = getZodiacPosition(normalizedSunLong);
+  const moonPosition = getZodiacPosition(normalizedMoonLong);
   const ascPosition = getZodiacPosition(ascendant);
   
-  console.log("Calculated positions:", {
+  console.log("Final positions:", {
     sun: sunPosition,
     moon: moonPosition,
     asc: ascPosition
@@ -115,7 +119,7 @@ function calculateAscendant(ramc: number, latitude: number, obliquity: number): 
   const ramcRad = deg2rad(ramc);
   const latRad = deg2rad(latitude);
   
-  // Calculate ascendant using the correct spherical trigonometry formula
+  // Calculate ascendant using spherical trigonometry
   const tanAsc = -Math.cos(ramcRad) / 
                  (Math.sin(obliquity) * Math.tan(latRad) + 
                   Math.cos(obliquity) * Math.sin(ramcRad));
@@ -147,7 +151,7 @@ function getZodiacPosition(longitude: number) {
   };
 }
 
-// Helper functions for angle conversions
+// Angle conversion helpers
 function deg2rad(degrees: number): number {
   return degrees * Math.PI / 180;
 }
