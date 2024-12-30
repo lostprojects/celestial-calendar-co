@@ -61,7 +61,7 @@ export function calculateBirthChart(
   // Get tropical positions directly from astronomia
   const sunLonTrop = solar.apparentLongitude(jdTT);
   const moonLonTrop = moonposition.position(jdTT).lon;
-  const ascLonTrop = calcAscendant(jdUT, latitude, longitude);
+  const ascLonTrop = calcAscendant(jdUT, jdTT, latitude, longitude);
   
   console.log("Tropical positions:", {
     sunLonTrop,
@@ -158,22 +158,24 @@ function extractSignDegrees(longitude: number) {
   return { sign, deg: finalDeg, min: minWhole };
 }
 
-function calcAscendant(jdUT: number, lat: number, lon: number): number {
-  // Get apparent sidereal time in hours
-  const gastH = sidereal.apparent(jdUT);
+function calcAscendant(jdUT: number, jdTT: number, lat: number, lon: number): number {
+  // Get nutation parameters from TT
+  const { dpsi, deps } = nutation.nutation(jdTT);
+  const meanEps = nutation.meanObliquity(jdTT);
+  const epsTrue = meanEps + deps;
+  
+  // Get apparent sidereal time in hours using nutation parameters
+  const gastH = sidereal.apparent(jdUT, dpsi, epsTrue);
   
   // Convert to degrees and add longitude for local sidereal time
   const lstDeg = wrap360(gastH * 15 + lon);
   const lstRad = lstDeg * Math.PI / 180;
   const latRad = lat * Math.PI / 180;
   
-  // Get true obliquity (already in radians from astronomia)
-  const eps = nutation.meanObliquity(jdUT) + nutation.nutation(jdUT).deps;
-
-  // Calculate ascendant
+  // Calculate ascendant using true obliquity
   const ascRad = Math.atan2(
     Math.cos(lstRad),
-    -Math.sin(lstRad) * Math.cos(eps) + Math.tan(latRad) * Math.sin(eps)
+    -Math.sin(lstRad) * Math.cos(epsTrue) + Math.tan(latRad) * Math.sin(epsTrue)
   );
   
   return wrap360(ascRad * 180 / Math.PI);
