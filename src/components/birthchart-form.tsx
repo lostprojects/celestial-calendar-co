@@ -26,6 +26,7 @@ export default function BirthChartForm() {
   const { toast } = useToast();
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
+    console.log("Location selected:", location);
     setFormData({
       ...formData,
       birthPlace: location.place,
@@ -37,14 +38,17 @@ export default function BirthChartForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsCalculating(true);
+    console.log("Form submitted with data:", formData);
     
     try {
       // Calculate Western
+      console.log("Calculating Western chart...");
       const wChart = calculateBirthChart(formData, "tropical");
       console.log("Western Chart Results:", wChart);
       setWesternResults(wChart);
 
       // Calculate Vedic
+      console.log("Calculating Vedic chart...");
       const sChart = calculateBirthChart(formData, "sidereal");
       console.log("Vedic Chart Results:", sChart);
       setVedicResults(sChart);
@@ -104,7 +108,10 @@ export default function BirthChartForm() {
             type="date"
             className="w-full"
             value={formData.birthDate}
-            onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+            onChange={(e) => {
+              console.log("Birth date changed:", e.target.value);
+              setFormData({ ...formData, birthDate: e.target.value });
+            }}
             required
           />
         </div>
@@ -115,7 +122,10 @@ export default function BirthChartForm() {
             type="time"
             className="w-full"
             value={formData.birthTime}
-            onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
+            onChange={(e) => {
+              console.log("Birth time changed:", e.target.value);
+              setFormData({ ...formData, birthTime: e.target.value });
+            }}
             required
           />
         </div>
