@@ -2,7 +2,7 @@ import { DateToJD } from "astronomia/julian";
 import * as solarCalc from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import { obliquity } from "astronomia/coord";
-import { Time } from "astronomia/base";
+import * as base from "astronomia/base";
 
 export interface BirthChartData {
   birthDate: string;
@@ -31,8 +31,8 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  // Create Time object for astronomia calculations
-  const t = new Time(year, month, day, hour + minute/60);
+  // Create base object for astronomia calculations
+  const t = new base.Julian(year, month, day, hour + minute/60);
   console.log("Time object created:", t);
   
   // Calculate Julian Day
@@ -79,7 +79,7 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   };
 }
 
-function calculateAscendant(t: Time, lat: number, long: number): number {
+function calculateAscendant(t: base.Julian, lat: number, long: number): number {
   // Local Sidereal Time calculation
   const jd = DateToJD(t);
   const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
@@ -108,7 +108,7 @@ function calculateAscendant(t: Time, lat: number, long: number): number {
   return ascendant;
 }
 
-function calculateAyanamsa(t: Time): number {
+function calculateAyanamsa(t: base.Julian): number {
   // Lahiri ayanamsa calculation
   const jd = DateToJD(t);
   const T = (jd - 2451545.0) / 36525;
