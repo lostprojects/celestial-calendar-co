@@ -1,7 +1,6 @@
-import * as julian from "astronomia/lib/julian";
-import * as solar from "astronomia/lib/solar";
-import * as moonphase from "astronomia/lib/moonphase";
-import * as planetposition from "astronomia/lib/planetposition";
+import { DateToJD } from "astronomia/julian";
+import { trueVSOP87 } from "astronomia/solar";
+import { meanVSOP87 } from "astronomia/moonphase";
 
 export interface BirthChartData {
   birthDate: string;
@@ -32,17 +31,17 @@ export function calculateBirthChart(data: BirthChartData, system: "tropical" | "
   const birthDate = new Date(year, month - 1, day, hour, minute);
   
   // Calculate Julian Day
-  const jd = julian.DateToJD(birthDate);
+  const jd = DateToJD(birthDate);
   
   // Calculate Julian Ephemeris Day (JDE)
   const deltaT = 67.2; // ΔT value for 1980
   const jde = jd + deltaT / 86400;
-
+  
   // Calculate Sun position
-  const sunLong = solar.trueVSOP87(jde);
+  const sunLong = trueVSOP87(jde);
   
   // Calculate Moon position
-  const moonLong = moonphase.meanVSOP87(jde);
+  const moonLong = meanVSOP87(jde);
   
   // Calculate Ascendant (placeholder - actual calculation needed)
   const ascendant = calculateAscendant(jde, data.latitude, data.longitude);

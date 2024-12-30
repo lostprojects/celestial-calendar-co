@@ -73,6 +73,7 @@ export default function BirthChartForm() {
     system: "tropical" | "sidereal"
   ) {
     const { error } = await supabase.from("birth_charts").insert({
+      name: "Anonymous", // Add default name since it's required
       birth_date: data.birthDate,
       birth_time: data.birthTime,
       birth_place: data.birthPlace,
