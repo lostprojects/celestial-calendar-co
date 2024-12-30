@@ -105,11 +105,14 @@ export function calculateBirthChart(
     difference: jdTT - jdUT
   });
 
-  // Calculate nutation parameters with validation
-  debugLog("Pre-nutation calculation", { jdTT });
+  // Convert JD to JDE for nutation calculation
+  const T = (jdTT - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const jde = jdTT + (0.000005 + 0.0000000155 * T) * T * T; // Convert to Ephemeris time
   
-  // Fix: Get raw nutation values first, validate, then convert to degrees
-  const nutResult = nutation.nutation(jdTT);
+  debugLog("Pre-nutation calculation", { jdTT, jde, T });
+  
+  // Calculate nutation with JDE
+  const nutResult = nutation.nutation(jde);
   
   // Validate raw radian values before conversion
   const dpsiRad = validateNumericValue(nutResult.dpsi, "Nutation dpsi (radians)");
@@ -119,19 +122,10 @@ export function calculateBirthChart(
   const dpsi = dpsiRad * RAD_TO_DEG;
   const deps = depsRad * RAD_TO_DEG;
 
-  const meanEpsRad = validateNumericValue(nutation.meanObliquity(jdTT), "Mean obliquity (radians)");
+  const meanEpsRad = validateNumericValue(nutation.meanObliquity(jde), "Mean obliquity (radians)");
   const meanEps = meanEpsRad * RAD_TO_DEG;
   const epsTrue = meanEps + deps;
   validateNumericValue(epsTrue, "True obliquity");
-  
-  debugLog("Nutation Parameters", {
-    dpsiRad,
-    depsRad,
-    dpsi,
-    deps,
-    meanEps,
-    epsTrue
-  });
 
   // Calculate positions with proper radian to degree conversion
   const sunLonRad = validateNumericValue(solar.apparentLongitude(jdTT), "Solar longitude (radians)");
