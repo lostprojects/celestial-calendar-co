@@ -62,7 +62,7 @@ export const Hero = () => {
                     className="w-8 h-8 rounded-full border-1 border-[#CA644E]"
                   />
                 </div>
-                <span className="text-sm font-mono text-background">Join 10,000+ seekers of cosmic wisdom</span>
+                <span className="text-sm font-mono text-accent-lightpalm">Join 10,000+ seekers of cosmic wisdom</span>
               </div>
 
               {/* Main Content */}
