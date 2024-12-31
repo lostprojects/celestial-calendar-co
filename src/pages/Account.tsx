@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { LogOut, User } from "lucide-react";
@@ -29,7 +28,6 @@ const Account = () => {
     if (!user) {
       navigate("/auth");
     } else {
-      // Load user profile data
       const loadProfile = async () => {
         const { data, error } = await supabase
           .from("profiles")
@@ -93,45 +91,42 @@ const Account = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-6 w-6" />
-            Account Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="full_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter your full name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">Save Changes</Button>
-            </form>
-          </Form>
+      <div className="birth-chart-form max-w-2xl mx-auto">
+        <div className="flex items-center gap-2 mb-6">
+          <User className="h-6 w-6" />
+          <h2 className="text-2xl font-serif">Account Settings</h2>
+        </div>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="full_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter your full name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full bg-primary text-white">Save Changes</Button>
+          </form>
+        </Form>
 
-          <div className="pt-4 border-t">
-            <Button
-              variant="destructive"
-              onClick={handleSignOut}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Sign Out
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <div className="pt-6 mt-6 border-t">
+          <Button
+            variant="destructive"
+            onClick={handleSignOut}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
