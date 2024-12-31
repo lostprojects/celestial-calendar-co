@@ -6,10 +6,6 @@ export const ColorSection = () => {
       <h5 className="text-xl font-mono font-bold mb-4">Colors</h5>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-2">
-          <div className="h-20 bg-primary-light rounded-lg"></div>
-          <p className="text-sm font-mono">primary.light (#F2FCE2)</p>
-        </div>
-        <div className="space-y-2">
           <div className="h-20 bg-primary-dark rounded-lg"></div>
           <p className="text-sm font-mono">primary.dark (#001018)</p>
         </div>
@@ -28,6 +24,10 @@ export const ColorSection = () => {
         <div className="space-y-2">
           <div className="h-20 bg-accent-orange rounded-lg"></div>
           <p className="text-sm font-mono">accent.orange (#D77145)</p>
+        </div>
+        <div className="space-y-2">
+          <div className="h-20 bg-accent-lightorange rounded-lg"></div>
+          <p className="text-sm font-mono">accent.lightorange (#E0815D)</p>
         </div>
         <div className="space-y-2">
           <div className="h-20 bg-[#FCFAF7] rounded-lg border border-primary/10"></div>

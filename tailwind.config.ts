@@ -29,13 +29,13 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "#403E43",
-          light: "#F2FCE2",
           dark: "#001018",
         },
         accent: {
           palm: "#5E5F34",
           lightpalm: "#6C783C",
           orange: "#D77145",
+          lightorange: "#E0815D",
         },
       },
       fontFamily: {
