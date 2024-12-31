@@ -108,18 +108,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   let denominator = Math.sin(epsRad) * Math.tan(latRad) + 
                    Math.cos(epsRad) * Math.sin(localSiderealTimeRad);
   
-  // Use atan2 for correct quadrant handling
-  let ascRad = Math.atan2(numerator, denominator);
-  
-  // Convert to degrees and normalize
-  let ascendant = normalizeDegrees(rad2deg(ascRad));
+  // Calculate the offset angle and add it to LST
+  let ascOffset = Math.atan2(numerator, denominator);
+  let lstDegrees = localSiderealTime * 15;
+  let ascendant = normalizeDegrees(lstDegrees + rad2deg(ascOffset));
 
   console.log("Rising sign calculation:", {
     greenwichSiderealTime,
     longitudeHours,
     localSiderealTime,
     localSiderealTimeRad,
-    ascRad,
+    lstDegrees,
+    ascOffset: rad2deg(ascOffset),
     ascendant
   });
 
