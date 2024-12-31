@@ -93,8 +93,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   ramc = (ramc + data.longitude / 15) % 24;
   if (ramc < 0) ramc += 24;
   
-  // Convert RAMC to radians (15° per hour)
-  const ramcRad = deg2rad(ramc * 15);
+  // Convert RAMC to degrees (15° per hour) and ADD 90° (key change)
+  const ramcDeg = ramc * 15;
+  const ascBase = normalizeDegrees(ramcDeg + 90);
+  const ramcRad = deg2rad(ascBase);
   
   // Calculate ascendant using the direct formula
   const latRad = deg2rad(data.latitude);
@@ -104,8 +106,8 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 
   console.log("Rising sign calculation:", {
     ramc,
-    ramcRad,
-    latRad,
+    ramcDeg,
+    ascBase,
     ascendant
   });
 
@@ -138,4 +140,16 @@ function getZodiacPosition(longitude: number) {
     degrees,
     minutes
   };
+}
+
+export function deg2rad(degrees: number): number {
+  return degrees * Math.PI / 180;
+}
+
+export function rad2deg(radians: number): number {
+  return radians * 180 / Math.PI;
+}
+
+export function normalizeDegrees(degrees: number): number {
+  return ((degrees % 360) + 360) % 360;
 }
