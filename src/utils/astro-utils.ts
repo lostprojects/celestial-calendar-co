@@ -46,11 +46,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lng: data.longitude
   });
 
-  // Convert local time to UTC using moment-timezone
   const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
   const utcMoment = localMoment.utc();
   
-  // Calculate Julian Day from UTC time
   const jd = calculateJulianDay(
     utcMoment.format("YYYY-MM-DD"),
     utcMoment.format("HH:mm")
@@ -61,19 +59,16 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
 
-  // Calculate obliquity (mean + nutation = true)
   const T = (jd - 2451545.0) / 36525;
   const meanEps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
-  const { deltaEps } = nutation(T);
-  const eps = meanEps + deltaEps;
-  const epsRad = deg2rad(eps);
+  const meanEpsRad = deg2rad(meanEps);
+  const { deltaObl } = nutation(T);
+  const epsRad = meanEpsRad + deltaObl;
 
-  // Calculate sun position
   const sunLongRad = solar.apparentLongitude(jde);
   const sunLongDeg = rad2deg(sunLongRad);
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
   
-  // Calculate moon position
   const moonPos = getMoonPosition(jde);
   const moonDistance = moonPos.range;
   const parallax = calculateLunarParallax(moonDistance);
@@ -89,18 +84,15 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Get LST (RAMC)
   let ramc = sidereal.apparent(jde);
   ramc = ramc % 24;
   if (ramc < 0) ramc += 24;
   ramc = (ramc + data.longitude / 15) % 24;
   if (ramc < 0) ramc += 24;
   
-  // Convert RAMC to degrees (15° per hour)
   const ramcDeg = ramc * 15;
   const ramcRad = deg2rad(ramcDeg);
   
-  // Calculate ascendant using geocentric latitude
   const geoLatRad = deg2rad(data.latitude - 0.1924 * Math.sin(2 * deg2rad(data.latitude)));
   const numerator = -Math.cos(ramcRad);
   const denominator = Math.sin(epsRad) * Math.tan(geoLatRad) + Math.cos(epsRad) * Math.sin(ramcRad);
@@ -112,7 +104,6 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     ascendant
   });
 
-  // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
   const moonPosition = getZodiacPosition(finalMoonLongitude);
   const ascPosition = getZodiacPosition(ascendant);
