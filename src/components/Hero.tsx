@@ -25,8 +25,21 @@ export const Hero = () => {
   }, []);
 
   return (
-    <section className="relative bg-gradient-to-br from-[#FEC6A1] via-[#FDE1D3] to-[#F5E6D3] pt-16">
-      <div className="container mx-auto px-4 py-16">
+    <section className="relative min-h-screen">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'url("/lovable-uploads/d4f799ab-fbf7-48c8-a1be-2fb4d27c4664.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#FEC6A1]/90 via-[#FDE1D3]/85 to-transparent z-10" />
+      
+      <div className="container mx-auto px-4 py-24 relative z-20">
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left space-y-6">
@@ -86,17 +99,7 @@ export const Hero = () => {
             </Button>
           </div>
 
-          {/* Right Column - Image */}
-          <div className="flex-1 relative">
-            <div className="relative rounded-2xl overflow-hidden">
-              <img 
-                src="/lovable-uploads/a63fd645-18a2-49ec-aaa7-2177e393c156.png"
-                alt="Woman gazing at stars" 
-                className="w-full h-[600px] rounded-2xl object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-bl from-[#FEC6A1]/30 to-transparent mix-blend-overlay" />
-            </div>
-          </div>
+          {/* Removed the right column with the image since we're using it as background */}
         </div>
       </div>
     </section>
