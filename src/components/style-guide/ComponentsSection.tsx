@@ -5,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { ChevronDown } from "lucide-react";
 
 export const ComponentsSection = () => {
   const { toast } = useToast();
@@ -38,6 +39,22 @@ export const ComponentsSection = () => {
     <section className="mb-12">
       <h5 className="text-xl font-mono font-bold mb-4">Components</h5>
       
+      {/* Chevron Dropdown */}
+      <div className="mb-8">
+        <h6 className="text-base font-mono font-semibold mb-4">chevron.dropdown <span className="text-sm font-mono text-primary/60">(@/components/ui/collapsible-header)</span></h6>
+        <div className="flex flex-wrap gap-4">
+          <div className="space-y-2">
+            <button className="flex items-center gap-2 text-primary-dark hover:text-primary-dark/80 transition-colors">
+              <span className="text-lg font-semibold">Collapsible Header</span>
+              <ChevronDown className="h-5 w-5" />
+            </button>
+            <p className="text-sm font-mono text-primary/60">
+              &lt;button className="flex items-center gap-2 text-primary-dark hover:text-primary-dark/80 transition-colors"&gt;
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Buttons */}
       <div className="mb-8">
         <h6 className="text-base font-mono font-semibold mb-4">button.variants <span className="text-sm font-mono text-primary/60">(@/components/ui/button)</span></h6>
