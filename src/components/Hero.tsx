@@ -49,17 +49,17 @@ export const Hero = () => {
                   <img 
                     src="https://randomuser.me/api/portraits/women/17.jpg" 
                     alt="User" 
-                    className="w-8 h-8 rounded-full border-2 border-[#CA644E]"
+                    className="w-8 h-8 rounded-full border-1 border-[#CA644E]"
                   />
                   <img 
                     src="https://randomuser.me/api/portraits/women/49.jpg" 
                     alt="User" 
-                    className="w-8 h-8 rounded-full border-2 border-[#CA644E]"
+                    className="w-8 h-8 rounded-full border-1 border-[#CA644E]"
                   />
                   <img 
                     src="https://randomuser.me/api/portraits/women/63.jpg" 
                     alt="User" 
-                    className="w-8 h-8 rounded-full border-2 border-[#CA644E]"
+                    className="w-8 h-8 rounded-full border-1 border-[#CA644E]"
                   />
                 </div>
                 <span className="text-sm font-mono">Join 10,000+ seekers of cosmic wisdom</span>
