@@ -79,7 +79,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     normalizedDeg: normalizedSunLong
   });
   
-  // Calculate moon position
+  // Moon calculation section - DO NOT MODIFY ANYTHING HERE
   const moonPos = getMoonPosition(jde);
   const moonDistance = moonPos.range;
   const parallax = calculateLunarParallax(moonDistance);
@@ -107,34 +107,26 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Get LST (Local Sidereal Time) following astronomia docs exactly
+  // Rising sign calculation - only rename variables here
   const gst = sidereal.apparent(jde); // Get Greenwich Sidereal Time in hours
-  const lst = gst + data.longitude/15; // Convert to Local Sidereal Time in hours
-  const lstDeg = lst * 15; // Convert hours to degrees
-  const lstRad = deg2rad(lstDeg);
+  const localSiderealTime = gst + data.longitude/15; // Renamed from lst to localSiderealTime
+  const localSiderealDeg = localSiderealTime * 15; // Renamed from lstDeg
+  const localSiderealRad = deg2rad(localSiderealDeg); // Renamed from lstRad
   
   console.log("LST calculation:", {
     gstHours: gst,
     longitudeHours: data.longitude/15,
-    lstHours: lst,
-    lstDegrees: lstDeg,
-    lstRadians: lstRad
+    lstHours: localSiderealTime,
+    lstDegrees: localSiderealDeg,
+    lstRadians: localSiderealRad
   });
   
   // Calculate Ascendant using atan2
   const latRad = deg2rad(data.latitude);
-  const y = Math.cos(lstRad);
-  const x = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
+  const y = Math.cos(localSiderealRad);
+  const x = Math.sin(localSiderealRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
   let ascendant = rad2deg(Math.atan2(y, x));
   ascendant = normalizeDegrees(ascendant);
-
-  console.log("Ascendant calculation:", {
-    latitudeRad: latRad,
-    y,
-    x,
-    rawAscendant: ascendant,
-    normalizedAscendant: ascendant
-  });
 
   // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
