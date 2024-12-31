@@ -25,7 +25,7 @@ export const Hero = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen px-5">
+    <section className="relative min-h-screen px-5 flex items-center">
       {/* Background Image */}
       <div 
         className="absolute inset-0 z-0"
@@ -37,7 +37,7 @@ export const Hero = () => {
         }}
       />
       
-      <div className="container mx-auto py-24 relative z-20">
+      <div className="container mx-auto relative z-20">
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left max-w-[50%]">
