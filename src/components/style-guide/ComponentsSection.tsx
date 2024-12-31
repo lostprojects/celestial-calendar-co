@@ -158,7 +158,7 @@ export const ComponentsSection = () => {
             <p className="text-sm font-mono text-primary/60">badge.primary from @/components/ui/badge</p>
           </div>
           <div className="space-y-2">
-            <Badge variant="secondary">badge.secondary</Badge>
+            <Badge className="bg-accent-palm hover:bg-accent-palm/90 text-white">badge.secondary</Badge>
             <p className="text-sm font-mono text-primary/60">badge.secondary</p>
           </div>
           <div className="space-y-2">
