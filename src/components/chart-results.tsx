@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BirthChartResult } from "@/utils/astro-utils";
-import { Sun, Moon, Sunrise, ChevronRight } from "lucide-react";
+import { Sun, Moon, Sunrise, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 
@@ -119,29 +119,40 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
         {/* AI Interpretation Button */}
         <div className="pt-12 text-center">
           <Button
-            variant="ghost"
-            className="text-accent-orange hover:text-accent-orange/90 hover:bg-accent-orange/10 text-lg font-mono group relative"
             onClick={() => setShowInterpretation(!showInterpretation)}
+            className="bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-float"
           >
-            <span className="relative z-10">Get Your Personal Reading</span>
-            <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+            <span className="relative z-10 font-bold flex items-center gap-2">
+              Get Your Personal Reading
+              <Sparkles className="w-5 h-5" />
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/90 to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </Button>
         </div>
 
         {/* AI Interpretation Section */}
         {showInterpretation && interpretation && (
-          <div className="mt-8 p-8 rounded-lg bg-white shadow-lg animate-fade-up">
-            <h3 className="text-2xl font-serif font-bold mb-6 text-primary-dark">
-              Your Personal Reading
-            </h3>
-            <div className="prose prose-slate max-w-none space-y-4">
-              {interpretation.split('\n').map((paragraph, index) => (
-                <p key={index} className="text-primary-dark/80 leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
+          <section className="mt-16 relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-background-sand/50 to-transparent opacity-50 rounded-3xl" />
+            <div className="relative z-10">
+              <div className="max-w-4xl mx-auto p-8 rounded-3xl bg-white/80 backdrop-blur-md shadow-xl border border-accent-orange/10">
+                <div className="flex items-center justify-center gap-2 mb-8">
+                  <div className="h-px flex-1 bg-accent-orange/20" />
+                  <h3 className="text-3xl font-serif font-bold text-primary-dark">
+                    Your Personal Reading
+                  </h3>
+                  <div className="h-px flex-1 bg-accent-orange/20" />
+                </div>
+                <div className="prose prose-slate max-w-none space-y-4">
+                  {interpretation.split('\n').map((paragraph, index) => (
+                    <p key={index} className="text-primary-dark/80 leading-relaxed text-lg font-mono">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
         )}
       </div>
     </div>
