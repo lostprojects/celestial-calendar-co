@@ -35,7 +35,7 @@ export const ComponentsSection = () => {
             <Button 
               className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"
             >
-              <span className="relative z-10">Hero Button</span>
+              <span className="relative z-10 font-bold">Hero Button</span>
               <div className="absolute inset-0 bg-gradient-to-t from-[#E0815D]/90 to-[#E0815D] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Button>
             <p className="text-sm font-mono text-primary/60 max-w-md">
