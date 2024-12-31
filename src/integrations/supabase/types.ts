@@ -29,6 +29,7 @@ export type Database = {
           sun_minutes: number | null
           sun_sign: string | null
           system_used: string | null
+          user_id: string | null
         }
         Insert: {
           ascendant_degrees?: number | null
@@ -49,6 +50,7 @@ export type Database = {
           sun_minutes?: number | null
           sun_sign?: string | null
           system_used?: string | null
+          user_id?: string | null
         }
         Update: {
           ascendant_degrees?: number | null
@@ -69,8 +71,17 @@ export type Database = {
           sun_minutes?: number | null
           sun_sign?: string | null
           system_used?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "birth_charts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       interpretations: {
         Row: {

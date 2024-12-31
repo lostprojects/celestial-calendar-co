@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@supabase/auth-helpers-react";
 import {
   calculateBirthChart,
   BirthChartData,
@@ -23,6 +24,7 @@ export default function BirthChartForm() {
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const { toast } = useToast();
+  const user = useUser();
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
     console.log("Location selected:", location);
@@ -86,6 +88,7 @@ export default function BirthChartForm() {
       ascendant_sign: result.risingSign,
       ascendant_degrees: result.risingDeg,
       ascendant_minutes: result.risingMin,
+      user_id: user?.id,
     });
     if (error) throw error;
   }

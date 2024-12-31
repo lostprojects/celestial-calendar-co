@@ -27,30 +27,22 @@ export const BirthChartSummaryModule = () => {
       }
 
       try {
-        console.log("Fetching for user:", user.id);
-        const { data: interpretations, error: interpretationsError } = await supabase
-          .from('interpretations')
-          .select('birth_chart_id')
+        console.log("Fetching birth charts for user:", user.id);
+        const { data: birthCharts, error: birthChartsError } = await supabase
+          .from('birth_charts')
+          .select('sun_sign, moon_sign, ascendant_sign')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1);
 
-        if (interpretationsError) throw interpretationsError;
+        if (birthChartsError) throw birthChartsError;
         
-        console.log("Interpretations found:", interpretations);
-        setDebugInfo({ interpretations });
+        console.log("Birth charts found:", birthCharts);
+        setDebugInfo({ birthCharts });
 
-        if (interpretations && interpretations.length > 0) {
-          const { data: birthChart, error: birthChartError } = await supabase
-            .from('birth_charts')
-            .select('sun_sign, moon_sign, ascendant_sign')
-            .eq('id', interpretations[0].birth_chart_id)
-            .single();
-
-          if (birthChartError) throw birthChartError;
-          
-          setChartData(birthChart);
-          console.log("Birth chart found:", birthChart);
+        if (birthCharts && birthCharts.length > 0) {
+          setChartData(birthCharts[0]);
+          console.log("Most recent birth chart:", birthCharts[0]);
         }
       } catch (error) {
         console.error('Error fetching birth chart:', error);
@@ -129,10 +121,10 @@ export const BirthChartSummaryModule = () => {
                 <TableCell>User ID</TableCell>
                 <TableCell>{user?.id || 'No user'}</TableCell>
               </TableRow>
-              {debugInfo.interpretations && (
+              {debugInfo.birthCharts && (
                 <TableRow>
-                  <TableCell>Interpretations Found</TableCell>
-                  <TableCell>{debugInfo.interpretations.length}</TableCell>
+                  <TableCell>Birth Charts Found</TableCell>
+                  <TableCell>{debugInfo.birthCharts.length}</TableCell>
                 </TableRow>
               )}
               {debugInfo.error && (
