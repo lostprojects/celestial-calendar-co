@@ -104,7 +104,7 @@ const StyleGuide = () => {
                 <p>Card content goes here.</p>
               </CardContent>
             </Card>
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg">
               <h3 className="text-lg font-serif mb-2">Glass Card</h3>
               <p>Our custom glass card style.</p>
             </div>
