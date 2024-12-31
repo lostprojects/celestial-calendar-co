@@ -89,9 +89,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   // Calculate Moon's position (tropical)
   const moonPos = getMoonPosition(jde);
-  const moonLongDeg = (moonPos.lon * 180) / Math.PI;  // Fixed radians to degrees conversion
+  console.log("Raw Moon Position object:", moonPos);
+  console.log("Moon Position properties:", {
+    longitude: moonPos.lon,
+    latitude: moonPos.lat,
+    distance: moonPos.range,
+    longitudeRad: moonPos.lon,
+    longitudeDeg: (moonPos.lon * 180) / Math.PI
+  });
+  
+  const moonLongDeg = (moonPos.lon * 180) / Math.PI;
   const normalizedMoonLong = normalizeDegrees(moonLongDeg);
-  console.log("Moon longitude (tropical):", normalizedMoonLong);
+  console.log("Final Moon longitude (tropical):", normalizedMoonLong);
   
   // Calculate obliquity of the ecliptic
   const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
