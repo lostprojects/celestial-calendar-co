@@ -106,7 +106,7 @@ const StyleGuide = () => {
           <h3 className="text-xl font-serif mb-4">Form Elements</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-4">
-              <Input placeholder="Default Input" />
+              <Input placeholder="Default Input" className="bg-white" />
               <Calendar mode="single" />
             </div>
           </div>
