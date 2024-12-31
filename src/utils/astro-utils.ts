@@ -90,34 +90,34 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const finalMoonLongitude = rad2deg(moonLongRad);
 
   // Get GST and normalize to [0, 24)
-  let gst = sidereal.apparent(jde);
-  gst = gst % 24;
-  if (gst < 0) gst += 24;
+  let greenwichSiderealTime = sidereal.apparent(jde);
+  greenwichSiderealTime = greenwichSiderealTime % 24;
+  if (greenwichSiderealTime < 0) greenwichSiderealTime += 24;
 
   // Convert longitude to hours and calculate LST
   let longitudeHours = data.longitude / 15;
-  let lst = gst + longitudeHours;
+  let localSiderealTime = greenwichSiderealTime + longitudeHours;
 
   // Normalize LST to [0, 24)
-  lst = lst % 24;
-  if (lst < 0) lst += 24;
+  localSiderealTime = localSiderealTime % 24;
+  if (localSiderealTime < 0) localSiderealTime += 24;
 
   // Convert LST directly to radians
-  let lstRad = lst * (Math.PI / 12);
+  let localSiderealTimeRad = localSiderealTime * (Math.PI / 12);
 
   // Calculate ascendant using spherical trig formula
   let latRad = deg2rad(data.latitude);
-  let tanAsc = -(Math.cos(lstRad)) / 
+  let tanAsc = -(Math.cos(localSiderealTimeRad)) / 
                (Math.sin(epsRad) * Math.tan(latRad) + 
-                Math.cos(epsRad) * Math.sin(lstRad));
+                Math.cos(epsRad) * Math.sin(localSiderealTimeRad));
                 
   // Get initial ascendant value in radians
   let ascRad = Math.atan(tanAsc);
   
   // Correct quadrant based on LST
-  if (Math.cos(lstRad) < 0) {
+  if (Math.cos(localSiderealTimeRad) < 0) {
     ascRad += Math.PI;
-  } else if (Math.cos(lstRad) >= 0 && Math.sin(lstRad) < 0) {
+  } else if (Math.cos(localSiderealTimeRad) >= 0 && Math.sin(localSiderealTimeRad) < 0) {
     ascRad += 2 * Math.PI;
   }
   
@@ -125,10 +125,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   let ascendant = normalizeDegrees(rad2deg(ascRad));
 
   console.log("Rising sign calculation:", {
-    gst,
+    greenwichSiderealTime,
     longitudeHours,
-    lst,
-    lstRad,
+    localSiderealTime,
+    localSiderealTimeRad,
     ascRad,
     ascendant
   });
