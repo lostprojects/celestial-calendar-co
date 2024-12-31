@@ -60,9 +60,8 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
 
-  // Calculate obliquity
-  const T = (jd - 2451545.0) / 36525;
-  const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
+  // Calculate obliquity (ε) for J2000.0
+  const eps = 23.4392911; // Exact value for J2000.0
   const epsRad = deg2rad(eps);
 
   // Calculate sun position
@@ -86,27 +85,43 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Get LST (RAMC)
-  let ramc = sidereal.apparent(jde);
-  ramc = ramc % 24;
-  if (ramc < 0) ramc += 24;
-  ramc = (ramc + data.longitude / 15) % 24;
-  if (ramc < 0) ramc += 24;
+  // Get LST (Local Sidereal Time) in degrees
+  let lstDeg = (sidereal.apparent(jde) + data.longitude / 15) * 15;
+  lstDeg = normalizeDegrees(lstDeg);
+  const lstRad = deg2rad(lstDeg);
   
-  // Convert RAMC to radians (15° per hour)
-  const ramcRad = deg2rad(ramc * 15);
-  
-  // Calculate ascendant using the direct formula
+  // Calculate Ascendant using the exact formula provided
   const latRad = deg2rad(data.latitude);
-  const numerator = Math.cos(ramcRad);
-  const denominator = Math.sin(epsRad) * Math.tan(latRad) + Math.cos(epsRad) * Math.sin(ramcRad);
-  const ascendant = normalizeDegrees(rad2deg(Math.atan2(numerator, denominator)));
+  
+  // λAsc = arctan(-cos(θL) / (sin(θL)cos(ε) + tan(φ)sin(ε)))
+  const numerator = -Math.cos(lstRad);
+  const denominator = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
+  let ascendant = rad2deg(Math.atan2(numerator, denominator));
+  
+  // Apply quadrant adjustments exactly as specified
+  if (numerator < 0) {
+    ascendant += 180;
+  } else {
+    ascendant += 360;
+  }
+  
+  // Final adjustment for eastern point
+  if (ascendant < 180) {
+    ascendant += 180;
+  } else {
+    ascendant -= 180;
+  }
+  
+  ascendant = normalizeDegrees(ascendant);
 
-  console.log("Rising sign calculation:", {
-    ramc,
-    ramcRad,
+  console.log("Ascendant calculation details:", {
+    lstDeg,
     latRad,
-    ascendant
+    epsRad,
+    numerator,
+    denominator,
+    rawAscendant: rad2deg(Math.atan2(numerator, denominator)),
+    finalAscendant: ascendant
   });
 
   // Get zodiac positions
