@@ -98,19 +98,25 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   // Classical formula for converting RA/Dec to ecliptic longitude
   const tanLambda = (Math.sin(moonPos._ra) * Math.cos(epsRad) - Math.tan(moonPos._dec) * Math.sin(epsRad)) / Math.cos(moonPos._ra);
-  let moonLongRad = Math.atan(tanLambda);
   
-  // Adjust quadrant based on RA
+  // Corrected Moon Longitude Calculation
+  const moonLongRad = Math.atan(tanLambda);
+
+  // Quadrant adjustment in radians
   if (Math.cos(moonPos._ra) < 0) {
-    moonLongRad += Math.PI;
+      moonLongRad += Math.PI;
   }
   if (moonLongRad < 0) {
-    moonLongRad += 2 * Math.PI;
+      moonLongRad += 2 * Math.PI;
   }
-  
+
+  // Convert to degrees
   const moonLongDeg = (moonLongRad * 180) / Math.PI;
-  const normalizedMoonLong = normalizeDegrees(moonLongDeg);
-  console.log("Final Moon longitude (tropical):", normalizedMoonLong);
+
+  // No additional normalization needed
+  const finalMoonLongitude = moonLongDeg; // Already normalized
+  
+  console.log("Final Moon longitude (tropical):", finalMoonLongitude);
   
   // Calculate Local Sidereal Time and RAMC
   const lst = sidereal.apparent(jde);
@@ -123,7 +129,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
-  const moonPosition = getZodiacPosition(normalizedMoonLong);
+  const moonPosition = getZodiacPosition(finalMoonLongitude);
   const ascPosition = getZodiacPosition(ascendant);
   
   console.log("Final positions:", {
