@@ -93,21 +93,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   ramc = (ramc + data.longitude / 15) % 24;
   if (ramc < 0) ramc += 24;
   
-  // Convert RAMC to degrees (15° per hour) and ADD 90° (key change)
+  // Convert RAMC to degrees (15° per hour)
   const ramcDeg = ramc * 15;
-  const ascBase = normalizeDegrees(ramcDeg + 90);
-  const ramcRad = deg2rad(ascBase);
+  const ramcRad = deg2rad(ramcDeg);
   
-  // Calculate ascendant using the direct formula
-  const latRad = deg2rad(data.latitude);
-  const numerator = Math.cos(ramcRad);
-  const denominator = Math.sin(epsRad) * Math.tan(latRad) + Math.cos(epsRad) * Math.sin(ramcRad);
+  // Calculate ascendant using the exact formula provided
+  const numerator = -Math.cos(ramcRad);
+  const denominator = Math.sin(epsRad) * Math.tan(deg2rad(data.latitude)) + Math.cos(epsRad) * Math.sin(ramcRad);
   const ascendant = normalizeDegrees(rad2deg(Math.atan2(numerator, denominator)));
 
   console.log("Rising sign calculation:", {
     ramc,
     ramcDeg,
-    ascBase,
     ascendant
   });
 
