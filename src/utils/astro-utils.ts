@@ -160,8 +160,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongDeg = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = moonLongDeg; // Already normalized
   
-  // Calculate Local Sidereal Time and RAMC
-  const lst = sidereal.apparent(jde);
+  // Calculate RAMC using the already calculated LST
   const ramc = normalizeDegrees(rad2deg(lst) + data.longitude);
   console.log("RAMC:", ramc);
   
@@ -238,3 +237,4 @@ function deg2rad(degrees: number): number {
 function rad2deg(radians: number): number {
   return radians * 180 / Math.PI;
 }
+
