@@ -30,6 +30,34 @@ const ZODIAC_SIGNS = [
   "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
+function calculateJulianDay(utcDate: string, utcTime: string): number {
+  // Basic validation
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(utcDate)) {
+    throw new Error("Invalid date format. Expected: YYYY-MM-DD");
+  }
+  if (!/^\d{1,2}:\d{2}$/.test(utcTime)) {
+    throw new Error("Invalid time format. Expected: HH:mm");
+  }
+
+  const [year, month, day] = utcDate.split('-').map(Number);
+  const [hour, minute] = utcTime.split(':').map(Number);
+
+  // Calculate the base Julian Day for the current date
+  const currentDayJD = CalendarGregorianToJD(year, month, day);
+
+  // Determine if the time is before or after noon
+  const hoursSinceNoon = hour + minute / 60 - 12;
+
+  if (hoursSinceNoon >= 0) {
+    // Time is after noon: Use current day's JD + fractional day
+    return currentDayJD + hoursSinceNoon / 24;
+  } else {
+    // Time is before noon: Use previous day's JD + fractional day
+    const previousDayJD = CalendarGregorianToJD(year, month, day - 1);
+    return previousDayJD + (hoursSinceNoon + 24) / 24;
+  }
+}
+
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   // Parse input date/time
   const [year, month, day] = data.birthDate.split("-").map(Number);
@@ -51,20 +79,11 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const utcMoment = localMoment.utc();
   console.log("UTC time:", utcMoment.format());
   
-  // Calculate Julian Day
-  const baseJD = CalendarGregorianToJD(
-    utcMoment.year(),
-    utcMoment.month() + 1,
-    utcMoment.date()
+  // Calculate Julian Day using our new function
+  const jd = calculateJulianDay(
+    utcMoment.format('YYYY-MM-DD'),
+    utcMoment.format('H:mm')
   );
-  
-  // Calculate hours since noon (astronomical day)
-  const utcHour = utcMoment.hours() + utcMoment.minutes() / 60.0;
-  const hoursSinceNoon = utcHour - 12;
-  const dayFraction = hoursSinceNoon / 24.0;
-  
-  // If time is before noon, use previous day's JD
-  const jd = baseJD + dayFraction;
   
   // Calculate Julian Ephemeris Day (adding deltaT correction)
   const deltaT = 67.2; // Approximate value for 1980
