@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { User, LogOut } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const user = useUser();
@@ -33,22 +40,36 @@ export const Navbar = () => {
           </Link>
           <div className="flex items-center gap-4">
             {user ? (
-              <>
-                <Link to="/account">
-                  <Button variant="ghost" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Account
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="text-white hover:bg-white/10"
+                  >
+                    <User className="h-5 w-5" />
                   </Button>
-                </Link>
-                <Button 
-                  variant="ghost" 
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2 text-red-600"
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 bg-white/95 backdrop-blur-sm"
                 >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
-                </Button>
-              </>
+                  <DropdownMenuItem asChild>
+                    <Link to="/account" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={handleSignOut}
+                    className="text-red-600 cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link to="/auth">
                 <Button>Sign In</Button>
