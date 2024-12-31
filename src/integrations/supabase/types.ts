@@ -72,6 +72,45 @@ export type Database = {
         }
         Relationships: []
       }
+      interpretations: {
+        Row: {
+          birth_chart_id: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          birth_chart_id: string
+          content: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          birth_chart_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interpretations_birth_chart_id_fkey"
+            columns: ["birth_chart_id"]
+            isOneToOne: false
+            referencedRelation: "birth_charts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interpretations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

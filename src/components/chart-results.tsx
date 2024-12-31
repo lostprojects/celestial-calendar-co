@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { BirthChartResult } from "@/utils/astro-utils";
-import { Sun, Moon, Sunrise, ChevronRight, Sparkles, Loader2, Star, Heart, Gem, Leaf } from "lucide-react";
+import { Sun, Moon, Sunrise, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { BirthSignCard } from "./birth-signs/BirthSignCard";
+import { InterpretationSection } from "./interpretation/InterpretationSection";
 
 interface ChartResultsProps {
   mainWestern: BirthChartResult | null;
@@ -22,10 +23,6 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
   if (!mainWestern) return null;
 
   console.log("ChartResults received Western:", mainWestern);
-
-  const formatPosition = (sign: string, deg: number, min: number) => {
-    return `${Math.floor(deg)}°${String(Math.floor(min)).padStart(2, "0")}′`;
-  };
 
   const descriptions = {
     sun: "Your Sun sign represents your core identity and basic personality—the essence of who you are. It influences how you express yourself and your fundamental approach to life.",
@@ -54,7 +51,10 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
 
       console.log("AI Interpretation received:", interpretationData);
       
-      // Store the interpretation in the database
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Find the matching birth chart
       const { data: birthChartData } = await supabase
         .from('birth_charts')
         .select('id')
@@ -64,13 +64,14 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
         .single();
 
       if (birthChartData) {
+        // Store the interpretation
         const { error: storageError } = await supabase
           .from('interpretations')
-          .insert({
+          .insert([{
             birth_chart_id: birthChartData.id,
             content: interpretationData.interpretation,
-            user_id: (await supabase.auth.getUser()).data.user?.id
-          });
+            user_id: user?.id || null
+          }]);
 
         if (storageError) {
           console.error("Error storing interpretation:", storageError);
@@ -98,86 +99,41 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
       </h2>
       
       <div className="max-w-2xl mx-auto px-4 space-y-6">
-        {/* Sun Sign */}
-        <div className="group">
-          <div 
-            className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
-            onClick={() => setOpenSection(openSection === 'sun' ? null : 'sun')}
-          >
-            <div className="p-3 rounded-full bg-accent-orange/10">
-              <Sun className="w-6 h-6 text-accent-orange" />
-            </div>
-            <div className="flex-1">
-              <div className="font-serif text-xl">{mainWestern.sunSign}</div>
-              <div className="text-sm text-primary/60 font-mono">
-                {formatPosition(mainWestern.sunSign, mainWestern.sunDeg, mainWestern.sunMin)}
-              </div>
-            </div>
-            <ChevronRight className={cn(
-              "w-5 h-5 text-accent-orange/70 transition-transform duration-200",
-              openSection === 'sun' && "rotate-90"
-            )} />
-          </div>
-          {openSection === 'sun' && (
-            <div className="mt-2 p-4 rounded-lg bg-accent-orange/5 text-primary-dark/80 animate-fade-up">
-              {descriptions.sun}
-            </div>
-          )}
-        </div>
+        <BirthSignCard
+          sign={mainWestern.sunSign}
+          position={`${mainWestern.sunDeg}°${mainWestern.sunMin}'`}
+          icon={Sun}
+          iconColor="accent-orange"
+          degrees={mainWestern.sunDeg}
+          minutes={mainWestern.sunMin}
+          isOpen={openSection === 'sun'}
+          description={descriptions.sun}
+          onClick={() => setOpenSection(openSection === 'sun' ? null : 'sun')}
+        />
 
-        {/* Moon Sign */}
-        <div className="group">
-          <div 
-            className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
-            onClick={() => setOpenSection(openSection === 'moon' ? null : 'moon')}
-          >
-            <div className="p-3 rounded-full bg-accent-lightpalm/10">
-              <Moon className="w-6 h-6 text-accent-lightpalm" />
-            </div>
-            <div className="flex-1">
-              <div className="font-serif text-xl">{mainWestern.moonSign}</div>
-              <div className="text-sm text-primary/60 font-mono">
-                {formatPosition(mainWestern.moonSign, mainWestern.moonDeg, mainWestern.moonMin)}
-              </div>
-            </div>
-            <ChevronRight className={cn(
-              "w-5 h-5 text-accent-lightpalm/70 transition-transform duration-200",
-              openSection === 'moon' && "rotate-90"
-            )} />
-          </div>
-          {openSection === 'moon' && (
-            <div className="mt-2 p-4 rounded-lg bg-accent-lightpalm/5 text-primary-dark/80 animate-fade-up">
-              {descriptions.moon}
-            </div>
-          )}
-        </div>
+        <BirthSignCard
+          sign={mainWestern.moonSign}
+          position={`${mainWestern.moonDeg}°${mainWestern.moonMin}'`}
+          icon={Moon}
+          iconColor="accent-lightpalm"
+          degrees={mainWestern.moonDeg}
+          minutes={mainWestern.moonMin}
+          isOpen={openSection === 'moon'}
+          description={descriptions.moon}
+          onClick={() => setOpenSection(openSection === 'moon' ? null : 'moon')}
+        />
 
-        {/* Rising Sign */}
-        <div className="group">
-          <div 
-            className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
-            onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
-          >
-            <div className="p-3 rounded-full bg-accent-palm/10">
-              <Sunrise className="w-6 h-6 text-accent-palm" />
-            </div>
-            <div className="flex-1">
-              <div className="font-serif text-xl">{mainWestern.risingSign}</div>
-              <div className="text-sm text-primary/60 font-mono">
-                {formatPosition(mainWestern.risingSign, mainWestern.risingDeg, mainWestern.risingMin)}
-              </div>
-            </div>
-            <ChevronRight className={cn(
-              "w-5 h-5 text-accent-palm/70 transition-transform duration-200",
-              openSection === 'rising' && "rotate-90"
-            )} />
-          </div>
-          {openSection === 'rising' && (
-            <div className="mt-2 p-4 rounded-lg bg-accent-palm/5 text-primary-dark/80 animate-fade-up">
-              {descriptions.rising}
-            </div>
-          )}
-        </div>
+        <BirthSignCard
+          sign={mainWestern.risingSign}
+          position={`${mainWestern.risingDeg}°${mainWestern.risingMin}'`}
+          icon={Sunrise}
+          iconColor="accent-palm"
+          degrees={mainWestern.risingDeg}
+          minutes={mainWestern.risingMin}
+          isOpen={openSection === 'rising'}
+          description={descriptions.rising}
+          onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
+        />
 
         {/* AI Interpretation Button */}
         <div className="pt-12 text-center">
@@ -205,50 +161,7 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
 
         {/* AI Interpretation Section */}
         {showInterpretation && interpretation && (
-          <section className="mt-16 relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-background-sand/50 to-transparent opacity-50 rounded-3xl" />
-            <div className="relative z-10">
-              <div className="max-w-4xl mx-auto p-8 rounded-3xl bg-white/80 backdrop-blur-md shadow-xl border border-accent-orange/10">
-                <div className="flex items-center justify-center gap-2 mb-8">
-                  <div className="h-px flex-1 bg-accent-orange/20" />
-                  <h3 className="text-3xl font-serif font-bold text-primary-dark">
-                    Your Personal Reading
-                  </h3>
-                  <div className="h-px flex-1 bg-accent-orange/20" />
-                </div>
-                <div className="prose prose-slate max-w-none space-y-8">
-                  {interpretation.split('\n\n').map((section, index) => {
-                    const icons = [
-                      <Star className="w-6 h-6 text-accent-orange" />,
-                      <Heart className="w-6 h-6 text-accent-lightpalm" />,
-                      <Gem className="w-6 h-6 text-accent-palm" />,
-                      <Leaf className="w-6 h-6 text-accent-lightorange" />
-                    ];
-                    const titles = [
-                      "Your Cosmic Essence",
-                      "Emotional Landscape",
-                      "Life Path & Purpose",
-                      "Personal Growth"
-                    ];
-                    
-                    return (
-                      <div key={index} className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          {icons[index]}
-                          <h4 className="text-xl font-serif font-semibold text-primary-dark/90">
-                            {titles[index]}
-                          </h4>
-                        </div>
-                        <p className="text-primary-dark/80 leading-relaxed text-base font-mono">
-                          {section}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </section>
+          <InterpretationSection interpretation={interpretation} />
         )}
       </div>
     </div>
