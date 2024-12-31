@@ -51,22 +51,27 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const utcMoment = localMoment.utc();
   console.log("UTC time:", utcMoment.format());
   
-  // Calculate Julian Day, accounting for astronomical day starting at noon
-  const utcHour = utcMoment.hours() + utcMoment.minutes() / 60.0;
-  const dayFraction = (utcHour - 12) / 24.0; // Adjust for noon-based astronomical day
-  
-  const jd = CalendarGregorianToJD(
+  // Calculate Julian Day
+  const baseJD = CalendarGregorianToJD(
     utcMoment.year(),
     utcMoment.month() + 1,
     utcMoment.date()
-  ) + dayFraction;
+  );
+  
+  // Calculate hours since noon (astronomical day)
+  const utcHour = utcMoment.hours() + utcMoment.minutes() / 60.0;
+  const hoursSinceNoon = utcHour - 12;
+  const dayFraction = hoursSinceNoon / 24.0;
+  
+  // If time is before noon, use previous day's JD
+  const jd = baseJD + dayFraction;
   
   // Calculate Julian Ephemeris Day (adding deltaT correction)
   const deltaT = 67.2; // Approximate value for 1980
   const jde = jd + deltaT / 86400;
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
-  
+
   // Calculate Sun's apparent longitude (tropical)
   const sunLongRad = solar.apparentLongitude(jde);
   const sunLongDeg = rad2deg(sunLongRad);
