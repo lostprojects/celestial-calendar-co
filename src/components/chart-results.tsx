@@ -29,123 +29,121 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
   };
 
   return (
-    <section className="py-16 bg-background">
-      <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-serif font-bold mb-12 text-center text-primary-dark">
-          Your Birth Signs
-        </h2>
-        
-        <div className="max-w-2xl mx-auto space-y-6">
-          {/* Sun Sign */}
-          <div className="group">
-            <div 
-              className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
-              onClick={() => setOpenSection(openSection === 'sun' ? null : 'sun')}
-            >
-              <div className="p-3 rounded-full bg-accent-orange/10">
-                <Sun className="w-6 h-6 text-accent-orange" />
-              </div>
-              <div className="flex-1">
-                <div className="font-serif text-xl">{mainWestern.sunSign}</div>
-                <div className="text-sm text-primary/60 font-mono">
-                  {formatPosition(mainWestern.sunSign, mainWestern.sunDeg, mainWestern.sunMin)}
-                </div>
-              </div>
-              <ChevronRight className={cn(
-                "w-5 h-5 text-accent-orange/70 transition-transform duration-200",
-                openSection === 'sun' && "rotate-90"
-              )} />
+    <div className="container mx-auto px-4">
+      <h2 className="text-4xl font-serif font-bold mb-12 text-center text-primary-dark">
+        Your Birth Signs
+      </h2>
+      
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* Sun Sign */}
+        <div className="group">
+          <div 
+            className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
+            onClick={() => setOpenSection(openSection === 'sun' ? null : 'sun')}
+          >
+            <div className="p-3 rounded-full bg-accent-orange/10">
+              <Sun className="w-6 h-6 text-accent-orange" />
             </div>
-            {openSection === 'sun' && (
-              <div className="mt-2 p-4 rounded-lg bg-accent-orange/5 text-primary-dark/80 animate-fade-up">
-                {descriptions.sun}
+            <div className="flex-1">
+              <div className="font-serif text-xl">{mainWestern.sunSign}</div>
+              <div className="text-sm text-primary/60 font-mono">
+                {formatPosition(mainWestern.sunSign, mainWestern.sunDeg, mainWestern.sunMin)}
               </div>
-            )}
-          </div>
-
-          {/* Moon Sign */}
-          <div className="group">
-            <div 
-              className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
-              onClick={() => setOpenSection(openSection === 'moon' ? null : 'moon')}
-            >
-              <div className="p-3 rounded-full bg-accent-lightpalm/10">
-                <Moon className="w-6 h-6 text-accent-lightpalm" />
-              </div>
-              <div className="flex-1">
-                <div className="font-serif text-xl">{mainWestern.moonSign}</div>
-                <div className="text-sm text-primary/60 font-mono">
-                  {formatPosition(mainWestern.moonSign, mainWestern.moonDeg, mainWestern.moonMin)}
-                </div>
-              </div>
-              <ChevronRight className={cn(
-                "w-5 h-5 text-accent-lightpalm/70 transition-transform duration-200",
-                openSection === 'moon' && "rotate-90"
-              )} />
             </div>
-            {openSection === 'moon' && (
-              <div className="mt-2 p-4 rounded-lg bg-accent-lightpalm/5 text-primary-dark/80 animate-fade-up">
-                {descriptions.moon}
-              </div>
-            )}
+            <ChevronRight className={cn(
+              "w-5 h-5 text-accent-orange/70 transition-transform duration-200",
+              openSection === 'sun' && "rotate-90"
+            )} />
           </div>
-
-          {/* Rising Sign */}
-          <div className="group">
-            <div 
-              className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
-              onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
-            >
-              <div className="p-3 rounded-full bg-accent-palm/10">
-                <Sunrise className="w-6 h-6 text-accent-palm" />
-              </div>
-              <div className="flex-1">
-                <div className="font-serif text-xl">{mainWestern.risingSign}</div>
-                <div className="text-sm text-primary/60 font-mono">
-                  {formatPosition(mainWestern.risingSign, mainWestern.risingDeg, mainWestern.risingMin)}
-                </div>
-              </div>
-              <ChevronRight className={cn(
-                "w-5 h-5 text-accent-palm/70 transition-transform duration-200",
-                openSection === 'rising' && "rotate-90"
-              )} />
-            </div>
-            {openSection === 'rising' && (
-              <div className="mt-2 p-4 rounded-lg bg-accent-palm/5 text-primary-dark/80 animate-fade-up">
-                {descriptions.rising}
-              </div>
-            )}
-          </div>
-
-          {/* AI Interpretation Button */}
-          <div className="pt-12 text-center">
-            <Button
-              variant="ghost"
-              className="text-accent-orange hover:text-accent-orange/90 hover:bg-accent-orange/10 text-lg font-mono group relative"
-              onClick={() => setShowInterpretation(!showInterpretation)}
-            >
-              <span className="relative z-10">Get Your Personal Reading</span>
-              <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
-            </Button>
-          </div>
-
-          {/* AI Interpretation Section */}
-          {showInterpretation && interpretation && (
-            <div className="mt-8 p-8 rounded-lg bg-white shadow-lg animate-fade-up">
-              <h3 className="text-2xl font-serif font-bold mb-6 text-primary-dark">
-                Your Personal Reading
-              </h3>
-              <div className="prose prose-slate max-w-none space-y-4">
-                {interpretation.split('\n').map((paragraph, index) => (
-                  <p key={index} className="text-primary-dark/80 leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+          {openSection === 'sun' && (
+            <div className="mt-2 p-4 rounded-lg bg-accent-orange/5 text-primary-dark/80 animate-fade-up">
+              {descriptions.sun}
             </div>
           )}
         </div>
+
+        {/* Moon Sign */}
+        <div className="group">
+          <div 
+            className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
+            onClick={() => setOpenSection(openSection === 'moon' ? null : 'moon')}
+          >
+            <div className="p-3 rounded-full bg-accent-lightpalm/10">
+              <Moon className="w-6 h-6 text-accent-lightpalm" />
+            </div>
+            <div className="flex-1">
+              <div className="font-serif text-xl">{mainWestern.moonSign}</div>
+              <div className="text-sm text-primary/60 font-mono">
+                {formatPosition(mainWestern.moonSign, mainWestern.moonDeg, mainWestern.moonMin)}
+              </div>
+            </div>
+            <ChevronRight className={cn(
+              "w-5 h-5 text-accent-lightpalm/70 transition-transform duration-200",
+              openSection === 'moon' && "rotate-90"
+            )} />
+          </div>
+          {openSection === 'moon' && (
+            <div className="mt-2 p-4 rounded-lg bg-accent-lightpalm/5 text-primary-dark/80 animate-fade-up">
+              {descriptions.moon}
+            </div>
+          )}
+        </div>
+
+        {/* Rising Sign */}
+        <div className="group">
+          <div 
+            className="flex items-center gap-4 p-6 rounded-lg bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
+            onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
+          >
+            <div className="p-3 rounded-full bg-accent-palm/10">
+              <Sunrise className="w-6 h-6 text-accent-palm" />
+            </div>
+            <div className="flex-1">
+              <div className="font-serif text-xl">{mainWestern.risingSign}</div>
+              <div className="text-sm text-primary/60 font-mono">
+                {formatPosition(mainWestern.risingSign, mainWestern.risingDeg, mainWestern.risingMin)}
+              </div>
+            </div>
+            <ChevronRight className={cn(
+              "w-5 h-5 text-accent-palm/70 transition-transform duration-200",
+              openSection === 'rising' && "rotate-90"
+            )} />
+          </div>
+          {openSection === 'rising' && (
+            <div className="mt-2 p-4 rounded-lg bg-accent-palm/5 text-primary-dark/80 animate-fade-up">
+              {descriptions.rising}
+            </div>
+          )}
+        </div>
+
+        {/* AI Interpretation Button */}
+        <div className="pt-12 text-center">
+          <Button
+            variant="ghost"
+            className="text-accent-orange hover:text-accent-orange/90 hover:bg-accent-orange/10 text-lg font-mono group relative"
+            onClick={() => setShowInterpretation(!showInterpretation)}
+          >
+            <span className="relative z-10">Get Your Personal Reading</span>
+            <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+          </Button>
+        </div>
+
+        {/* AI Interpretation Section */}
+        {showInterpretation && interpretation && (
+          <div className="mt-8 p-8 rounded-lg bg-white shadow-lg animate-fade-up">
+            <h3 className="text-2xl font-serif font-bold mb-6 text-primary-dark">
+              Your Personal Reading
+            </h3>
+            <div className="prose prose-slate max-w-none space-y-4">
+              {interpretation.split('\n').map((paragraph, index) => (
+                <p key={index} className="text-primary-dark/80 leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
