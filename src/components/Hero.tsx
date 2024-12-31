@@ -41,7 +41,7 @@ export const Hero = () => {
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left max-w-[50%]">
-            {/* Glass Card Background - removed border class */}
+            {/* Glass Card Background */}
             <div className="bg-white/30 backdrop-blur-md rounded-3xl p-8 shadow-xl">
               {/* Social Proof */}
               <div className="flex items-center gap-3 mb-8 animate-fade-up">
@@ -62,14 +62,14 @@ export const Hero = () => {
                     className="w-8 h-8 rounded-full border-2 border-[#D4DCCD]"
                   />
                 </div>
-                <span className="text-primary font-mono text-sm">Join 10,000+ seekers of cosmic wisdom</span>
+                <span className="text-sm font-mono">Join 10,000+ seekers of cosmic wisdom</span>
               </div>
 
               {/* Main Content */}
               <h1 className="text-4xl md:text-5xl font-serif font-medium mb-4 text-primary-dark leading-[1.1] max-w-xl animate-fade-up">
                 Your Personal Cosmic Blueprint for Success
               </h1>
-              <p className="text-lg text-primary-dark/80 font-mono leading-relaxed max-w-lg mb-8 animate-fade-up">
+              <p className="text-base text-primary-dark/80 font-mono leading-relaxed max-w-lg mb-8 animate-fade-up">
                 Unlock the power of celestial intelligence to make confident decisions in your career, relationships, and personal growth.
               </p>
               
