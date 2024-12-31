@@ -22,6 +22,14 @@ export const TypographySection = () => {
           <p className="text-sm font-mono text-primary/60">h4 (text-xl, 20px)</p>
         </div>
         <div>
+          <h5 className="text-lg font-mono font-semibold">h5.mono (Subheading Large)</h5>
+          <p className="text-sm font-mono text-primary/60">h5.mono (text-lg, 18px, font-semibold)</p>
+        </div>
+        <div>
+          <h6 className="text-base font-mono font-semibold">h6.mono (Subheading Regular)</h6>
+          <p className="text-sm font-mono text-primary/60">h6.mono (text-base, 16px, font-semibold)</p>
+        </div>
+        <div>
           <p className="text-lg font-mono">Large Body Text - IBM Plex Mono</p>
           <p className="text-sm font-mono text-primary/60">p.large (text-lg, 18px)</p>
         </div>
