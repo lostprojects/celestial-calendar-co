@@ -92,7 +92,7 @@ export const Hero = () => {
               {/* CTA */}
               <Button 
                 onClick={scrollToForm}
-                className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
+                className="w-full bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
               >
                 <span className="relative z-10 font-bold">Get Your Cosmic Blueprint</span>
               </Button>
