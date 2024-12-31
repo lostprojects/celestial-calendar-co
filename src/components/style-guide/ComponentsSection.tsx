@@ -33,13 +33,13 @@ export const ComponentsSection = () => {
           {/* Hero Button */}
           <div className="space-y-2">
             <Button 
-              className="bg-primary-dark hover:bg-primary-dark/90 text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"
+              className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"
             >
               <span className="relative z-10">Hero Button</span>
-              <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/90 to-primary-dark opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#B1583B]/90 to-[#B1583B] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </Button>
             <p className="text-sm font-mono text-primary/60 max-w-md">
-              &lt;Button className="bg-primary-dark hover:bg-primary-dark/90 text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"&gt;
+              &lt;Button className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"&gt;
             </p>
           </div>
         </div>
