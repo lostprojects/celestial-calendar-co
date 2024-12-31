@@ -1,5 +1,10 @@
-import { serve } from "std/server";
-import { openai } from "@/lib/openai";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { openai } from "./openai.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 const generateInterpretation = async (birthChart: any, format: any) => {
   const prompt = `Based on this birth chart data:
@@ -19,7 +24,7 @@ Do not use any markdown formatting or special characters.
 Separate sections with double newlines.
 Focus on practical advice and positive growth opportunities.`;
 
-  const response = await openai.chat.completions.create({
+  const response = await openai.createChatCompletion({
     model: "gpt-4",
     messages: [
       {
@@ -36,14 +41,28 @@ Focus on practical advice and positive growth opportunities.`;
   });
 
   return {
-    interpretation: response.choices[0].message.content
+    interpretation: response.data.choices[0].message?.content
   };
 };
 
 serve(async (req) => {
-  const { birthChart, format } = await req.json();
-  const interpretation = await generateInterpretation(birthChart, format);
-  return new Response(JSON.stringify(interpretation), {
-    headers: { "Content-Type": "application/json" },
-  });
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { birthChart, format } = await req.json();
+    const interpretation = await generateInterpretation(birthChart, format);
+    
+    return new Response(JSON.stringify(interpretation), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error generating interpretation:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 });
