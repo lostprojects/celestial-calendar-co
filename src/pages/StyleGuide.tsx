@@ -2,7 +2,6 @@ import React from 'react';
 import { ColorSection } from '@/components/style-guide/ColorSection';
 import { TypographySection } from '@/components/style-guide/TypographySection';
 import { ComponentsSection } from '@/components/style-guide/ComponentsSection';
-import { GuidelinesSection } from '@/components/style-guide/GuidelinesSection';
 
 const StyleGuide = () => {
   return (
@@ -10,7 +9,6 @@ const StyleGuide = () => {
       <ColorSection />
       <TypographySection />
       <ComponentsSection />
-      <GuidelinesSection />
     </div>
   );
 };
