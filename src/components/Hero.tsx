@@ -94,8 +94,7 @@ export const Hero = () => {
                 onClick={scrollToForm}
                 className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-fade-up"
               >
-                <span className="relative z-10">Get Your Cosmic Blueprint</span>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#B1583B]/90 to-[#B1583B] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="relative z-10 font-bold">Get Your Cosmic Blueprint</span>
               </Button>
             </div>
           </div>
