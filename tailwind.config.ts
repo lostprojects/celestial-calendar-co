@@ -27,7 +27,7 @@ export default {
         primary: {
           DEFAULT: "#403E43",
           light: "#F2FCE2",
-          dark: "#001D2D",
+          dark: "#001018",
         },
         accent: {
           sage: "#D4DCCD",
