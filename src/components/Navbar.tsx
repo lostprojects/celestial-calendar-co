@@ -7,10 +7,10 @@ export const Navbar = () => {
   const user = useUser();
 
   return (
-    <nav className="py-4">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center">
-          <Link to="/" className="text-xl font-semibold">
+    <nav className="h-16 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container h-full mx-auto px-4">
+        <div className="flex h-full justify-between items-center">
+          <Link to="/" className="text-xl font-serif">
             AstroChart
           </Link>
           <div className="flex items-center gap-4">
@@ -31,4 +31,4 @@ export const Navbar = () => {
       </div>
     </nav>
   );
-};
+}

@@ -7,7 +7,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarHeader,
 } from "@/components/ui/sidebar";
 
 interface AccountSidebarProps {
@@ -15,19 +14,16 @@ interface AccountSidebarProps {
   onTabChange: (tab: string) => void;
 }
 
-export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) {
-  const menuItems = [
-    { id: "details", title: "My Details", icon: User },
-    { id: "settings", title: "Settings", icon: Settings },
-    { id: "security", title: "Security", icon: Lock },
-    { id: "email", title: "Email", icon: Mail },
-  ];
+const menuItems = [
+  { id: "details", title: "Personal Info", icon: User },
+  { id: "settings", title: "Preferences", icon: Settings },
+  { id: "security", title: "Security", icon: Lock },
+  { id: "email", title: "Notifications", icon: Mail },
+];
 
+export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) {
   return (
     <Sidebar>
-      <SidebarHeader className="px-6 py-4">
-        <h1 className="text-xl font-serif">AstroChart</h1>
-      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -37,7 +33,7 @@ export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) 
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id)}
                     data-active={activeTab === item.id}
-                    className="w-full px-6 py-2 text-base gap-4"
+                    className="w-full px-4 py-2 text-base gap-3"
                   >
                     <item.icon className="h-5 w-5" />
                     <span>{item.title}</span>

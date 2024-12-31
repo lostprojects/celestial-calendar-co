@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useToast } from "@/components/ui/use-toast";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { AccountSidebar } from "@/components/account/AccountSidebar";
 import { AccountDetails } from "@/components/account/AccountDetails";
-import { Navbar } from "@/components/Navbar";
+import { DashboardLayout } from "@/components/layouts/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 
@@ -62,16 +61,20 @@ const Account = () => {
         return user && <AccountDetails userId={user.id} initialData={profileData} />;
       case "settings":
         return (
-          <div className="space-y-6 max-w-2xl">
-            <h1 className="text-2xl font-serif mb-2">Settings</h1>
-            <p className="text-sm text-muted-foreground font-mono">Coming soon...</p>
+          <div className="space-y-6">
+            <h1 className="text-3xl font-serif">Preferences</h1>
+            <p className="text-sm text-muted-foreground">
+              Customize your AstroChart experience.
+            </p>
           </div>
         );
       case "security":
         return (
-          <div className="space-y-6 max-w-2xl">
-            <h1 className="text-2xl font-serif mb-2">Security</h1>
-            <p className="text-sm text-muted-foreground font-mono">Coming soon...</p>
+          <div className="space-y-6">
+            <h1 className="text-3xl font-serif">Security Settings</h1>
+            <p className="text-sm text-muted-foreground">
+              Manage your account security and authentication preferences.
+            </p>
             <div className="pt-6">
               <Button
                 variant="destructive"
@@ -86,9 +89,11 @@ const Account = () => {
         );
       case "email":
         return (
-          <div className="space-y-6 max-w-2xl">
-            <h1 className="text-2xl font-serif mb-2">Email Preferences</h1>
-            <p className="text-sm text-muted-foreground font-mono">Coming soon...</p>
+          <div className="space-y-6">
+            <h1 className="text-3xl font-serif">Notification Preferences</h1>
+            <p className="text-sm text-muted-foreground">
+              Manage your email notifications and communication preferences.
+            </p>
           </div>
         );
       default:
@@ -97,19 +102,16 @@ const Account = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <div className="flex-1 flex">
-        <SidebarProvider defaultOpen>
-          <div className="flex-1 flex w-full">
-            <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-            <main className="flex-1 px-8 py-6">
-              {renderContent()}
-            </main>
+    <DashboardLayout>
+      <div className="flex w-full">
+        <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <main className="flex-1 p-8 overflow-auto">
+          <div className="max-w-4xl mx-auto">
+            {renderContent()}
           </div>
-        </SidebarProvider>
+        </main>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
