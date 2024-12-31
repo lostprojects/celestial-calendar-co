@@ -5,13 +5,16 @@ import {
   BirthChartData,
   BirthChartResult,
 } from "@/utils/astro-utils";
-import { ChartResults } from "./chart-results";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
 import { useToast } from "@/hooks/use-toast";
 
-export default function BirthChartForm() {
+interface BirthChartFormProps {
+  onResultsCalculated: (results: BirthChartResult, interpretation: string | null) => void;
+}
+
+export default function BirthChartForm({ onResultsCalculated }: BirthChartFormProps) {
   const [formData, setFormData] = useState<BirthChartData>({
     birthDate: "1980-10-14",
     birthTime: "00:30",
@@ -20,8 +23,6 @@ export default function BirthChartForm() {
     longitude: 0,
   });
 
-  const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
-  const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const { toast } = useToast();
 
@@ -60,15 +61,16 @@ export default function BirthChartForm() {
       console.log("Calculating Western chart...");
       const wChart = calculateBirthChart(formData);
       console.log("Western Chart Results:", wChart);
-      setWesternResults(wChart);
 
       // Get AI interpretation
       console.log("Fetching AI interpretation...");
       const aiInterpretation = await getAIInterpretation(wChart);
-      setInterpretation(aiInterpretation);
 
       // Store in DB
       await supabaseInsert(formData, wChart);
+
+      // Pass results up to parent
+      onResultsCalculated(wChart, aiInterpretation);
 
       toast({
         title: "Success",
@@ -112,7 +114,7 @@ export default function BirthChartForm() {
   }
 
   return (
-    <div className="birth-chart-form">
+    <div className="max-w-xl mx-auto">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-primary-dark">Birth Date</label>
@@ -160,14 +162,6 @@ export default function BirthChartForm() {
           <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/90 to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </Button>
       </form>
-
-      {westernResults && (
-        <ChartResults
-          mainWestern={westernResults}
-          mainVedic={null}
-          interpretation={interpretation || undefined}
-        />
-      )}
     </div>
   );
 }
