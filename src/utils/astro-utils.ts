@@ -90,22 +90,13 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   lstDeg = normalizeDegrees(lstDeg);
   const lstRad = deg2rad(lstDeg);
   
-  // Calculate Ascendant using the exact formula provided
+  // Calculate Ascendant using atan2
   const latRad = deg2rad(data.latitude);
+  const y = -Math.cos(lstRad);
+  const x = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
+  let ascendant = rad2deg(Math.atan2(y, x));
   
-  // λAsc = arctan(-cos(θL) / (sin(θL)cos(ε) + tan(φ)sin(ε)))
-  const numerator = -Math.cos(lstRad);
-  const denominator = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
-  let ascendant = rad2deg(Math.atan2(numerator, denominator));
-  
-  // Apply quadrant adjustments exactly as specified
-  if (numerator < 0) {
-    ascendant += 180;
-  } else {
-    ascendant += 360;
-  }
-  
-  // Final adjustment for eastern point
+  // Only apply the eastern point rule
   if (ascendant < 180) {
     ascendant += 180;
   } else {
@@ -118,9 +109,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lstDeg,
     latRad,
     epsRad,
-    numerator,
-    denominator,
-    rawAscendant: rad2deg(Math.atan2(numerator, denominator)),
+    y,
+    x,
+    rawAscendant: rad2deg(Math.atan2(y, x)),
     finalAscendant: ascendant
   });
 
