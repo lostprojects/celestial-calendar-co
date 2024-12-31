@@ -99,13 +99,13 @@ const Account = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#FCFAF7]">
       <Navbar />
-      <div className="flex-1 pt-16"> {/* Add padding-top to account for navbar height */}
+      <div className="flex-1 flex">
         <SidebarProvider>
-          <div className="flex w-full h-full">
+          <div className="flex w-full">
             <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-            <div className="flex-1 p-8">
+            <main className="flex-1 p-8 overflow-auto">
               {renderContent()}
-            </div>
+            </main>
           </div>
         </SidebarProvider>
       </div>

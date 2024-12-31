@@ -17,12 +17,12 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <SessionContextProvider supabaseClient={supabase}>
       <TooltipProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col bg-background">
           <Toaster />
           <Sonner />
           <BrowserRouter>
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 flex">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />

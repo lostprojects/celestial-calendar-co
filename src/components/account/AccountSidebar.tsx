@@ -23,7 +23,7 @@ export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) 
   ];
 
   return (
-    <Sidebar className="border-r border-border/10 h-[calc(100vh-4rem)]">
+    <Sidebar className="w-64 border-r border-border/10">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
