@@ -97,19 +97,21 @@ const Account = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FCFAF7]">
+    <>
       <Navbar />
-      <div className="container mx-auto">
-        <SidebarProvider>
-          <div className="flex min-h-[calc(100vh-4rem)] w-full pt-8">
-            <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-            <div className="flex-1 p-8">
-              {renderContent()}
+      <div className="min-h-[calc(100vh-4rem)] bg-[#FCFAF7]">
+        <div className="container mx-auto">
+          <SidebarProvider>
+            <div className="flex w-full">
+              <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+              <div className="flex-1 p-8">
+                {renderContent()}
+              </div>
             </div>
-          </div>
-        </SidebarProvider>
+          </SidebarProvider>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
