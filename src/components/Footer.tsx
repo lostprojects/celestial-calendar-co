@@ -5,7 +5,7 @@ export const Footer = () => {
   
   return (
     <footer className="mt-auto py-6 bg-background-sand">
-      <div className="container mx-auto px-4 flex justify-between items-center text-sm text-primary-dark/60">
+      <div className="container mx-auto px-4 flex justify-between items-center text-sm text-accent-palm">
         <div>
           © {currentYear} Celestial. All rights reserved.
         </div>
