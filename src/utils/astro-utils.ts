@@ -93,8 +93,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 
   // Calculate Sun's apparent longitude (tropical)
   const sunLongRad = solar.apparentLongitude(jde);
+  console.log("Raw solar.apparentLongitude() result in radians:", sunLongRad);
   const sunLongDeg = rad2deg(sunLongRad);
-  const normalizedSunLong = normalizeDegrees(sunLongDeg); // Fixed: removed the 360 - part
+  const normalizedSunLong = normalizeDegrees(sunLongDeg);
   console.log("Sun longitude (tropical):", normalizedSunLong);
   
   // Calculate Moon's position (tropical)
