@@ -25,7 +25,7 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="h-16 fixed top-0 left-0 right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
+    <nav className="h-16 fixed top-0 left-0 right-0 bg-gradient-to-b from-[#1A1F2C] from-90% to-transparent z-50">
       <div className="container h-full mx-auto px-4">
         <div className="flex h-full justify-between items-center">
           <Link to="/" className="text-xl font-serif text-white">
