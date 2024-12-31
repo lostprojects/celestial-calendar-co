@@ -5,8 +5,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { AccountSidebar } from "@/components/account/AccountSidebar";
 import { AccountDetails } from "@/components/account/AccountDetails";
 import { DashboardLayout } from "@/components/layouts/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
 
 const Account = () => {
   const user = useUser();
@@ -42,19 +40,6 @@ const Account = () => {
     }
   }, [user, navigate, supabase, toast]);
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error signing out",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      navigate("/auth");
-    }
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case "details":
@@ -65,34 +50,6 @@ const Account = () => {
             <h1 className="text-3xl font-serif">Preferences</h1>
             <p className="text-sm text-muted-foreground">
               Customize your AstroChart experience.
-            </p>
-          </div>
-        );
-      case "security":
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-serif">Security Settings</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage your account security and authentication preferences.
-            </p>
-            <div className="pt-6">
-              <Button
-                variant="destructive"
-                onClick={handleSignOut}
-                className="h-12 px-6 font-mono flex items-center gap-2"
-              >
-                <LogOut className="h-5 w-5" />
-                Sign Out
-              </Button>
-            </div>
-          </div>
-        );
-      case "email":
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-serif">Notification Preferences</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage your email notifications and communication preferences.
             </p>
           </div>
         );
