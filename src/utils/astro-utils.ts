@@ -12,16 +12,16 @@ export interface BirthChartData {
   longitude: number;
 }
 
+interface PlanetPosition {
+  sign: string;
+  degrees: number;
+  minutes: number;
+}
+
 export interface BirthChartResult {
-  sunSign: string;
-  moonSign: string;
-  risingSign: string;
-  sunDeg: number;
-  sunMin: number;
-  moonDeg: number;
-  moonMin: number;
-  risingDeg: number;
-  risingMin: number;
+  sun: PlanetPosition;
+  moon: PlanetPosition;
+  rising: PlanetPosition;
 }
 
 const ZODIAC_SIGNS = [
@@ -129,15 +129,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   });
 
   return {
-    sunSign: sunPosition.sign,
-    moonSign: moonPosition.sign,
-    risingSign: ascPosition.sign,
-    sunDeg: sunPosition.degrees,
-    sunMin: sunPosition.minutes,
-    moonDeg: moonPosition.degrees,
-    moonMin: moonPosition.minutes,
-    risingDeg: ascPosition.degrees,
-    risingMin: ascPosition.minutes
+    sun: sunPosition,
+    moon: moonPosition,
+    rising: ascPosition
   };
 }
 
