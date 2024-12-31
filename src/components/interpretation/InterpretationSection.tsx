@@ -1,5 +1,5 @@
 import React from "react";
-import { Star, Heart, Gem, Leaf } from "lucide-react";
+import { Star, Heart, Gem, Leaf, Sparkles } from "lucide-react";
 
 interface InterpretationSectionProps {
   interpretation: string;
@@ -18,31 +18,33 @@ export function InterpretationSection({ interpretation }: InterpretationSectionP
             </h3>
             <div className="h-px flex-1 bg-accent-orange/20" />
           </div>
-          <div className="prose prose-slate max-w-none space-y-8">
+          <div className="prose prose-slate max-w-none space-y-12">
             {interpretation.split('\n\n').map((section, index) => {
               const icons = [
-                <Star key="star" className="w-6 h-6 text-accent-orange" />,
-                <Heart key="heart" className="w-6 h-6 text-accent-lightpalm" />,
-                <Gem key="gem" className="w-6 h-6 text-accent-palm" />,
-                <Leaf key="leaf" className="w-6 h-6 text-accent-lightorange" />
+                <Star key="star" className="w-8 h-8 text-accent-orange" />,
+                <Heart key="heart" className="w-8 h-8 text-accent-lightpalm" />,
+                <Gem key="gem" className="w-8 h-8 text-accent-palm" />,
+                <Leaf key="leaf" className="w-8 h-8 text-accent-lightorange" />,
+                <Sparkles key="sparkles" className="w-8 h-8 text-accent-orange" />
               ];
               const titles = [
                 "Your Cosmic Essence",
                 "Emotional Landscape",
                 "Life Path & Purpose",
-                "Personal Growth"
+                "Personal Growth",
+                "Future Potential"
               ];
               
               return (
-                <div key={index} className="space-y-3">
-                  <div className="flex items-center gap-2">
+                <div key={index} className="space-y-4">
+                  <div className="flex flex-col items-center gap-3">
                     {icons[index]}
-                    <h4 className="text-xl font-serif font-semibold text-primary-dark/90">
+                    <h4 className="text-2xl font-serif font-semibold text-primary-dark/90 text-center">
                       {titles[index]}
                     </h4>
                   </div>
-                  <p className="text-primary-dark/80 leading-relaxed text-base font-mono">
-                    {section}
+                  <p className="text-primary-dark/80 leading-relaxed text-sm font-mono max-w-2xl mx-auto">
+                    {section.replace(/^###\s*/g, '')}
                   </p>
                 </div>
               );

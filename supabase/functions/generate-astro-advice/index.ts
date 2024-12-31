@@ -1,67 +1,49 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "std/server";
+import { openai } from "@/lib/openai";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const generateInterpretation = async (birthChart: any, format: any) => {
+  const prompt = `Based on this birth chart data:
+Sun Sign: ${birthChart.sunSign}
+Moon Sign: ${birthChart.moonSign}
+Rising Sign: ${birthChart.risingSign}
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+Generate a personalized astrological reading divided into these sections:
+1. Your Cosmic Essence
+2. Emotional Landscape
+3. Life Path & Purpose
+4. Personal Growth
+5. Future Potential
+
+For each section, write a detailed paragraph (about 100 words) that provides meaningful insights. 
+Do not use any markdown formatting or special characters.
+Separate sections with double newlines.
+Focus on practical advice and positive growth opportunities.`;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: "You are an insightful astrologer who provides meaningful, practical interpretations of birth charts. Your readings are clear, positive, and actionable."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 1000
+  });
+
+  return {
+    interpretation: response.choices[0].message.content
+  };
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  try {
-    const { birthChart } = await req.json();
-
-    const systemPrompt = `You are an expert astrologer with deep knowledge of both Western and Vedic astrology. 
-    Analyze birth charts and provide insightful, personalized interpretations. 
-    Focus on the relationship between planets, houses, and aspects. 
-    Provide practical advice while maintaining a supportive and encouraging tone.`;
-
-    const userPrompt = `Please analyze this birth chart:
-    Sun Sign: ${birthChart.sunSign} (${birthChart.sunDeg}° ${birthChart.sunMin}')
-    Moon Sign: ${birthChart.moonSign} (${birthChart.moonDeg}° ${birthChart.moonMin}')
-    Ascendant: ${birthChart.risingSign} (${birthChart.risingDeg}° ${birthChart.risingMin}')
-    
-    Provide a brief but insightful interpretation focusing on:
-    1. Core personality (Sun)
-    2. Emotional nature (Moon)
-    3. Outward expression (Ascendant)
-    4. Key strengths and potential challenges`;
-
-    console.log('Sending request to OpenAI with fine-tuned model');
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'ft:gpt-4o-2024-08-06:personal:western:AkThv6zN',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-      }),
-    });
-
-    const data = await response.json();
-    console.log('OpenAI Response:', data);
-    
-    const interpretation = data.choices[0].message.content;
-
-    return new Response(JSON.stringify({ interpretation }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  } catch (error) {
-    console.error('Error in generate-astro-advice function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
+  const { birthChart, format } = await req.json();
+  const interpretation = await generateInterpretation(birthChart, format);
+  return new Response(JSON.stringify(interpretation), {
+    headers: { "Content-Type": "application/json" },
+  });
 });
