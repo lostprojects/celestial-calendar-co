@@ -91,10 +91,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
 
-  // Calculate Sun's apparent longitude (tropical)
+  // Calculate Sun's apparent longitude (tropical) - FIXED HERE
   const sunLongRad = solar.apparentLongitude(jde);
   const sunLongDeg = rad2deg(sunLongRad);
-  const normalizedSunLong = normalizeDegrees(sunLongDeg);
+  const normalizedSunLong = normalizeDegrees(360 - sunLongDeg); // Fix: subtract from 360 to get correct zodiacal longitude
   console.log("Sun longitude (tropical):", normalizedSunLong);
   
   // Calculate Moon's position (tropical)
