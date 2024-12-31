@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { LogOut } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AccountSidebar } from "@/components/account/AccountSidebar";
 import { AccountDetails } from "@/components/account/AccountDetails";
 import { Navbar } from "@/components/Navbar";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 const Account = () => {
   const user = useUser();
@@ -97,21 +97,19 @@ const Account = () => {
   };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-[#FCFAF7]">
       <Navbar />
-      <div className="min-h-[calc(100vh-4rem)] bg-[#FCFAF7]">
-        <div className="container mx-auto">
-          <SidebarProvider>
-            <div className="flex w-full">
-              <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-              <div className="flex-1 p-8">
-                {renderContent()}
-              </div>
+      <div className="flex-1 pt-16"> {/* Add padding-top to account for navbar height */}
+        <SidebarProvider>
+          <div className="flex w-full h-full">
+            <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+            <div className="flex-1 p-8">
+              {renderContent()}
             </div>
-          </SidebarProvider>
-        </div>
+          </div>
+        </SidebarProvider>
       </div>
-    </>
+    </div>
   );
 };
 
