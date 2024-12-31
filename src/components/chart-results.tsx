@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BirthChartResult } from "@/utils/astro-utils";
-import { Sun, Moon, Sunrise, ChevronRight, Sparkles, Loader2 } from "lucide-react";
+import { Sun, Moon, Sunrise, ChevronRight, Sparkles, Loader2, Star, Heart, Gem, Leaf } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,14 +36,48 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
   const getAIInterpretation = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate-astro-advice', {
-        body: { birthChart: mainWestern }
+      const { data: interpretationData, error: interpretationError } = await supabase.functions.invoke('generate-astro-advice', {
+        body: { 
+          birthChart: mainWestern,
+          format: {
+            sections: [
+              { title: "Your Cosmic Essence", icon: "star" },
+              { title: "Emotional Landscape", icon: "heart" },
+              { title: "Life Path & Purpose", icon: "gem" },
+              { title: "Personal Growth", icon: "leaf" }
+            ]
+          }
+        }
       });
 
-      if (error) throw error;
+      if (interpretationError) throw interpretationError;
 
-      console.log("AI Interpretation received:", data);
-      setInterpretation(data.interpretation);
+      console.log("AI Interpretation received:", interpretationData);
+      
+      // Store the interpretation in the database
+      const { data: birthChartData } = await supabase
+        .from('birth_charts')
+        .select('id')
+        .eq('sun_sign', mainWestern.sunSign)
+        .eq('moon_sign', mainWestern.moonSign)
+        .eq('ascendant_sign', mainWestern.risingSign)
+        .single();
+
+      if (birthChartData) {
+        const { error: storageError } = await supabase
+          .from('interpretations')
+          .insert({
+            birth_chart_id: birthChartData.id,
+            content: interpretationData.interpretation,
+            user_id: (await supabase.auth.getUser()).data.user?.id
+          });
+
+        if (storageError) {
+          console.error("Error storing interpretation:", storageError);
+        }
+      }
+
+      setInterpretation(interpretationData.interpretation);
       setShowInterpretation(true);
     } catch (error) {
       console.error("Error getting AI interpretation:", error);
@@ -182,12 +216,35 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
                   </h3>
                   <div className="h-px flex-1 bg-accent-orange/20" />
                 </div>
-                <div className="prose prose-slate max-w-none space-y-4">
-                  {interpretation.split('\n').map((paragraph, index) => (
-                    <p key={index} className="text-primary-dark/80 leading-relaxed text-lg font-mono">
-                      {paragraph}
-                    </p>
-                  ))}
+                <div className="prose prose-slate max-w-none space-y-8">
+                  {interpretation.split('\n\n').map((section, index) => {
+                    const icons = [
+                      <Star className="w-6 h-6 text-accent-orange" />,
+                      <Heart className="w-6 h-6 text-accent-lightpalm" />,
+                      <Gem className="w-6 h-6 text-accent-palm" />,
+                      <Leaf className="w-6 h-6 text-accent-lightorange" />
+                    ];
+                    const titles = [
+                      "Your Cosmic Essence",
+                      "Emotional Landscape",
+                      "Life Path & Purpose",
+                      "Personal Growth"
+                    ];
+                    
+                    return (
+                      <div key={index} className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          {icons[index]}
+                          <h4 className="text-xl font-serif font-semibold text-primary-dark/90">
+                            {titles[index]}
+                          </h4>
+                        </div>
+                        <p className="text-primary-dark/80 leading-relaxed text-base font-mono">
+                          {section}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
