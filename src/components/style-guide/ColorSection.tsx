@@ -14,6 +14,10 @@ export const ColorSection = () => {
           <p className="text-sm font-mono">Primary Light (#F2FCE2)</p>
         </div>
         <div className="space-y-2">
+          <div className="h-20 bg-primary-dark rounded-lg"></div>
+          <p className="text-sm font-mono">Primary Dark (#001018)</p>
+        </div>
+        <div className="space-y-2">
           <div className="h-20 bg-accent-sage rounded-lg"></div>
           <p className="text-sm font-mono">Accent Sage (#D4DCCD)</p>
         </div>
