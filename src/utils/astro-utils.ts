@@ -149,25 +149,17 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const deltaRA = -parallax * Math.cos(hourAngle) / Math.cos(moonPos._dec);
   const deltaDec = -parallax * Math.sin(hourAngle) * Math.sin(geoLat);
   
-  // Create corrected position
+  // Create corrected position while preserving full astronomia object structure
   const topoMoonPos = {
+    ...moonPos,
     _ra: moonPos._ra + deltaRA,
-    _dec: moonPos._dec + deltaDec,
-    distance: moonDistance
+    _dec: moonPos._dec + deltaDec
   };
   
   // Calculate Moon's longitude using the corrected position
   const moonLongDeg = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = moonLongDeg; // Already normalized
-  
-  // Calculate RAMC using the already calculated LST
-  const ramc = normalizeDegrees(rad2deg(lst) + data.longitude);
-  console.log("RAMC:", ramc);
-  
-  // Calculate Ascendant
-  const ascendant = calculateAscendant(ramc, data.latitude, epsRad);
-  console.log("Ascendant:", ascendant);
-  
+
   // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
   const moonPosition = getZodiacPosition(finalMoonLongitude);
@@ -237,4 +229,3 @@ function deg2rad(degrees: number): number {
 function rad2deg(radians: number): number {
   return radians * 180 / Math.PI;
 }
-
