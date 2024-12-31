@@ -75,7 +75,7 @@ export const Hero = () => {
 
               {/* Main Content */}
               <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-background leading-[1.1] max-w-xl animate-fade-up">
-                Your Personal Cosmic Blueprint for Success
+                Your Cosmic Blueprint for Success
               </h1>
               <p className="text-base text-accent-lightpalm font-mono leading-relaxed max-w-lg mb-6 animate-fade-up">
                 Unlock the power of celestial intelligence to make confident decisions in your career, relationships, and personal growth.
