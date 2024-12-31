@@ -121,11 +121,11 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lstRadians: localSiderealRad
   });
   
-  // Calculate Ascendant using atan2 with SWAPPED x,y parameters
+  // Calculate Ascendant using atan2 with PROPERLY swapped x,y parameters
   const latRad = deg2rad(data.latitude);
   const y = Math.cos(localSiderealRad);
   const x = Math.sin(localSiderealRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
-  let ascendant = rad2deg(Math.atan2(y, x)); // SWAPPED from (y,x) to (x,y)
+  let ascendant = rad2deg(Math.atan2(x, y)); // PROPERLY swapped to (x,y)
   ascendant = normalizeDegrees(ascendant);
 
   // Get zodiac positions
