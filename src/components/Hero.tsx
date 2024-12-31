@@ -66,7 +66,7 @@ export const Hero = () => {
               </div>
 
               {/* Main Content */}
-              <h1 className="text-4xl md:text-5xl font-serif font-medium mb-4 text-primary-dark leading-[1.1] max-w-xl animate-fade-up">
+              <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-primary-dark leading-[1.1] max-w-xl animate-fade-up">
                 Your Personal Cosmic Blueprint for Success
               </h1>
               <p className="text-base text-primary-dark/80 font-mono leading-relaxed max-w-lg mb-8 animate-fade-up">
