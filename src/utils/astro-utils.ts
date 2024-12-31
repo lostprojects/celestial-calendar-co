@@ -63,58 +63,70 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
 
+  // Calculate obliquity
   const T = (jd - 2451545.0) / 36525;
   const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
   const epsRad = deg2rad(eps);
 
+  // Calculate sun position (keeping existing logic)
   const sunLongRad = solar.apparentLongitude(jde);
-  console.log("Raw solar.apparentLongitude() result in radians:", sunLongRad);
   const sunLongDeg = rad2deg(sunLongRad);
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
-  console.log("Sun longitude (tropical):", normalizedSunLong);
   
-  // Moon position with topocentric correction
+  // Calculate moon position (keeping existing logic)
   const moonPos = getMoonPosition(jde);
-  console.log("Raw Moon Position object:", moonPos);
-  
   const moonDistance = moonPos.range;
   const parallax = calculateLunarParallax(moonDistance);
   const geoLat = calculateGeocentricLatitude(data.latitude);
-  
   const lst = sidereal.apparent(jde);
   const hourAngle = lst - moonPos._ra;
-  
   const deltaRA = -parallax * Math.cos(hourAngle) / Math.cos(moonPos._dec);
   const deltaDec = -parallax * Math.sin(hourAngle) * Math.sin(geoLat);
-  
   const topoMoonPos = {
     _ra: moonPos._ra + deltaRA,
     _dec: moonPos._dec + deltaDec
   };
-  
-  // Calculate Moon longitude in radians, normalize to [0, 2π)
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  const RAMC = lst * 15;
-  const ascendant = calculateAscendant(RAMC, data.latitude, eps);
+  // NEW Rising Sign Calculation
+  // Get LST and adjust for longitude
+  let lstHours = lst + (data.longitude / 15);
+  // Convert to degrees and normalize
+  let lstDegrees = normalizeDegrees(lstHours * 15);
+  // Convert to radians
+  let lstRad = deg2rad(lstDegrees);
+  // Convert latitude to radians
+  let latRad = deg2rad(data.latitude);
+
+  // Calculate ascendant using spherical trig formula
+  let tanAsc = -(Math.cos(lstRad)) / 
+               (Math.sin(epsRad) * Math.tan(latRad) + 
+                Math.cos(epsRad) * Math.sin(lstRad));
+                
+  // Get initial ascendant value
+  let ascRad = Math.atan(tanAsc);
+  
+  // Correct quadrant
+  if (Math.cos(lstRad) < 0) {
+    ascRad += Math.PI;
+  } else if (Math.cos(lstRad) >= 0 && Math.sin(lstRad) < 0) {
+    ascRad += 2 * Math.PI;
+  }
+  
+  // Convert to degrees and normalize
+  let ascendant = normalizeDegrees(rad2deg(ascRad));
+  
   console.log("Ascendant calculation:", {
-    RAMC,
-    latitude: data.latitude,
-    obliquity: eps,
-    result: ascendant
+    lstHours,
+    lstDegrees,
+    ascendant
   });
 
-  // Get zodiac positions
+  // Get zodiac positions (keeping existing logic for sun and moon)
   const sunPosition = getZodiacPosition(normalizedSunLong);
   const moonPosition = getZodiacPosition(finalMoonLongitude);
   const ascPosition = getZodiacPosition(ascendant);
-  
-  console.log("Final positions:", {
-    sun: sunPosition,
-    moon: moonPosition,
-    asc: ascPosition
-  });
 
   return {
     sunSign: sunPosition.sign,
