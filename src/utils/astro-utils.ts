@@ -47,6 +47,16 @@ function calculateJulianDay(utcDate: string, utcTime: string): number {
   return jdNoon + dayFraction;
 }
 
+function calculateLunarParallax(moonDistance: number): number {
+  const earthRadius = 6378.14; // km
+  return Math.asin(earthRadius / moonDistance);
+}
+
+function calculateGeocentricLatitude(geographicLat: number): number {
+  const latRad = deg2rad(geographicLat);
+  return latRad - (0.1924 * Math.sin(2 * latRad));
+}
+
 function calculateMoonLongitude(moonPos: { _ra: number; _dec: number }, epsRad: number): number {
   const { _ra: ra, _dec: dec } = moonPos;
 
@@ -122,12 +132,32 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
   console.log("Sun longitude (tropical):", normalizedSunLong);
   
-  // Calculate Moon's position (tropical)
+  // Calculate Moon's position (tropical) with topocentric correction
   const moonPos = getMoonPosition(jde);
   console.log("Raw Moon Position object:", moonPos);
   
-  // Calculate Moon's longitude using the corrected formula
-  const moonLongDeg = calculateMoonLongitude(moonPos, epsRad);
+  // Apply topocentric corrections to Moon position
+  const moonDistance = moonPos.distance;
+  const parallax = calculateLunarParallax(moonDistance);
+  const geoLat = calculateGeocentricLatitude(data.latitude);
+  
+  // Get hour angle using LST
+  const lst = sidereal.apparent(jde);
+  const hourAngle = lst - moonPos._ra;
+  
+  // Calculate corrections
+  const deltaRA = -parallax * Math.cos(hourAngle) / Math.cos(moonPos._dec);
+  const deltaDec = -parallax * Math.sin(hourAngle) * Math.sin(geoLat);
+  
+  // Create corrected position
+  const topoMoonPos = {
+    _ra: moonPos._ra + deltaRA,
+    _dec: moonPos._dec + deltaDec,
+    distance: moonDistance
+  };
+  
+  // Calculate Moon's longitude using the corrected position
+  const moonLongDeg = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = moonLongDeg; // Already normalized
   
   // Calculate Local Sidereal Time and RAMC
