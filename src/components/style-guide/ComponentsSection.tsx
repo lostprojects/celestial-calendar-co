@@ -23,8 +23,8 @@ export const ComponentsSection = () => {
             <p className="text-sm font-mono text-primary/60">&lt;Button className="bg-primary-dark hover:bg-primary-dark/90 text-white px-8 py-6 text-lg"&gt;</p>
           </div>
           <div className="space-y-2">
-            <Button variant="secondary" className="text-white">Secondary Button</Button>
-            <p className="text-sm font-mono text-primary/60">&lt;Button variant="secondary" className="text-white"&gt;</p>
+            <Button variant="secondary" className="bg-[#E0815D] hover:bg-[#E0815D]/90 text-white">Secondary Button</Button>
+            <p className="text-sm font-mono text-primary/60">&lt;Button variant="secondary" className="bg-[#E0815D] hover:bg-[#E0815D]/90 text-white"&gt;</p>
           </div>
           <div className="space-y-2">
             <Button variant="outline" className="text-white">Outline Button</Button>
