@@ -4,14 +4,13 @@ import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { LogOut, User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 type ProfileFormValues = {
-  username: string;
+  full_name: string;
 };
 
 const Account = () => {
@@ -22,7 +21,7 @@ const Account = () => {
 
   const form = useForm<ProfileFormValues>({
     defaultValues: {
-      username: "",
+      full_name: "",
     },
   });
 
@@ -34,7 +33,7 @@ const Account = () => {
       const loadProfile = async () => {
         const { data, error } = await supabase
           .from("profiles")
-          .select("username")
+          .select("full_name")
           .eq("id", user.id)
           .single();
 
@@ -46,7 +45,7 @@ const Account = () => {
           });
         } else if (data) {
           form.reset({
-            username: data.username || "",
+            full_name: data.full_name || "",
           });
         }
       };
@@ -61,7 +60,7 @@ const Account = () => {
     const { error } = await supabase
       .from("profiles")
       .update({
-        username: values.username,
+        full_name: values.full_name,
       })
       .eq("id", user.id);
 
@@ -106,12 +105,12 @@ const Account = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="username"
+                name="full_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} placeholder="Enter your full name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
