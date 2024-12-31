@@ -113,9 +113,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   // Correct quadrant based on LST
   if (Math.cos(localSiderealTimeRad) < 0) {
-    ascRad += Math.PI;
+    ascRad = ascRad + Math.PI;
   } else if (Math.cos(localSiderealTimeRad) >= 0 && Math.sin(localSiderealTimeRad) < 0) {
-    ascRad += 2 * Math.PI;
+    ascRad = ascRad + 2 * Math.PI;
   }
   
   // Convert to degrees and normalize
