@@ -68,7 +68,6 @@ function getZodiacPosition(longitude: number) {
 }
 
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
-  // Parse input date/time
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
@@ -102,7 +101,6 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
   const epsRad = deg2rad(eps);
 
-  // Sun position (convert from radians to degrees)
   const sunLongRad = solar.apparentLongitude(jde);
   console.log("Raw solar.apparentLongitude() result in radians:", sunLongRad);
   const sunLongDeg = rad2deg(sunLongRad);
@@ -129,12 +127,13 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     _dec: moonPos._dec + deltaDec
   };
   
-  // Calculate Moon longitude in radians, then convert to degrees for display
+  // Calculate Moon longitude in radians, normalize to [0, 2π)
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
-  const moonLongDeg = rad2deg(moonLongRad);
-  const finalMoonLongitude = normalizeDegrees(moonLongDeg);
+  const normalizedMoonLongRad = ((moonLongRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  
+  // Convert to degrees only for final display/storage
+  const finalMoonLongitude = rad2deg(normalizedMoonLongRad);
 
-  // Calculate Ascendant
   const RAMC = lst * 15;
   const ascendant = calculateAscendant(RAMC, data.latitude, eps);
   console.log("Ascendant calculation:", {
