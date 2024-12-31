@@ -4,8 +4,36 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 export const ComponentsSection = () => {
+  const { toast } = useToast();
+
+  const showSuccessToast = () => {
+    toast({
+      title: "Success Toast",
+      description: "Your action was completed successfully.",
+      className: "bg-white border-green-500 text-primary-dark",
+    });
+  };
+
+  const showErrorToast = () => {
+    toast({
+      title: "Error Toast",
+      description: "Something went wrong. Please try again.",
+      variant: "destructive",
+      className: "bg-white border-red-500 text-primary-dark",
+    });
+  };
+
+  const showInfoToast = () => {
+    toast({
+      title: "Info Toast",
+      description: "Here's some helpful information.",
+      className: "bg-white border-[#CA644E] text-primary-dark",
+    });
+  };
+
   return (
     <section className="mb-12">
       <h2 className="text-2xl font-serif mb-4">Components</h2>
@@ -42,6 +70,44 @@ export const ComponentsSection = () => {
               &lt;Button className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"&gt;
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Toast Section */}
+      <div className="mb-8">
+        <h3 className="text-xl font-serif mb-4">Toasts <span className="text-sm font-mono text-primary/60">(@/components/ui/toast)</span></h3>
+        <div className="flex flex-wrap gap-4">
+          <div className="space-y-2">
+            <Button onClick={showSuccessToast} variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
+              Show Success Toast
+            </Button>
+            <p className="text-sm font-mono text-primary/60">Success Toast with green border</p>
+          </div>
+          <div className="space-y-2">
+            <Button onClick={showErrorToast} variant="outline" className="border-red-500 text-red-600 hover:bg-red-50">
+              Show Error Toast
+            </Button>
+            <p className="text-sm font-mono text-primary/60">Error Toast with red border</p>
+          </div>
+          <div className="space-y-2">
+            <Button onClick={showInfoToast} variant="outline" className="border-[#CA644E] text-[#CA644E] hover:bg-[#CA644E]/10">
+              Show Info Toast
+            </Button>
+            <p className="text-sm font-mono text-primary/60">Info Toast with primary accent border</p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <p className="text-sm font-mono text-primary/60">
+            Usage example:
+            {`
+              const { toast } = useToast();
+              toast({
+                title: "Title",
+                description: "Description",
+                className: "bg-white border-[color] text-primary-dark"
+              });
+            `}
+          </p>
         </div>
       </div>
 
