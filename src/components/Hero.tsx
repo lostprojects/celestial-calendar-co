@@ -77,23 +77,23 @@ export const Hero = () => {
               <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-background leading-[1.1] max-w-xl animate-fade-up">
                 Your Personal Cosmic Blueprint for Success
               </h1>
-              <p className="text-base text-accent-lightpalm font-mono leading-relaxed max-w-lg mb-8 animate-fade-up">
+              <p className="text-base text-accent-lightpalm font-mono leading-relaxed max-w-lg mb-6 animate-fade-up">
                 Unlock the power of celestial intelligence to make confident decisions in your career, relationships, and personal growth.
               </p>
               
               {/* Features List */}
               <div className="flex flex-col space-y-3 mb-8 animate-fade-up">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#8E9196]" strokeWidth={1.5} />
-                  <span className="text-sm text-[#8E9196]">Google/Apple Calendar Sync</span>
+                  <Calendar className="w-4 h-4 text-[#aaadb0]" strokeWidth={1.5} />
+                  <span className="text-sm text-[#aaadb0]">Google/Apple Calendar Sync</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-[#8E9196]" strokeWidth={1.5} />
-                  <span className="text-sm text-[#8E9196]">Daily decision guidance</span>
+                  <Lightbulb className="w-4 h-4 text-[#aaadb0]" strokeWidth={1.5} />
+                  <span className="text-sm text-[#aaadb0]">Daily decision guidance</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-[#8E9196]" strokeWidth={1.5} />
-                  <span className="text-sm text-[#8E9196]">Personalized life phases</span>
+                  <User className="w-4 h-4 text-[#aaadb0]" strokeWidth={1.5} />
+                  <span className="text-sm text-[#aaadb0]">Personalized life phases</span>
                 </div>
               </div>
               
