@@ -160,6 +160,16 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongDeg = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = moonLongDeg; // Already normalized
 
+  // Calculate Ascendant
+  const RAMC = lst * 15; // Convert to degrees
+  const ascendant = calculateAscendant(RAMC, data.latitude, eps);
+  console.log("Ascendant calculation:", {
+    RAMC,
+    latitude: data.latitude,
+    obliquity: eps,
+    result: ascendant
+  });
+
   // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
   const moonPosition = getZodiacPosition(finalMoonLongitude);
@@ -188,11 +198,12 @@ function calculateAscendant(ramc: number, latitude: number, obliquity: number): 
   // Convert inputs to radians
   const ramcRad = deg2rad(ramc);
   const latRad = deg2rad(latitude);
+  const obliqRad = deg2rad(obliquity);
   
   // Calculate ascendant using spherical trigonometry
   const tanAsc = -Math.cos(ramcRad) / 
-                 (Math.sin(obliquity) * Math.tan(latRad) + 
-                  Math.cos(obliquity) * Math.sin(ramcRad));
+                 (Math.sin(obliqRad) * Math.tan(latRad) + 
+                  Math.cos(obliqRad) * Math.sin(ramcRad));
   
   let ascendant = rad2deg(Math.atan(tanAsc));
   
