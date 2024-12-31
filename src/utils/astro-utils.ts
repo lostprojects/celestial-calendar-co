@@ -99,19 +99,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   localSiderealTime = localSiderealTime % 24;
   if (localSiderealTime < 0) localSiderealTime += 24;
 
-  // Convert LST to radians
-  let localSiderealTimeRad = localSiderealTime * (Math.PI / 12);
+  // Convert LST to radians and subtract 90° (6 hours) for eastern horizon
+  let localSiderealTimeRad = (localSiderealTime * 15 - 90) * (Math.PI / 180);
 
-  // Calculate ascendant using atan2
+  // Calculate ascendant using the corrected hour angle
   let latRad = deg2rad(data.latitude);
   let numerator = -Math.cos(localSiderealTimeRad);
   let denominator = Math.sin(epsRad) * Math.tan(latRad) + 
                    Math.cos(epsRad) * Math.sin(localSiderealTimeRad);
   
-  // Calculate the offset angle and add it to LST
   let ascOffset = Math.atan2(numerator, denominator);
   let lstDegrees = localSiderealTime * 15;
-  let ascendant = normalizeDegrees(lstDegrees - rad2deg(ascOffset));  // CHANGED: + to -
+  let ascendant = normalizeDegrees(lstDegrees - rad2deg(ascOffset));
 
   console.log("Rising sign calculation:", {
     greenwichSiderealTime,
