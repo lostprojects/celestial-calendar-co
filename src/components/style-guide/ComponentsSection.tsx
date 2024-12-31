@@ -30,6 +30,18 @@ export const ComponentsSection = () => {
             <Button variant="ghost" className="text-white">Ghost Button</Button>
             <p className="text-sm font-mono text-primary/60">&lt;Button variant="ghost" className="text-white"&gt;</p>
           </div>
+          {/* Hero Button */}
+          <div className="space-y-2">
+            <Button 
+              className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group"
+            >
+              <span className="relative z-10">Hero Button</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#B1583B]/90 to-[#B1583B] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </Button>
+            <p className="text-sm font-mono text-primary/60 max-w-md">
+              &lt;Button className="bg-[#CA644E] hover:bg-[#B1583B] text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group"&gt;
+            </p>
+          </div>
         </div>
       </div>
 
