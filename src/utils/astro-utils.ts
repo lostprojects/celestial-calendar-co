@@ -70,9 +70,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const sunLongDeg = rad2deg(sunLongRad);
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
   
-  // Fixed Moon calculation
+  // Fixed Moon calculation - properly accessing _ra and _dec
   const moonPos = getMoonPosition(jde);
-  const moonLongRad = calculateMoonLongitude(moonPos, epsRad);
+  const moonLongRad = calculateMoonLongitude({ _ra: moonPos._ra, _dec: moonPos._dec }, epsRad);
   const moonLongDeg = rad2deg(moonLongRad);
   const normalizedMoonLong = normalizeDegrees(moonLongDeg);
 
