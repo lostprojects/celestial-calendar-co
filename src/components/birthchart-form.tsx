@@ -164,7 +164,7 @@ export default function BirthChartForm() {
       </div>
 
       {westernResults && (
-        <section className="py-16 mt-24">
+        <section className="bg-background-sand py-16 mt-24">
           <div className="container mx-auto px-4">
             <ChartResults
               mainWestern={westernResults}
