@@ -49,7 +49,7 @@ export const Hero = () => {
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left max-w-[50%]">
-            {/* Glass Card Background - Updated opacity from 30% to 45% */}
+            {/* Glass Card Background */}
             <div className="bg-primary-dark/45 backdrop-blur-md rounded-3xl p-8 shadow-xl">
               {/* Social Proof */}
               <div className="flex items-center gap-3 mb-8 animate-fade-up">
@@ -72,7 +72,7 @@ export const Hero = () => {
                 </div>
                 <span className="text-sm font-mono text-accent-lightorange">Join 10,000+ seekers of cosmic wisdom</span>
               </div>
-
+              
               {/* Main Content */}
               <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-background leading-[1.1] max-w-xl animate-fade-up">
                 Your Personal Cosmic Blueprint for Success
@@ -84,16 +84,16 @@ export const Hero = () => {
               {/* Features List */}
               <div className="flex flex-col space-y-4 mb-8 animate-fade-up">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-background" />
-                  <span className="text-sm text-background">Google/Apple Calendar Sync</span>
+                  <Calendar className="w-[4.75] h-[4.75] text-accent-palm" />
+                  <span className="text-sm text-accent-palm">Google/Apple Calendar Sync</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-background" />
-                  <span className="text-sm text-background">Daily decision guidance</span>
+                  <Lightbulb className="w-[4.75] h-[4.75] text-accent-palm" />
+                  <span className="text-sm text-accent-palm">Daily decision guidance</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-background" />
-                  <span className="text-sm text-background">Personalized life phases</span>
+                  <User className="w-[4.75] h-[4.75] text-accent-palm" />
+                  <span className="text-sm text-accent-palm">Personalized life phases</span>
                 </div>
               </div>
               
