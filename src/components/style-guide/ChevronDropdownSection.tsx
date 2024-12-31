@@ -22,7 +22,7 @@ export const ChevronDropdownSection = () => {
             </div>
           )}
           <p className="text-sm font-mono text-primary/60">
-            &lt;button className="flex items-center gap-2 text-accent-lightpalm hover:text-accent-lightpalm/80 transition-colors"&gt;
+            &lt;CollapsibleHeader className="flex items-center gap-2 text-accent-lightpalm hover:text-accent-lightpalm/80 transition-colors"&gt;
           </p>
         </div>
       </div>
