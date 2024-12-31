@@ -33,6 +33,7 @@ serve(async (req) => {
     3. Outward expression (Ascendant)
     4. Key strengths and potential challenges`;
 
+    console.log('Sending request to OpenAI with fine-tuned model');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -40,7 +41,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'ft:gpt-4o-2024-08-06:personal:western:AkThv6zN',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
