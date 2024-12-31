@@ -1,15 +1,15 @@
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   text-align: center;
+  overflow-x: hidden;
 }
 
 .page-container {
   min-height: 100vh;
-  padding: 0 1.25rem;
+  padding: 0;
   margin: 0 auto;
-  max-width: 1440px;
   position: relative;
+  overflow-x: hidden;
 }
 
 .content-wrapper {

@@ -2,7 +2,7 @@ import { default as BirthChartForm } from "./birthchart-form";
 
 export const BirthChartSection = () => {
   return (
-    <section id="birth-chart-section" className="w-screen bg-background-sand py-24">
+    <section className="relative w-[100vw] left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] bg-background-sand py-24">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center mb-12">
           <h2 className="text-4xl font-serif font-bold mb-6 text-primary-dark">
