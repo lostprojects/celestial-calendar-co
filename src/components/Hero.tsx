@@ -78,7 +78,7 @@ export const Hero = () => {
                 Your Cosmic Blueprint for Success
               </h1>
               <p className="text-base text-accent-lightpalm font-mono leading-relaxed max-w-lg mb-6 animate-fade-up">
-                Unlock the power of celestial intelligence to make confident decisions in your career, relationships, and personal growth.
+                Unlock the wisdom of the stars and make confident decisions in your career, relationships, and personal growth.
               </p>
               
               {/* Features List */}
