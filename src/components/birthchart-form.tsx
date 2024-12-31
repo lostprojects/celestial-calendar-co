@@ -146,17 +146,18 @@ export default function BirthChartForm() {
         
         <Button 
           type="submit" 
-          className="w-full bg-primary text-white"
+          className="w-full bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"
           disabled={isCalculating}
         >
           {isCalculating ? (
             <div className="flex items-center gap-2">
               <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
-              <span>Calculating...</span>
+              <span className="relative z-10 font-bold">Calculating...</span>
             </div>
           ) : (
-            "Calculate Birth Chart"
+            <span className="relative z-10 font-bold">Calculate Birth Chart</span>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/90 to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </Button>
       </form>
 
