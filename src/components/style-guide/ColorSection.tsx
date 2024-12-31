@@ -6,10 +6,6 @@ export const ColorSection = () => {
       <h2 className="text-2xl font-serif mb-4">Colors</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-2">
-          <div className="h-20 bg-primary rounded-lg"></div>
-          <p className="text-sm font-mono">Primary (#403E43)</p>
-        </div>
-        <div className="space-y-2">
           <div className="h-20 bg-primary-light rounded-lg"></div>
           <p className="text-sm font-mono">Primary Light (#F2FCE2)</p>
         </div>
