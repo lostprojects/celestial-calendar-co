@@ -111,7 +111,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   // Calculate the offset angle and add it to LST
   let ascOffset = Math.atan2(numerator, denominator);
   let lstDegrees = localSiderealTime * 15;
-  let ascendant = normalizeDegrees(lstDegrees + rad2deg(ascOffset));
+  let ascendant = normalizeDegrees(lstDegrees - rad2deg(ascOffset));  // CHANGED: + to -
 
   console.log("Rising sign calculation:", {
     greenwichSiderealTime,
