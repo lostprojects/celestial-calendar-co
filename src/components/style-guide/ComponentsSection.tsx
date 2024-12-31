@@ -88,7 +88,7 @@ export const ComponentsSection = () => {
             <p className="text-sm font-mono text-primary/60">&lt;Avatar&gt; from @/components/ui/avatar</p>
           </div>
           <div className="space-y-2">
-            <Badge>New</Badge>
+            <Badge className="bg-[#E0815D] hover:bg-[#E0815D]/90">New</Badge>
             <p className="text-sm font-mono text-primary/60">&lt;Badge&gt; from @/components/ui/badge</p>
           </div>
           <div className="space-y-2">
