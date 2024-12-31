@@ -65,25 +65,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const { deltaObl } = nutation(T);
   const epsRad = meanEpsRad + deltaObl;
 
+  // Sun calculation (keeping as is since it works)
   const sunLongRad = solar.apparentLongitude(jde);
   const sunLongDeg = rad2deg(sunLongRad);
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
   
+  // Fixed Moon calculation
   const moonPos = getMoonPosition(jde);
-  const moonDistance = moonPos.range;
-  const parallax = calculateLunarParallax(moonDistance);
-  const geoLat = calculateGeocentricLatitude(data.latitude);
-  const lst = sidereal.apparent(jde);
-  const hourAngle = lst - moonPos._ra;
-  const deltaRA = -parallax * Math.cos(hourAngle) / Math.cos(moonPos._dec);
-  const deltaDec = -parallax * Math.sin(hourAngle) * Math.sin(geoLat);
-  const topoMoonPos = {
-    _ra: moonPos._ra + deltaRA,
-    _dec: moonPos._dec + deltaDec
-  };
-  const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
-  const finalMoonLongitude = rad2deg(moonLongRad);
+  const moonLongRad = calculateMoonLongitude(moonPos, epsRad);
+  const moonLongDeg = rad2deg(moonLongRad);
+  const normalizedMoonLong = normalizeDegrees(moonLongDeg);
 
+  // Fixed Rising sign calculation
   let ramc = sidereal.apparent(jde);
   ramc = ramc % 24;
   if (ramc < 0) ramc += 24;
@@ -92,20 +85,20 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   const ramcDeg = ramc * 15;
   const ramcRad = deg2rad(ramcDeg);
+  const geoLatRad = deg2rad(data.latitude);
   
-  const geoLatRad = deg2rad(data.latitude - 0.1924 * Math.sin(2 * deg2rad(data.latitude)));
   const numerator = -Math.cos(ramcRad);
-  const denominator = Math.sin(epsRad) * Math.tan(geoLatRad) + Math.cos(epsRad) * Math.sin(ramcRad);
+  const denominator = Math.cos(epsRad) * Math.sin(ramcRad);
   const ascendant = normalizeDegrees(rad2deg(Math.atan2(numerator, denominator)));
 
-  console.log("Rising sign calculation:", {
-    ramc,
-    ramcDeg,
-    ascendant
+  console.log("Calculation results:", {
+    sun: normalizedSunLong,
+    moon: normalizedMoonLong,
+    asc: ascendant
   });
 
   const sunPosition = getZodiacPosition(normalizedSunLong);
-  const moonPosition = getZodiacPosition(finalMoonLongitude);
+  const moonPosition = getZodiacPosition(normalizedMoonLong);
   const ascPosition = getZodiacPosition(ascendant);
 
   return {
