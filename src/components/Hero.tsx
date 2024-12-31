@@ -25,7 +25,7 @@ export const Hero = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen px-10">
+    <section className="relative min-h-screen px-5">
       {/* Background Image */}
       <div 
         className="absolute inset-0 z-0"
