@@ -25,6 +25,7 @@ export default {
         background: {
           DEFAULT: "hsl(var(--background))",
           sand: "#F5E6D3",
+          primary: "#403E43",
         },
         foreground: "hsl(var(--foreground))",
         primary: {
