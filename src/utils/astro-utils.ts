@@ -57,8 +57,12 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   const deltaT = 67.2;
   const jde = jd + deltaT / 86400;
-  console.log("Julian Day:", jd);
-  console.log("Julian Ephemeris Day:", jde);
+  console.log("Time calculations:", {
+    localTime: localMoment.format(),
+    utcTime: utcMoment.format(),
+    julianDay: jd,
+    julianEphemerisDay: jde
+  });
 
   // Calculate obliquity (ε) for J2000.0
   const eps = 23.4392911; // Exact value for J2000.0
@@ -68,6 +72,12 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const sunLongRad = solar.apparentLongitude(jde);
   const sunLongDeg = rad2deg(sunLongRad);
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
+  
+  console.log("Sun position:", {
+    longitudeRad: sunLongRad,
+    longitudeDeg: sunLongDeg,
+    normalizedDeg: normalizedSunLong
+  });
   
   // Calculate moon position
   const moonPos = getMoonPosition(jde);
@@ -82,6 +92,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     _ra: moonPos._ra + deltaRA,
     _dec: moonPos._dec + deltaDec
   };
+  
+  console.log("Moon calculations:", {
+    distance: moonDistance,
+    parallax,
+    geoLat,
+    lst,
+    hourAngle,
+    deltaRA,
+    deltaDec,
+    topocentric: topoMoonPos
+  });
+
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
@@ -90,27 +112,40 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   lstDeg = normalizeDegrees(lstDeg);
   const lstRad = deg2rad(lstDeg);
   
+  console.log("LST calculation:", {
+    gstHours: sidereal.apparent(jde),
+    longitudeHours: data.longitude / 15,
+    combinedHours: sidereal.apparent(jde) + data.longitude / 15,
+    lstDegrees: lstDeg,
+    lstRadians: lstRad,
+    cosineLST: Math.cos(lstRad)
+  });
+  
   // Calculate Ascendant using atan2
   const latRad = deg2rad(data.latitude);
-  const y = Math.cos(lstRad);  // Removed the unnecessary negation
+  const y = Math.cos(lstRad);
   const x = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
   let ascendant = rad2deg(Math.atan2(y, x));
   ascendant = normalizeDegrees(ascendant);
 
-  console.log("Ascendant calculation details:", {
-    lstDeg,
-    latRad,
-    epsRad,
+  console.log("Ascendant calculation:", {
+    latitudeRad: latRad,
     y,
     x,
     rawAscendant: ascendant,
-    finalAscendant: ascendant
+    normalizedAscendant: ascendant
   });
 
   // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
   const moonPosition = getZodiacPosition(finalMoonLongitude);
   const ascPosition = getZodiacPosition(ascendant);
+
+  console.log("Final zodiac positions:", {
+    sun: sunPosition,
+    moon: moonPosition,
+    ascendant: ascPosition
+  });
 
   return {
     sunSign: sunPosition.sign,
