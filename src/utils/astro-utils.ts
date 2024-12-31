@@ -95,14 +95,6 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const y = -Math.cos(lstRad);
   const x = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
   let ascendant = rad2deg(Math.atan2(y, x));
-  
-  // Only apply the eastern point rule
-  if (ascendant < 180) {
-    ascendant += 180;
-  } else {
-    ascendant -= 180;
-  }
-  
   ascendant = normalizeDegrees(ascendant);
 
   console.log("Ascendant calculation details:", {
@@ -111,7 +103,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     epsRad,
     y,
     x,
-    rawAscendant: rad2deg(Math.atan2(y, x)),
+    rawAscendant: ascendant,
     finalAscendant: ascendant
   });
 
