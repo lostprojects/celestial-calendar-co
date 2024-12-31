@@ -25,8 +25,8 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="h-16 fixed top-0 left-0 right-0 bg-gradient-to-b from-[#1A1F2C] to-transparent z-50">
-      <div className="container h-full mx-auto px-4">
+    <nav className="h-16 fixed top-0 left-0 right-0 bg-gradient-to-b from-[#1A1F2C] to-transparent z-50 px-10">
+      <div className="container h-full mx-auto">
         <div className="flex h-full justify-between items-center">
           <Link to="/" className="text-xl font-serif text-white">
             celestial

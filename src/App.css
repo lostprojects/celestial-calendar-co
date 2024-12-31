@@ -1,8 +1,21 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+}
+
+.page-container {
+  min-height: 100vh;
+  padding: 0 2.5rem;
+  margin: 0 auto;
+  max-width: 1440px;
+  position: relative;
+}
+
+.content-wrapper {
+  width: 100%;
+  position: relative;
+  padding-top: 4rem; /* Account for fixed navbar */
 }
 
 .logo {
