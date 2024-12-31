@@ -22,8 +22,8 @@ export const ColorSection = () => {
           <p className="text-sm font-mono">accent.sand (#F5E6D3)</p>
         </div>
         <div className="space-y-2">
-          <div className="h-20 bg-[#CA644E] rounded-lg"></div>
-          <p className="text-sm font-mono">button.primary (#CA644E)</p>
+          <div className="h-20 bg-accent-palm rounded-lg"></div>
+          <p className="text-sm font-mono">accent.palm (#5E5F34)</p>
         </div>
         <div className="space-y-2">
           <div className="h-20 bg-[#FCFAF7] rounded-lg border border-primary/10"></div>

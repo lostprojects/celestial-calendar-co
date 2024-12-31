@@ -32,6 +32,7 @@ export default {
         accent: {
           sage: "#D4DCCD",
           sand: "#F5E6D3",
+          palm: "#5E5F34",
         },
       },
       fontFamily: {
