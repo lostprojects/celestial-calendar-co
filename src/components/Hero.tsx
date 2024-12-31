@@ -42,7 +42,7 @@ export const Hero = () => {
       <div className="container mx-auto px-4 py-24 relative z-20">
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
-          <div className="flex-1 text-left">
+          <div className="flex-1 text-left max-w-[50%]">
             {/* Glass Card Background */}
             <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-xl">
               {/* Social Proof */}
@@ -102,7 +102,8 @@ export const Hero = () => {
             </div>
           </div>
 
-          {/* Removed the right column with the image since we're using it as background */}
+          {/* Right half remains empty for the background image to show through */}
+          <div className="flex-1" />
         </div>
       </div>
     </section>
