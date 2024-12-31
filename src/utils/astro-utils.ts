@@ -92,7 +92,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   // Calculate Ascendant using atan2
   const latRad = deg2rad(data.latitude);
-  const y = -Math.cos(lstRad);
+  const y = Math.cos(lstRad);  // Removed the unnecessary negation
   const x = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
   let ascendant = rad2deg(Math.atan2(y, x));
   ascendant = normalizeDegrees(ascendant);
