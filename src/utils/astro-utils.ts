@@ -78,7 +78,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     longitudeDeg: sunLongDeg,
     normalizedDeg: normalizedSunLong
   });
-  
+
   // Moon calculation section - DO NOT MODIFY ANYTHING HERE
   const moonPos = getMoonPosition(jde);
   const moonDistance = moonPos.range;
@@ -107,11 +107,11 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Rising sign calculation - only rename variables here
-  const gst = sidereal.apparent(jde); // Get Greenwich Sidereal Time in hours
-  const localSiderealTime = gst + data.longitude/15; // Renamed from lst to localSiderealTime
-  const localSiderealDeg = localSiderealTime * 15; // Renamed from lstDeg
-  const localSiderealRad = deg2rad(localSiderealDeg); // Renamed from lstRad
+  // Rising sign calculation - ONLY MODIFYING THIS SECTION
+  const gst = sidereal.apparent(jde) % 24; // Normalize to 0-24 hours
+  const localSiderealTime = gst + data.longitude/15; // Convert to LST
+  const localSiderealDeg = localSiderealTime * 15; // Convert to degrees
+  const localSiderealRad = deg2rad(localSiderealDeg);
   
   console.log("LST calculation:", {
     gstHours: gst,
