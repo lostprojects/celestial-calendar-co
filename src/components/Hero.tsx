@@ -41,8 +41,8 @@ export const Hero = () => {
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left max-w-[50%]">
-            {/* Glass Card Background */}
-            <div className="bg-white/30 backdrop-blur-md rounded-3xl p-8 shadow-xl">
+            {/* Glass Card Background - Updated with primary dark background */}
+            <div className="bg-primary-dark/30 backdrop-blur-md rounded-3xl p-8 shadow-xl">
               {/* Social Proof */}
               <div className="flex items-center gap-3 mb-8 animate-fade-up">
                 <div className="flex -space-x-3">
