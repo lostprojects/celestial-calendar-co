@@ -86,39 +86,26 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Get GST and normalize to [0, 24)
-  let greenwichSiderealTime = sidereal.apparent(jde);
-  greenwichSiderealTime = greenwichSiderealTime % 24;
-  if (greenwichSiderealTime < 0) greenwichSiderealTime += 24;
-
-  // Convert longitude to hours and calculate LST
-  let longitudeHours = data.longitude / 15;
-  let localSiderealTime = greenwichSiderealTime + longitudeHours;
-
-  // Normalize LST to [0, 24)
-  localSiderealTime = localSiderealTime % 24;
-  if (localSiderealTime < 0) localSiderealTime += 24;
-
-  // Convert LST to radians and subtract 90° (6 hours) for eastern horizon
-  let localSiderealTimeRad = (localSiderealTime * 15 - 90) * (Math.PI / 180);
-
-  // Calculate ascendant using the corrected hour angle
-  let latRad = deg2rad(data.latitude);
-  let numerator = -Math.cos(localSiderealTimeRad);
-  let denominator = Math.sin(epsRad) * Math.tan(latRad) + 
-                   Math.cos(epsRad) * Math.sin(localSiderealTimeRad);
+  // Get LST (RAMC)
+  let ramc = sidereal.apparent(jde);
+  ramc = ramc % 24;
+  if (ramc < 0) ramc += 24;
+  ramc = (ramc + data.longitude / 15) % 24;
+  if (ramc < 0) ramc += 24;
   
-  let ascOffset = Math.atan2(numerator, denominator);
-  let lstDegrees = localSiderealTime * 15;
-  let ascendant = normalizeDegrees(lstDegrees - rad2deg(ascOffset));
+  // Convert RAMC to radians (15° per hour)
+  const ramcRad = deg2rad(ramc * 15);
+  
+  // Calculate ascendant using the direct formula
+  const latRad = deg2rad(data.latitude);
+  const numerator = Math.cos(ramcRad);
+  const denominator = Math.sin(epsRad) * Math.tan(latRad) + Math.cos(epsRad) * Math.sin(ramcRad);
+  const ascendant = normalizeDegrees(rad2deg(Math.atan2(numerator, denominator)));
 
   console.log("Rising sign calculation:", {
-    greenwichSiderealTime,
-    longitudeHours,
-    localSiderealTime,
-    localSiderealTimeRad,
-    lstDegrees,
-    ascOffset: rad2deg(ascOffset),
+    ramc,
+    ramcRad,
+    latRad,
     ascendant
   });
 
