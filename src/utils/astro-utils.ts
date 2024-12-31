@@ -86,7 +86,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Get GST using the same JDE and normalize to [0, 24)
+  // Get GST and normalize to [0, 24)
   let greenwichSiderealTime = sidereal.apparent(jde);
   greenwichSiderealTime = greenwichSiderealTime % 24;
   if (greenwichSiderealTime < 0) greenwichSiderealTime += 24;
@@ -99,24 +99,17 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   localSiderealTime = localSiderealTime % 24;
   if (localSiderealTime < 0) localSiderealTime += 24;
 
-  // Convert LST directly to radians
+  // Convert LST to radians
   let localSiderealTimeRad = localSiderealTime * (Math.PI / 12);
 
-  // Calculate ascendant using spherical trig formula
+  // Calculate ascendant using atan2
   let latRad = deg2rad(data.latitude);
-  let tanAsc = -(Math.cos(localSiderealTimeRad)) / 
-               (Math.sin(epsRad) * Math.tan(latRad) + 
-                Math.cos(epsRad) * Math.sin(localSiderealTimeRad));
-                
-  // Get initial ascendant value in radians
-  let ascRad = Math.atan(tanAsc);
+  let numerator = -Math.cos(localSiderealTimeRad);
+  let denominator = Math.sin(epsRad) * Math.tan(latRad) + 
+                   Math.cos(epsRad) * Math.sin(localSiderealTimeRad);
   
-  // Correct quadrant based on LST
-  if (Math.cos(localSiderealTimeRad) < 0) {
-    ascRad = ascRad + Math.PI;
-  } else if (Math.cos(localSiderealTimeRad) >= 0 && Math.sin(localSiderealTimeRad) < 0) {
-    ascRad = ascRad + 2 * Math.PI;
-  }
+  // Use atan2 for correct quadrant handling
+  let ascRad = Math.atan2(numerator, denominator);
   
   // Convert to degrees and normalize
   let ascendant = normalizeDegrees(rad2deg(ascRad));
@@ -146,27 +139,6 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     risingDeg: ascPosition.degrees,
     risingMin: ascPosition.minutes
   };
-}
-
-function calculateAscendant(ramc: number, latitude: number, obliquity: number): number {
-  // Convert inputs to radians
-  const ramcRad = deg2rad(ramc);
-  const latRad = deg2rad(latitude);
-  const obliqRad = deg2rad(obliquity);
-  
-  // Calculate ascendant using spherical trigonometry
-  const tanAsc = -Math.cos(ramcRad) / 
-                 (Math.sin(obliqRad) * Math.tan(latRad) + 
-                  Math.cos(obliqRad) * Math.sin(ramcRad));
-  
-  let ascendant = rad2deg(Math.atan(tanAsc));
-  
-  // Adjust quadrant based on RAMC
-  if (ramc >= 180) {
-    ascendant += 180;
-  }
-  
-  return normalizeDegrees(ascendant);
 }
 
 function getZodiacPosition(longitude: number) {
