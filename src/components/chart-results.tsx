@@ -29,7 +29,7 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
   };
 
   return (
-    <section className="py-24 relative">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-serif font-bold mb-12 text-center text-primary-dark">
           Your Birth Signs
