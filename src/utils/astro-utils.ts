@@ -97,9 +97,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const ramcDeg = ramc * 15;
   const ramcRad = deg2rad(ramcDeg);
   
-  // Calculate ascendant using the exact formula provided
+  // Calculate ascendant using geocentric latitude
+  const geoLatRad = deg2rad(data.latitude - 0.1924 * Math.sin(2 * deg2rad(data.latitude)));
   const numerator = -Math.cos(ramcRad);
-  const denominator = Math.sin(epsRad) * Math.tan(deg2rad(data.latitude)) + Math.cos(epsRad) * Math.sin(ramcRad);
+  const denominator = Math.sin(epsRad) * Math.tan(geoLatRad) + Math.cos(epsRad) * Math.sin(ramcRad);
   const ascendant = normalizeDegrees(rad2deg(Math.atan2(numerator, denominator)));
 
   console.log("Rising sign calculation:", {
