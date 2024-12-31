@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { BirthChartResult } from "@/utils/astro-utils";
-import { Sun, Moon, Sunrise, ChevronRight, Sparkles } from "lucide-react";
+import { Sun, Moon, Sunrise, ChevronRight, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChartResultsProps {
   mainWestern: BirthChartResult | null;
@@ -10,9 +12,12 @@ interface ChartResultsProps {
   interpretation?: string;
 }
 
-export function ChartResults({ mainWestern, interpretation }: ChartResultsProps) {
+export function ChartResults({ mainWestern, interpretation: initialInterpretation }: ChartResultsProps) {
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [showInterpretation, setShowInterpretation] = useState(false);
+  const [interpretation, setInterpretation] = useState<string | undefined>(initialInterpretation);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   if (!mainWestern) return null;
 
@@ -26,6 +31,30 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
     sun: "Your Sun sign represents your core identity and basic personality—the essence of who you are. It influences how you express yourself and your fundamental approach to life.",
     moon: "Your Moon sign reflects your emotional nature, instincts, and subconscious patterns. It reveals how you process feelings and what makes you feel secure and comfortable.",
     rising: "Your Rising sign (or Ascendant) is the mask you wear when meeting others. It influences your appearance and how you approach new situations and environments."
+  };
+
+  const getAIInterpretation = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-astro-advice', {
+        body: { birthChart: mainWestern }
+      });
+
+      if (error) throw error;
+
+      console.log("AI Interpretation received:", data);
+      setInterpretation(data.interpretation);
+      setShowInterpretation(true);
+    } catch (error) {
+      console.error("Error getting AI interpretation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate your personal reading. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -119,12 +148,22 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
         {/* AI Interpretation Button */}
         <div className="pt-12 text-center">
           <Button
-            onClick={() => setShowInterpretation(!showInterpretation)}
+            onClick={getAIInterpretation}
+            disabled={isLoading}
             className="bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-float"
           >
             <span className="relative z-10 font-bold flex items-center gap-2">
-              Get Your Personal Reading
-              <Sparkles className="w-5 h-5" />
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Generating Your Reading...
+                </>
+              ) : (
+                <>
+                  Get Your Personal Reading
+                  <Sparkles className="w-5 h-5" />
+                </>
+              )}
             </span>
             <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/90 to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </Button>
