@@ -26,15 +26,15 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
           <div className="space-y-4 font-mono">
             <p className="flex items-baseline">
               <span className="w-20 font-medium">Sun:</span>
-              <span>{formatPosition(mainWestern.sunSign, mainWestern.sunDeg, mainWestern.sunMin)}</span>
+              <span>{formatPosition(mainWestern.sun.sign, mainWestern.sun.degrees, mainWestern.sun.minutes)}</span>
             </p>
             <p className="flex items-baseline">
               <span className="w-20 font-medium">Moon:</span>
-              <span>{formatPosition(mainWestern.moonSign, mainWestern.moonDeg, mainWestern.moonMin)}</span>
+              <span>{formatPosition(mainWestern.moon.sign, mainWestern.moon.degrees, mainWestern.moon.minutes)}</span>
             </p>
             <p className="flex items-baseline">
               <span className="w-20 font-medium">Rising:</span>
-              <span>{formatPosition(mainWestern.risingSign, mainWestern.risingDeg, mainWestern.risingMin)}</span>
+              <span>{formatPosition(mainWestern.rising.sign, mainWestern.rising.degrees, mainWestern.rising.minutes)}</span>
             </p>
           </div>
         </div>
