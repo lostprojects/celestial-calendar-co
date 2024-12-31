@@ -32,7 +32,7 @@ export const BirthChartSection = () => {
       </section>
 
       {westernResults && (
-        <section className="py-24 bg-background">
+        <section className="py-24 bg-background-sand">
           <ChartResults 
             mainWestern={westernResults}
             mainVedic={vedicResults}
