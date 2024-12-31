@@ -42,7 +42,7 @@ export const Hero = () => {
           {/* Left Column */}
           <div className="flex-1 text-left max-w-[50%]">
             {/* Glass Card Background */}
-            <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-xl">
+            <div className="bg-white/30 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-xl">
               {/* Social Proof */}
               <div className="flex items-center gap-3 mb-8 animate-fade-up">
                 <div className="flex -space-x-3">
