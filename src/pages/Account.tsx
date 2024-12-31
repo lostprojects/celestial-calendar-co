@@ -7,6 +7,7 @@ import { CalendarModule } from "@/components/account/CalendarModule";
 import { UpcomingReadingsModule } from "@/components/account/UpcomingReadingsModule";
 import { RecentChartsModule } from "@/components/account/RecentChartsModule";
 import { CommunityModule } from "@/components/account/CommunityModule";
+import { BirthChartSummaryModule } from "@/components/account/BirthChartSummaryModule";
 
 const Account = () => {
   const user = useUser();
@@ -52,6 +53,7 @@ const Account = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="space-y-6">
+          <BirthChartSummaryModule />
           <CalendarModule />
           <UpcomingReadingsModule />
         </div>
