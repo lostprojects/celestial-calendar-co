@@ -1,12 +1,6 @@
 import { default as BirthChartForm } from "./birthchart-form";
-import { ChartResults } from "./chart-results";
-import { useState } from "react";
-import { BirthChartResult } from "@/utils/astro-utils";
 
 export const BirthChartSection = () => {
-  const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
-  const [interpretation, setInterpretation] = useState<string | null>(null);
-
   return (
     <section id="birth-chart-section" className="py-24 relative">
       <div className="container mx-auto px-4">
@@ -19,21 +13,8 @@ export const BirthChartSection = () => {
           </p>
         </div>
         
-        <BirthChartForm 
-          onResultsCalculated={(results, aiInterpretation) => {
-            setWesternResults(results);
-            setInterpretation(aiInterpretation);
-          }} 
-        />
+        <BirthChartForm />
       </div>
-
-      {westernResults && (
-        <ChartResults
-          mainWestern={westernResults}
-          mainVedic={null}
-          interpretation={interpretation || undefined}
-        />
-      )}
     </section>
   );
 };
