@@ -54,12 +54,12 @@ export const TypographySection = () => {
           />
           <CollapsibleContent className="space-y-6">
             <div>
-              <h5 className="text-lg md:text-xl font-serif mb-4">Heading 5</h5>
-              <p className="text-sm text-accent-palm font-mono">text-lg md:text-xl font-serif</p>
+              <h5 className="text-lg md:text-xl font-mono font-bold tracking-tight mb-4">Heading 5</h5>
+              <p className="text-sm text-accent-palm font-mono">text-lg md:text-xl font-mono font-bold tracking-tight</p>
             </div>
             <div>
-              <h6 className="text-base md:text-lg font-serif mb-4">Heading 6</h6>
-              <p className="text-sm text-accent-palm font-mono">text-base md:text-lg font-serif</p>
+              <h6 className="text-base md:text-lg font-mono font-bold tracking-tight mb-4">Heading 6</h6>
+              <p className="text-sm text-accent-palm font-mono">text-base md:text-lg font-mono font-bold tracking-tight</p>
             </div>
           </CollapsibleContent>
         </Collapsible>
