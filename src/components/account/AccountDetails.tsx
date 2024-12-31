@@ -47,29 +47,38 @@ export function AccountDetails({ userId, initialData }: { userId: string, initia
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-2xl">
       <div>
-        <h3 className="text-lg font-medium">My Details</h3>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-serif mb-2">My Details</h1>
+        <p className="text-sm text-muted-foreground font-mono">
           Update your personal information.
         </p>
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
             name="full_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel className="text-base font-mono">Full Name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Enter your full name" />
+                  <Input 
+                    {...field} 
+                    placeholder="Enter your full name" 
+                    className="h-12 px-4 font-mono text-base"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit">Save changes</Button>
+          <Button 
+            type="submit"
+            className="h-12 px-6 font-mono bg-primary hover:bg-primary/90"
+          >
+            Save changes
+          </Button>
         </form>
       </Form>
     </div>

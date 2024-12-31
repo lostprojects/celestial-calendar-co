@@ -23,7 +23,7 @@ export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) 
   ];
 
   return (
-    <Sidebar>
+    <Sidebar className="border-r border-border/10">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -33,8 +33,9 @@ export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) 
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id)}
                     data-active={activeTab === item.id}
+                    className="font-mono text-base gap-4 px-4"
                   >
-                    <item.icon className="h-4 w-4" />
+                    <item.icon className="h-5 w-5" />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

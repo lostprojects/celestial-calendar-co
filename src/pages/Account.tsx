@@ -61,23 +61,33 @@ const Account = () => {
         return user && <AccountDetails userId={user.id} initialData={profileData} />;
       case "settings":
         return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium">Settings</h3>
-            <p className="text-muted-foreground">Coming soon...</p>
+          <div className="space-y-6 max-w-2xl">
+            <h1 className="text-2xl font-serif mb-2">Settings</h1>
+            <p className="text-sm text-muted-foreground font-mono">Coming soon...</p>
           </div>
         );
       case "security":
         return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium">Security</h3>
-            <p className="text-muted-foreground">Coming soon...</p>
+          <div className="space-y-6 max-w-2xl">
+            <h1 className="text-2xl font-serif mb-2">Security</h1>
+            <p className="text-sm text-muted-foreground font-mono">Coming soon...</p>
+            <div className="pt-6">
+              <Button
+                variant="destructive"
+                onClick={handleSignOut}
+                className="h-12 px-6 font-mono flex items-center gap-2"
+              >
+                <LogOut className="h-5 w-5" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         );
       case "email":
         return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium">Email Preferences</h3>
-            <p className="text-muted-foreground">Coming soon...</p>
+          <div className="space-y-6 max-w-2xl">
+            <h1 className="text-2xl font-serif mb-2">Email Preferences</h1>
+            <p className="text-sm text-muted-foreground font-mono">Coming soon...</p>
           </div>
         );
       default:
@@ -86,24 +96,12 @@ const Account = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-[#FCFAF7]">
       <SidebarProvider>
-        <div className="flex min-h-[80vh] w-full gap-8">
+        <div className="flex min-h-[calc(100vh-4rem)] w-full">
           <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-8">
             {renderContent()}
-            {activeTab === "security" && (
-              <div className="mt-8 pt-6 border-t">
-                <Button
-                  variant="destructive"
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign Out
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </SidebarProvider>
