@@ -102,3 +102,12 @@ _Last Updated: March 19, 2024_
   - username (text, unique)
   - avatar_url (text)
   - created_at (timestamp)
+
+### src/components/ui/collapsible-header.tsx
+- **Purpose**: Reusable component for collapsible section headers with chevron animation
+- **Dependencies**: lucide-react
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial implementation of CollapsibleHeader component
+  - Added chevron animation and hover states
+  - Integrated with Typography section
