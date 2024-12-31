@@ -42,12 +42,12 @@ const Account = () => {
   }, [user, navigate, supabase, toast]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 min-h-screen bg-[#FCFAF7]">
       <div className="mb-8">
-        <h1 className="text-3xl font-serif">
+        <h1 className="text-3xl font-serif text-primary-dark">
           Welcome, {profileData.full_name || "Friend"}!
         </h1>
-        <p className="text-primary/60">Here is your astrological dashboard</p>
+        <p className="text-primary/60 font-mono">Here is your celestial dashboard</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -65,7 +65,7 @@ const Account = () => {
         </div>
       </div>
 
-      <div className="mt-12">
+      <div className="mt-12 bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-[#403E43]/10">
         {user && <AccountDetails userId={user.id} initialData={profileData} />}
       </div>
     </div>

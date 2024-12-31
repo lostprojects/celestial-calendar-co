@@ -1,4 +1,3 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Users } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -10,24 +9,22 @@ export const CommunityModule = () => {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-medium">Community Members</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
+      <h3 className="text-lg font-serif text-primary-dark mb-4">Community Members</h3>
+      <div className="space-y-4">
         {members.map((member, index) => (
-          <div key={index} className="flex items-center gap-3">
+          <div key={index} className="flex items-center gap-3 bg-white/50 p-3 rounded-xl">
             <Avatar className="h-8 w-8">
               <AvatarImage src={member.avatar} alt={member.name} />
               <AvatarFallback>{member.name.split(' ')[0][0]}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="text-sm font-medium">{member.name}</p>
-              <p className="text-xs text-primary/60">{member.role}</p>
+              <p className="text-sm font-medium text-primary-dark">{member.name}</p>
+              <p className="text-xs text-primary/60 font-mono">{member.role}</p>
             </div>
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

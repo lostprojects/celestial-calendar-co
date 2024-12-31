@@ -7,18 +7,18 @@ export const CalendarModule = () => {
   const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-medium">{currentMonth}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
+      <div className="flex flex-row items-center justify-between pb-4">
+        <h3 className="text-lg font-serif text-primary-dark">{currentMonth}</h3>
+      </div>
+      <div className="bg-white rounded-xl">
         <Calendar
           mode="single"
           selected={date}
           onSelect={setDate}
-          className="rounded-md border"
+          className="rounded-xl"
         />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
