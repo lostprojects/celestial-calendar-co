@@ -9,8 +9,6 @@ import { Separator } from "@/components/ui/separator";
 const StyleGuide = () => {
   return (
     <div className="container mx-auto px-4 py-24">
-      <h1 className="text-4xl font-serif mb-8">Style Guide</h1>
-      
       {/* Colors */}
       <section className="mb-12">
         <h2 className="text-2xl font-serif mb-4">Colors</h2>
@@ -96,14 +94,6 @@ const StyleGuide = () => {
         <div className="mb-8">
           <h3 className="text-xl font-serif mb-4">Cards</h3>
           <div className="grid md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Card Title</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>Card content goes here.</p>
-              </CardContent>
-            </Card>
             <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 shadow-lg">
               <h3 className="text-lg font-serif mb-2">Glass Card</h3>
               <p>Our custom glass card style.</p>
