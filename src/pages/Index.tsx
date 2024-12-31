@@ -3,7 +3,7 @@ import { BirthChartSection } from "@/components/BirthChartSection";
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col">
       <Hero />
       <BirthChartSection />
     </div>
