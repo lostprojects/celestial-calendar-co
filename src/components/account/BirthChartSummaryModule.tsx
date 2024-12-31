@@ -105,9 +105,9 @@ export const BirthChartSummaryModule = () => {
         </div>
       </div>
 
-      {/* Debug Table - Moved to bottom */}
+      {/* Debug Table */}
       {debugInfo && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md p-6 shadow-lg border-t border-[#403E43]/10 mt-auto">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
           <h3 className="text-lg font-serif text-primary-dark mb-4">Debug Information</h3>
           <Table>
             <TableHeader>
