@@ -29,12 +29,12 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
   };
 
   return (
-    <div className="container mx-auto px-4">
-      <h2 className="text-4xl font-serif font-bold mb-12 text-center text-primary-dark">
+    <div className="w-screen">
+      <h2 className="text-4xl font-serif font-bold text-center text-primary-dark pt-4 pb-8">
         Your Birth Signs
       </h2>
       
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto px-4 space-y-6">
         {/* Sun Sign */}
         <div className="group">
           <div 
