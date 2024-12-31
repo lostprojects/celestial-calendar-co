@@ -51,11 +51,11 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const utcMoment = localMoment.utc();
   console.log("UTC time:", utcMoment.format());
   
-  // Calculate Julian Day using UTC components
+  // Calculate Julian Day using UTC components, being careful to use the correct date
   const jd = CalendarGregorianToJD(
     utcMoment.year(),
     utcMoment.month() + 1,
-    utcMoment.date() + ((utcMoment.hours() + utcMoment.minutes() / 60.0) / 24.0)
+    utcMoment.date() + (utcMoment.hours() + utcMoment.minutes() / 60.0) / 24.0
   );
   
   // Calculate Julian Ephemeris Day (adding deltaT correction)
