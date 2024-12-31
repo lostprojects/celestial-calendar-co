@@ -22,7 +22,10 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
+        background: {
+          DEFAULT: "hsl(var(--background))",
+          sand: "#F5E6D3",
+        },
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "#403E43",
@@ -31,7 +34,6 @@ export default {
         },
         accent: {
           sage: "#D4DCCD",
-          sand: "#F5E6D3",
           palm: "#5E5F34",
         },
       },
