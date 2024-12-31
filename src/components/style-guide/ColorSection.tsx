@@ -26,6 +26,10 @@ export const ColorSection = () => {
           <p className="text-sm font-mono">accent.palm (#5E5F34)</p>
         </div>
         <div className="space-y-2">
+          <div className="h-20 bg-accent-lightpalm rounded-lg"></div>
+          <p className="text-sm font-mono">accent.lightpalm (#6C783C)</p>
+        </div>
+        <div className="space-y-2">
           <div className="h-20 bg-[#FCFAF7] rounded-lg border border-primary/10"></div>
           <p className="text-sm font-mono">background.default (#FCFAF7)</p>
         </div>
