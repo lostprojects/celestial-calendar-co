@@ -4,9 +4,10 @@ import { BirthChartResult } from "@/utils/astro-utils";
 interface ChartResultsProps {
   mainWestern: BirthChartResult | null;
   mainVedic: BirthChartResult | null;
+  interpretation?: string;
 }
 
-export function ChartResults({ mainWestern }: ChartResultsProps) {
+export function ChartResults({ mainWestern, interpretation }: ChartResultsProps) {
   if (!mainWestern) return null;
 
   console.log("ChartResults received Western:", mainWestern);
@@ -37,6 +38,19 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
             </p>
           </div>
         </div>
+
+        {interpretation && (
+          <div className="p-6 border rounded-lg shadow-sm">
+            <h3 className="text-2xl font-serif mb-6">
+              Astrological Interpretation
+            </h3>
+            <div className="prose prose-slate max-w-none">
+              {interpretation.split('\n').map((paragraph, index) => (
+                <p key={index} className="mb-4">{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

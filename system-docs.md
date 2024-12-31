@@ -16,13 +16,25 @@ _Last Updated: March 19, 2024_
 - **Purpose**: Main React component for birth chart form and database logic
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Initial file creation with purpose documentation
+  - Added AI interpretation integration
+  - Connected to generate-astro-advice Edge Function
+  - Enhanced error handling for API calls
 
 ### src/components/chart-results.tsx
 - **Purpose**: Display component for birth chart calculation results
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Initial file creation with purpose documentation
+  - Added AI interpretation display section
+  - Enhanced typography for interpretation text
+
+### supabase/functions/generate-astro-advice/index.ts
+- **Purpose**: Edge Function for generating AI-powered astrological interpretations
+- **Dependencies**: OpenAI API
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial implementation of AI interpretation generation
+  - Integration with OpenAI GPT-4o-mini model
+  - Added error handling and CORS support
 
 ### src/main.tsx
 - **Purpose**: Entry point of the application, renders the root App component
