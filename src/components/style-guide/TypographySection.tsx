@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown } from 'lucide-react';
 
 export const TypographySection = () => {
   const [openSections, setOpenSections] = useState({
@@ -23,11 +24,16 @@ export const TypographySection = () => {
         <Collapsible open={openSections.headings}>
           <CollapsibleTrigger 
             onClick={() => toggleSection('headings')}
-            className="w-full text-left"
+            className="w-full text-left flex items-center gap-2 group"
           >
             <h6 className="text-base font-mono font-semibold mb-4 hover:text-primary/80">
               Headings
             </h6>
+            <ChevronDown 
+              className={`h-4 w-4 transition-transform duration-200 text-primary/60 group-hover:text-primary/80 ${
+                openSections.headings ? 'rotate-180' : ''
+              }`}
+            />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-6">
             <div>
@@ -52,11 +58,16 @@ export const TypographySection = () => {
         <Collapsible open={openSections.subheadings}>
           <CollapsibleTrigger 
             onClick={() => toggleSection('subheadings')}
-            className="w-full text-left"
+            className="w-full text-left flex items-center gap-2 group"
           >
             <h6 className="text-base font-mono font-semibold mb-4 hover:text-primary/80">
               Subheadings
             </h6>
+            <ChevronDown 
+              className={`h-4 w-4 transition-transform duration-200 text-primary/60 group-hover:text-primary/80 ${
+                openSections.subheadings ? 'rotate-180' : ''
+              }`}
+            />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-6">
             <div>
@@ -73,11 +84,16 @@ export const TypographySection = () => {
         <Collapsible open={openSections.bodyText}>
           <CollapsibleTrigger 
             onClick={() => toggleSection('bodyText')}
-            className="w-full text-left"
+            className="w-full text-left flex items-center gap-2 group"
           >
             <h6 className="text-base font-mono font-semibold mb-4 hover:text-primary/80">
               Body Text
             </h6>
+            <ChevronDown 
+              className={`h-4 w-4 transition-transform duration-200 text-primary/60 group-hover:text-primary/80 ${
+                openSections.bodyText ? 'rotate-180' : ''
+              }`}
+            />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-6">
             <div>
