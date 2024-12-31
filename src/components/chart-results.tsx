@@ -13,10 +13,9 @@ interface ChartResultsProps {
   interpretation?: string;
 }
 
-export function ChartResults({ mainWestern, interpretation: initialInterpretation }: ChartResultsProps) {
+export function ChartResults({ mainWestern }: ChartResultsProps) {
   const [openSection, setOpenSection] = useState<string | null>(null);
-  const [showInterpretation, setShowInterpretation] = useState(false);
-  const [interpretation, setInterpretation] = useState<string | undefined>(initialInterpretation);
+  const [currentInterpretation, setCurrentInterpretation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -78,8 +77,7 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
         }
       }
 
-      setInterpretation(interpretationData.interpretation);
-      setShowInterpretation(true);
+      setCurrentInterpretation(interpretationData.interpretation);
     } catch (error) {
       console.error("Error getting AI interpretation:", error);
       toast({
@@ -160,8 +158,8 @@ export function ChartResults({ mainWestern, interpretation: initialInterpretatio
         </div>
 
         {/* AI Interpretation Section */}
-        {showInterpretation && interpretation && (
-          <InterpretationSection interpretation={interpretation} />
+        {currentInterpretation && (
+          <InterpretationSection interpretation={currentInterpretation} />
         )}
       </div>
     </div>
