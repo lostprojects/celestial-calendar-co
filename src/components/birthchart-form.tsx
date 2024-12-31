@@ -21,7 +21,6 @@ export default function BirthChartForm() {
   });
 
   const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
-  const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const { toast } = useToast();
 
@@ -35,21 +34,6 @@ export default function BirthChartForm() {
     });
   };
 
-  async function getAIInterpretation(chartData: BirthChartResult) {
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-astro-advice', {
-        body: { birthChart: chartData }
-      });
-
-      if (error) throw error;
-      console.log("AI Interpretation received:", data);
-      return data.interpretation;
-    } catch (err) {
-      console.error("Error getting AI interpretation:", err);
-      throw err;
-    }
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsCalculating(true);
@@ -62,17 +46,12 @@ export default function BirthChartForm() {
       console.log("Western Chart Results:", wChart);
       setWesternResults(wChart);
 
-      // Get AI interpretation
-      console.log("Fetching AI interpretation...");
-      const aiInterpretation = await getAIInterpretation(wChart);
-      setInterpretation(aiInterpretation);
-
       // Store in DB
       await supabaseInsert(formData, wChart);
 
       toast({
         title: "Success",
-        description: "Birth chart calculated and interpreted successfully!",
+        description: "Birth chart calculated successfully!",
       });
     } catch (err) {
       console.error("Calculation error:", err);
@@ -169,7 +148,7 @@ export default function BirthChartForm() {
             <ChartResults
               mainWestern={westernResults}
               mainVedic={null}
-              interpretation={interpretation || undefined}
+              interpretation={undefined}
             />
           </div>
         </section>
