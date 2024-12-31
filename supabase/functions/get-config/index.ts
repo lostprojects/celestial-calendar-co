@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,7 +20,7 @@ serve(async (req) => {
       throw new Error('Invalid key requested')
     }
 
-    // Instead of querying the database, get the secret directly from Deno.env
+    // Get the secret directly from Deno.env
     const value = Deno.env.get(key)
     if (!value) {
       throw new Error(`Secret ${key} not found`)
