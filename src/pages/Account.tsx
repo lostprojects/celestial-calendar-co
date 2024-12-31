@@ -5,7 +5,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AccountSidebar } from "@/components/account/AccountSidebar";
 import { AccountDetails } from "@/components/account/AccountDetails";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 
@@ -98,17 +97,14 @@ const Account = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FCFAF7]">
-      <Navbar />
-      <div className="flex-1 flex">
-        <SidebarProvider>
-          <div className="flex w-full">
-            <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-            <main className="flex-1 p-8 overflow-auto">
-              {renderContent()}
-            </main>
-          </div>
-        </SidebarProvider>
-      </div>
+      <SidebarProvider>
+        <div className="flex-1 flex w-full">
+          <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          <main className="flex-1 p-8 overflow-auto">
+            {renderContent()}
+          </main>
+        </div>
+      </SidebarProvider>
     </div>
   );
 };
