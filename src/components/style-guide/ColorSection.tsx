@@ -26,10 +26,6 @@ export const ColorSection = () => {
           <p className="text-sm font-mono">Button Primary (#CA644E)</p>
         </div>
         <div className="space-y-2">
-          <div className="h-20 bg-[#B1583B] rounded-lg"></div>
-          <p className="text-sm font-mono">Button Hover (#B1583B)</p>
-        </div>
-        <div className="space-y-2">
           <div className="h-20 bg-[#FCFAF7] rounded-lg border border-primary/10"></div>
           <p className="text-sm font-mono">Background (#FCFAF7)</p>
         </div>
