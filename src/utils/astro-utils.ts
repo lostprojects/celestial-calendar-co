@@ -96,11 +96,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonPos = getMoonPosition(jde);
   console.log("Raw Moon Position object:", moonPos);
   
-  // Convert equatorial coordinates (RA/Dec) to ecliptic coordinates
-  const moonLongRad = Math.atan2(
-    Math.sin(moonPos._ra) * Math.cos(epsRad) + Math.tan(moonPos._dec) * Math.sin(epsRad),
-    Math.cos(moonPos._ra)
-  );
+  // Classical formula for converting RA/Dec to ecliptic longitude
+  const tanLambda = (Math.sin(moonPos._ra) * Math.cos(epsRad) - Math.tan(moonPos._dec) * Math.sin(epsRad)) / Math.cos(moonPos._ra);
+  let moonLongRad = Math.atan(tanLambda);
+  
+  // Adjust quadrant based on RA
+  if (Math.cos(moonPos._ra) < 0) {
+    moonLongRad += Math.PI;
+  }
+  if (moonLongRad < 0) {
+    moonLongRad += 2 * Math.PI;
+  }
+  
   const moonLongDeg = (moonLongRad * 180) / Math.PI;
   const normalizedMoonLong = normalizeDegrees(moonLongDeg);
   console.log("Final Moon longitude (tropical):", normalizedMoonLong);
