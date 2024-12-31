@@ -15,8 +15,12 @@ export const ComponentsSection = () => {
         <h3 className="text-xl font-serif mb-4">Buttons <span className="text-sm font-mono text-primary/60">(@/components/ui/button)</span></h3>
         <div className="flex flex-wrap gap-4">
           <div className="space-y-2">
-            <Button className="bg-primary-dark hover:bg-primary-dark/90 text-white">Default Button</Button>
+            <Button className="bg-primary-dark hover:bg-primary-dark/90 text-white">Small Button</Button>
             <p className="text-sm font-mono text-primary/60">&lt;Button className="bg-primary-dark hover:bg-primary-dark/90 text-white"&gt;</p>
+          </div>
+          <div className="space-y-2">
+            <Button className="bg-primary-dark hover:bg-primary-dark/90 text-white px-8 py-6 text-lg">Main Button</Button>
+            <p className="text-sm font-mono text-primary/60">&lt;Button className="bg-primary-dark hover:bg-primary-dark/90 text-white px-8 py-6 text-lg"&gt;</p>
           </div>
           <div className="space-y-2">
             <Button variant="secondary" className="text-white">Secondary Button</Button>
