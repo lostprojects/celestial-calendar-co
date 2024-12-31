@@ -62,30 +62,30 @@ export const Hero = () => {
                     className="w-8 h-8 rounded-full border-1 border-[#CA644E]"
                   />
                 </div>
-                <span className="text-sm font-mono text-background-primary">Join 10,000+ seekers of cosmic wisdom</span>
+                <span className="text-sm font-mono text-[#B1583B]">Join 10,000+ seekers of cosmic wisdom</span>
               </div>
 
               {/* Main Content */}
-              <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-background-primary leading-[1.1] max-w-xl animate-fade-up">
+              <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-primary-dark leading-[1.1] max-w-xl animate-fade-up">
                 Your Personal Cosmic Blueprint for Success
               </h1>
-              <p className="text-base text-background-primary/80 font-mono leading-relaxed max-w-lg mb-8 animate-fade-up">
+              <p className="text-base text-primary-dark/80 font-mono leading-relaxed max-w-lg mb-8 animate-fade-up">
                 Unlock the power of celestial intelligence to make confident decisions in your career, relationships, and personal growth.
               </p>
               
               {/* Features List */}
               <div className="flex flex-col space-y-4 mb-8 animate-fade-up">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-background-primary" />
-                  <span className="text-sm text-background-primary">Google/Apple Calendar Sync</span>
+                  <Calendar className="w-5 h-5 text-[#403E43]" />
+                  <span className="text-sm">Google/Apple Calendar Sync</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-background-primary" />
-                  <span className="text-sm text-background-primary">Daily decision guidance</span>
+                  <Lightbulb className="w-5 h-5 text-[#403E43]" />
+                  <span className="text-sm">Daily decision guidance</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-background-primary" />
-                  <span className="text-sm text-background-primary">Personalized life phases</span>
+                  <User className="w-5 h-5 text-[#403E43]" />
+                  <span className="text-sm">Personalized life phases</span>
                 </div>
               </div>
               
