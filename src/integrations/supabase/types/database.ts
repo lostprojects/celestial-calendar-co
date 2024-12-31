@@ -1,3 +1,6 @@
+import type { BirthChartsTable } from './birth-charts';
+import type { ProfilesTable } from './profiles';
+
 export type Json =
   | string
   | number
