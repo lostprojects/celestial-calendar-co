@@ -36,11 +36,11 @@ export const ComponentsSection = () => {
 
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-serif mb-4">Components</h2>
+      <h5 className="text-xl font-mono font-bold mb-4">Components</h5>
       
       {/* Buttons */}
       <div className="mb-8">
-        <h3 className="text-xl font-serif mb-4">button.variants <span className="text-sm font-mono text-primary/60">(@/components/ui/button)</span></h3>
+        <h6 className="text-base font-mono font-semibold mb-4">button.variants <span className="text-sm font-mono text-primary/60">(@/components/ui/button)</span></h6>
         <div className="flex flex-wrap gap-4">
           <div className="space-y-2">
             <Button className="bg-primary-dark hover:bg-primary-dark/90 text-white">button.small</Button>
@@ -75,7 +75,7 @@ export const ComponentsSection = () => {
 
       {/* Toast Section */}
       <div className="mb-8">
-        <h3 className="text-xl font-serif mb-4">toast.variants <span className="text-sm font-mono text-primary/60">(@/components/ui/toast)</span></h3>
+        <h6 className="text-base font-mono font-semibold mb-4">toast.variants <span className="text-sm font-mono text-primary/60">(@/components/ui/toast)</span></h6>
         <div className="flex flex-wrap gap-4">
           <div className="space-y-2">
             <Button onClick={showSuccessToast} variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
@@ -113,7 +113,7 @@ export const ComponentsSection = () => {
 
       {/* Glass Card */}
       <div className="mb-8">
-        <h3 className="text-xl font-serif mb-4">card.variants <span className="text-sm font-mono text-primary/60">(@/components/ui/card)</span></h3>
+        <h6 className="text-base font-mono font-semibold mb-4">card.variants <span className="text-sm font-mono text-primary/60">(@/components/ui/card)</span></h6>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 shadow-lg">
@@ -127,7 +127,7 @@ export const ComponentsSection = () => {
 
       {/* Form Elements */}
       <div className="mb-8">
-        <h3 className="text-xl font-serif mb-4">form.elements</h3>
+        <h6 className="text-base font-mono font-semibold mb-4">form.elements</h6>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-4">
             <div className="space-y-2">
@@ -144,7 +144,7 @@ export const ComponentsSection = () => {
 
       {/* Avatars & Badges */}
       <div className="mb-8">
-        <h3 className="text-xl font-serif mb-4">display.elements</h3>
+        <h6 className="text-base font-mono font-semibold mb-4">display.elements</h6>
         <div className="flex flex-wrap gap-8">
           <div className="space-y-2">
             <Avatar>
@@ -170,7 +170,7 @@ export const ComponentsSection = () => {
 
       {/* Animations */}
       <div className="mb-8">
-        <h3 className="text-xl font-serif mb-4">animation.variants</h3>
+        <h6 className="text-base font-mono font-semibold mb-4">animation.variants</h6>
         <div className="grid md:grid-cols-3 gap-4">
           <div className="p-4 bg-white/80 backdrop-blur-md rounded-lg animate-float">
             animation.float

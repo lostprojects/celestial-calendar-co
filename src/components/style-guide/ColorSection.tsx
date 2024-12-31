@@ -3,7 +3,7 @@ import React from 'react';
 export const ColorSection = () => {
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-serif mb-4">Colors</h2>
+      <h5 className="text-xl font-mono font-bold mb-4">Colors</h5>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="space-y-2">
           <div className="h-20 bg-primary-light rounded-lg"></div>

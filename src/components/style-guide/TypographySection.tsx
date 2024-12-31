@@ -3,7 +3,7 @@ import React from 'react';
 export const TypographySection = () => {
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-serif mb-4">Typography</h2>
+      <h5 className="text-xl font-mono font-bold mb-4">Typography</h5>
       <div className="space-y-8">
         <div>
           <h1 className="text-4xl font-serif">Heading 1 - Playfair Display</h1>
