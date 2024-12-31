@@ -2,6 +2,7 @@ import moment from 'moment-timezone';
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as solar from "astronomia/solar";
 import * as sidereal from "astronomia/sidereal";
+import * as base from "astronomia/base";
 import {
   ZODIAC_SIGNS,
   calculateJulianDay,
@@ -60,9 +61,11 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
 
-  // Calculate obliquity
+  // Calculate obliquity (mean + nutation = true)
   const T = (jd - 2451545.0) / 36525;
-  const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
+  const meanEps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
+  const { deltaEps } = base.nutation(T);
+  const eps = meanEps + deltaEps;
   const epsRad = deg2rad(eps);
 
   // Calculate sun position
