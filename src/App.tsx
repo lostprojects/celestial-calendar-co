@@ -10,6 +10,7 @@ import { Footer } from "./components/Footer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Account from "./pages/Account";
+import StyleGuide from "./pages/StyleGuide";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/style-guide" element={<StyleGuide />} />
               </Routes>
             </main>
             <Footer />
