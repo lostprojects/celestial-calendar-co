@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
@@ -9,6 +9,7 @@ import { ChevronDown } from "lucide-react";
 
 export const ComponentsSection = () => {
   const { toast } = useToast();
+  const [isOpen, setIsOpen] = useState(false);
 
   const showSuccessToast = () => {
     toast({
@@ -44,10 +45,18 @@ export const ComponentsSection = () => {
         <h6 className="text-base font-mono font-semibold mb-4">chevron.dropdown <span className="text-sm font-mono text-primary/60">(@/components/ui/collapsible-header)</span></h6>
         <div className="flex flex-wrap gap-4">
           <div className="space-y-2">
-            <button className="flex items-center gap-2 text-primary-dark hover:text-primary-dark/80 transition-colors">
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex items-center gap-2 text-primary-dark hover:text-primary-dark/80 transition-colors"
+            >
               <span className="text-lg font-semibold">Collapsible Header</span>
-              <ChevronDown className="h-5 w-5" />
+              <ChevronDown className={`h-5 w-5 transform transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
+            {isOpen && (
+              <div className="pl-4 py-2 text-primary-dark/80">
+                This is placeholder content that appears when the chevron is clicked.
+              </div>
+            )}
             <p className="text-sm font-mono text-primary/60">
               &lt;button className="flex items-center gap-2 text-primary-dark hover:text-primary-dark/80 transition-colors"&gt;
             </p>
