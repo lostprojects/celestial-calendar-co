@@ -6,24 +6,24 @@ export const TypographySection = () => {
       <h2 className="text-2xl font-serif mb-4">Typography</h2>
       <div className="space-y-8">
         <div>
-          <h1 className="text-4xl font-serif">h1</h1>
+          <h1 className="text-4xl font-serif">Heading 1 - Playfair Display</h1>
           <p className="text-sm font-mono text-primary/60">h1 (text-4xl, 36px)</p>
         </div>
         <div>
-          <h2 className="text-3xl font-serif">h2</h2>
+          <h2 className="text-3xl font-serif">Heading 2 - Playfair Display</h2>
           <p className="text-sm font-mono text-primary/60">h2 (text-3xl, 30px)</p>
         </div>
         <div>
-          <h3 className="text-2xl font-serif">h3</h3>
+          <h3 className="text-2xl font-serif">Heading 3 - Playfair Display</h3>
           <p className="text-sm font-mono text-primary/60">h3 (text-2xl, 24px)</p>
         </div>
         <div>
-          <h4 className="text-xl font-serif">h4</h4>
+          <h4 className="text-xl font-serif">Heading 4 - Playfair Display</h4>
           <p className="text-sm font-mono text-primary/60">h4 (text-xl, 20px)</p>
         </div>
         <div>
-          <h5 className="text-xl font-mono font-semibold">h5.mono (Subheading Large)</h5>
-          <p className="text-sm font-mono text-primary/60">h5.mono (text-xl, 20px, font-semibold)</p>
+          <h5 className="text-lg font-mono font-semibold">h5.mono (Subheading Large)</h5>
+          <p className="text-sm font-mono text-primary/60">h5.mono (text-lg, 18px, font-semibold)</p>
         </div>
         <div>
           <h6 className="text-base font-mono font-semibold">h6.mono (Subheading Regular)</h6>
