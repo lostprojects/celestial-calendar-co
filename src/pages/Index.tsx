@@ -3,10 +3,10 @@ import { BirthChartSection } from "@/components/BirthChartSection";
 
 const Index = () => {
   return (
-    <div className="flex flex-col">
+    <>
       <Hero />
       <BirthChartSection />
-    </div>
+    </>
   );
 };
 

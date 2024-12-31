@@ -25,10 +25,8 @@ export const Hero = () => {
   }, []);
 
   return (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FEC6A1] via-[#FDE1D3] to-[#F5E6D3] opacity-80" />
-      
-      <div className="container mx-auto px-4 py-12 relative z-10">
+    <section className="relative bg-gradient-to-br from-[#FEC6A1] via-[#FDE1D3] to-[#F5E6D3]">
+      <div className="container mx-auto px-4 py-16">
         <div className="flex flex-col md:flex-row items-center gap-12">
           {/* Left Column */}
           <div className="flex-1 text-left space-y-6">
@@ -101,6 +99,6 @@ export const Hero = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

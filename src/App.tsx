@@ -22,7 +22,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Navbar />
-            <main className="flex-1 flex">
+            <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
