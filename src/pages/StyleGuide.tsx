@@ -79,24 +79,39 @@ const StyleGuide = () => {
       <section className="mb-12">
         <h2 className="text-2xl font-serif mb-4">Components</h2>
         
-        {/* Buttons */}
+        {/* Buttons - @/components/ui/button */}
         <div className="mb-8">
-          <h3 className="text-xl font-serif mb-4">Buttons</h3>
+          <h3 className="text-xl font-serif mb-4">Buttons <span className="text-sm font-mono text-primary/60">(@/components/ui/button)</span></h3>
           <div className="flex flex-wrap gap-4">
-            <Button>Default Button</Button>
-            <Button variant="secondary">Secondary Button</Button>
-            <Button variant="outline">Outline Button</Button>
-            <Button variant="ghost">Ghost Button</Button>
+            <div className="space-y-2">
+              <Button>Default Button</Button>
+              <p className="text-sm font-mono text-primary/60">&lt;Button&gt;</p>
+            </div>
+            <div className="space-y-2">
+              <Button variant="secondary">Secondary Button</Button>
+              <p className="text-sm font-mono text-primary/60">&lt;Button variant="secondary"&gt;</p>
+            </div>
+            <div className="space-y-2">
+              <Button variant="outline">Outline Button</Button>
+              <p className="text-sm font-mono text-primary/60">&lt;Button variant="outline"&gt;</p>
+            </div>
+            <div className="space-y-2">
+              <Button variant="ghost">Ghost Button</Button>
+              <p className="text-sm font-mono text-primary/60">&lt;Button variant="ghost"&gt;</p>
+            </div>
           </div>
         </div>
 
-        {/* Cards */}
+        {/* Cards - @/components/ui/card */}
         <div className="mb-8">
-          <h3 className="text-xl font-serif mb-4">Cards</h3>
+          <h3 className="text-xl font-serif mb-4">Cards <span className="text-sm font-mono text-primary/60">(@/components/ui/card)</span></h3>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 shadow-lg">
-              <h3 className="text-lg font-serif mb-2">Glass Card</h3>
-              <p>Our custom glass card style.</p>
+            <div className="space-y-2">
+              <div className="bg-white/80 backdrop-blur-md rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-serif mb-2">Glass Card</h3>
+                <p>Our custom glass card style.</p>
+              </div>
+              <p className="text-sm font-mono text-primary/60">Custom glass card with bg-white/80 backdrop-blur-md rounded-xl</p>
             </div>
           </div>
         </div>
@@ -106,8 +121,14 @@ const StyleGuide = () => {
           <h3 className="text-xl font-serif mb-4">Form Elements</h3>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-4">
-              <Input placeholder="Default Input" className="bg-white" />
-              <Calendar mode="single" />
+              <div className="space-y-2">
+                <Input placeholder="Default Input" className="bg-white" />
+                <p className="text-sm font-mono text-primary/60">&lt;Input&gt; from @/components/ui/input</p>
+              </div>
+              <div className="space-y-2">
+                <Calendar mode="single" />
+                <p className="text-sm font-mono text-primary/60">&lt;Calendar mode="single"&gt; from @/components/ui/calendar</p>
+              </div>
             </div>
           </div>
         </div>
@@ -115,14 +136,26 @@ const StyleGuide = () => {
         {/* Avatars & Badges */}
         <div className="mb-8">
           <h3 className="text-xl font-serif mb-4">Avatars & Badges</h3>
-          <div className="flex flex-wrap gap-4 items-center">
-            <Avatar>
-              <AvatarImage src="https://randomuser.me/api/portraits/women/17.jpg" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            <Badge>New</Badge>
-            <Badge variant="secondary">Premium</Badge>
-            <Badge variant="outline">Basic</Badge>
+          <div className="flex flex-wrap gap-8">
+            <div className="space-y-2">
+              <Avatar>
+                <AvatarImage src="https://randomuser.me/api/portraits/women/17.jpg" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <p className="text-sm font-mono text-primary/60">&lt;Avatar&gt; from @/components/ui/avatar</p>
+            </div>
+            <div className="space-y-2">
+              <Badge>New</Badge>
+              <p className="text-sm font-mono text-primary/60">&lt;Badge&gt; from @/components/ui/badge</p>
+            </div>
+            <div className="space-y-2">
+              <Badge variant="secondary">Premium</Badge>
+              <p className="text-sm font-mono text-primary/60">&lt;Badge variant="secondary"&gt;</p>
+            </div>
+            <div className="space-y-2">
+              <Badge variant="outline">Basic</Badge>
+              <p className="text-sm font-mono text-primary/60">&lt;Badge variant="outline"&gt;</p>
+            </div>
           </div>
         </div>
 
@@ -132,12 +165,15 @@ const StyleGuide = () => {
           <div className="grid md:grid-cols-3 gap-4">
             <div className="p-4 bg-white/80 backdrop-blur-md rounded-lg animate-float">
               Float Animation
+              <p className="text-sm font-mono text-primary/60">animate-float</p>
             </div>
             <div className="p-4 bg-white/80 backdrop-blur-md rounded-lg animate-fade-up">
               Fade Up Animation
+              <p className="text-sm font-mono text-primary/60">animate-fade-up</p>
             </div>
             <div className="p-4 bg-white/80 backdrop-blur-md rounded-lg animate-pulse-subtle">
               Pulse Animation
+              <p className="text-sm font-mono text-primary/60">animate-pulse-subtle</p>
             </div>
           </div>
         </div>
