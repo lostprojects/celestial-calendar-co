@@ -12,7 +12,6 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
   console.log("ChartResults received Western:", mainWestern);
 
   const formatPosition = (sign: string, deg: number, min: number) => {
-    console.log(`Formatting position for ${sign}:`, { deg, min });
     return `${sign} ${Math.floor(deg)}°${String(Math.floor(min)).padStart(2, "0")}′`;
   };
 
@@ -26,15 +25,15 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
           <div className="space-y-4 font-mono">
             <p className="flex items-baseline">
               <span className="w-20 font-medium">Sun:</span>
-              <span>{formatPosition(mainWestern.sun.sign, mainWestern.sun.degrees, mainWestern.sun.minutes)}</span>
+              <span>{formatPosition(mainWestern.sunSign, mainWestern.sunDeg, mainWestern.sunMin)}</span>
             </p>
             <p className="flex items-baseline">
               <span className="w-20 font-medium">Moon:</span>
-              <span>{formatPosition(mainWestern.moon.sign, mainWestern.moon.degrees, mainWestern.moon.minutes)}</span>
+              <span>{formatPosition(mainWestern.moonSign, mainWestern.moonDeg, mainWestern.moonMin)}</span>
             </p>
             <p className="flex items-baseline">
               <span className="w-20 font-medium">Rising:</span>
-              <span>{formatPosition(mainWestern.rising.sign, mainWestern.rising.degrees, mainWestern.rising.minutes)}</span>
+              <span>{formatPosition(mainWestern.risingSign, mainWestern.risingDeg, mainWestern.risingMin)}</span>
             </p>
           </div>
         </div>
