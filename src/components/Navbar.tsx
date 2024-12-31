@@ -28,8 +28,8 @@ export const Navbar = () => {
     <nav className="h-16 fixed top-0 left-0 right-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
       <div className="container h-full mx-auto px-4">
         <div className="flex h-full justify-between items-center">
-          <Link to="/" className="text-xl font-serif">
-            AstroChart
+          <Link to="/" className="text-xl font-serif text-white">
+            celestial
           </Link>
           <div className="flex items-center gap-4">
             {user ? (
