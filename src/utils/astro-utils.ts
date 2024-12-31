@@ -68,12 +68,12 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
   const epsRad = deg2rad(eps);
 
-  // Calculate sun position (keeping existing logic)
+  // Calculate sun position
   const sunLongRad = solar.apparentLongitude(jde);
   const sunLongDeg = rad2deg(sunLongRad);
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
   
-  // Calculate moon position (keeping existing logic)
+  // Calculate moon position
   const moonPos = getMoonPosition(jde);
   const moonDistance = moonPos.range;
   const parallax = calculateLunarParallax(moonDistance);
@@ -89,25 +89,32 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // NEW Rising Sign Calculation
-  // Get LST and adjust for longitude
-  let lstHours = lst + (data.longitude / 15);
-  // Convert to degrees and normalize
-  let lstDegrees = normalizeDegrees(lstHours * 15);
-  // Convert to radians
-  let lstRad = deg2rad(lstDegrees);
-  // Convert latitude to radians
-  let latRad = deg2rad(data.latitude);
+  // Get GST and normalize to [0, 24)
+  let gst = sidereal.apparent(jde);
+  gst = gst % 24;
+  if (gst < 0) gst += 24;
+
+  // Convert longitude to hours and calculate LST
+  let longitudeHours = data.longitude / 15;
+  let lst = gst + longitudeHours;
+
+  // Normalize LST to [0, 24)
+  lst = lst % 24;
+  if (lst < 0) lst += 24;
+
+  // Convert LST directly to radians
+  let lstRad = lst * (Math.PI / 12);
 
   // Calculate ascendant using spherical trig formula
+  let latRad = deg2rad(data.latitude);
   let tanAsc = -(Math.cos(lstRad)) / 
                (Math.sin(epsRad) * Math.tan(latRad) + 
                 Math.cos(epsRad) * Math.sin(lstRad));
                 
-  // Get initial ascendant value
+  // Get initial ascendant value in radians
   let ascRad = Math.atan(tanAsc);
   
-  // Correct quadrant
+  // Correct quadrant based on LST
   if (Math.cos(lstRad) < 0) {
     ascRad += Math.PI;
   } else if (Math.cos(lstRad) >= 0 && Math.sin(lstRad) < 0) {
@@ -116,14 +123,17 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   // Convert to degrees and normalize
   let ascendant = normalizeDegrees(rad2deg(ascRad));
-  
-  console.log("Ascendant calculation:", {
-    lstHours,
-    lstDegrees,
+
+  console.log("Rising sign calculation:", {
+    gst,
+    longitudeHours,
+    lst,
+    lstRad,
+    ascRad,
     ascendant
   });
 
-  // Get zodiac positions (keeping existing logic for sun and moon)
+  // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
   const moonPosition = getZodiacPosition(finalMoonLongitude);
   const ascPosition = getZodiacPosition(ascendant);
