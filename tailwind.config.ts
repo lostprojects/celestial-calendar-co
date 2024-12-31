@@ -33,7 +33,7 @@ export default {
         },
         accent: {
           palm: "#5E5F34",
-          lightpalm: "#6C783C",
+          lightpalm: "#7A8C44",  // Brightened from #6C783C while keeping the natural tone
           orange: "#D77145",
           lightorange: "#E0815D",
         },
