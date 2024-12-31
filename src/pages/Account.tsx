@@ -42,7 +42,7 @@ const Account = () => {
   }, [user, navigate, supabase, toast]);
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen bg-[#FCFAF7]">
+    <div className="container mx-auto px-4 pt-24 pb-8 min-h-screen bg-[#FCFAF7]">
       <div className="mb-8">
         <h1 className="text-3xl font-serif text-primary-dark">
           Welcome, {profileData.full_name || "Friend"}!
