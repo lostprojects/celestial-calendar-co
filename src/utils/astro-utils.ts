@@ -80,10 +80,15 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
 
+  // Calculate obliquity of the ecliptic first
+  const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
+  const epsRad = deg2rad(eps);
+
   // Calculate Sun's apparent longitude (tropical)
   const sunLongRad = solar.apparentLongitude(jde);
   console.log("Raw solar.apparentLongitude() result in radians:", sunLongRad);
-  const sunLongDeg = (sunLongRad * 180) / Math.PI;  // Fixed radians to degrees conversion
+  const sunLongDeg = (sunLongRad * 180) / Math.PI;
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
   console.log("Sun longitude (tropical):", normalizedSunLong);
   
@@ -99,11 +104,6 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongDeg = (moonLongRad * 180) / Math.PI;
   const normalizedMoonLong = normalizeDegrees(moonLongDeg);
   console.log("Final Moon longitude (tropical):", normalizedMoonLong);
-  
-  // Calculate obliquity of the ecliptic
-  const T = (jd - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const eps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
-  const epsRad = deg2rad(eps);
   
   // Calculate Local Sidereal Time and RAMC
   const lst = sidereal.apparent(jde);
