@@ -27,8 +27,8 @@ export const ComponentsSection = () => {
             <p className="text-sm font-mono text-primary/60">&lt;Button variant="secondary" className="bg-[#E0815D] hover:bg-[#E0815D]/90 text-white"&gt;</p>
           </div>
           <div className="space-y-2">
-            <Button variant="outline" className="text-white">Outline Button</Button>
-            <p className="text-sm font-mono text-primary/60">&lt;Button variant="outline" className="text-white"&gt;</p>
+            <Button variant="outline" className="border-primary-dark text-primary-dark hover:bg-primary-dark/10">Outline Button</Button>
+            <p className="text-sm font-mono text-primary/60">&lt;Button variant="outline" className="border-primary-dark text-primary-dark hover:bg-primary-dark/10"&gt;</p>
           </div>
           <div className="space-y-2">
             <Button variant="ghost" className="text-[#E0815D] hover:bg-[#E0815D]/10 hover:text-[#E0815D]/90">Ghost Button</Button>
