@@ -4,6 +4,7 @@ import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useToast } from "@/components/ui/use-toast";
 import { AccountSidebar } from "@/components/account/AccountSidebar";
 import { AccountDetails } from "@/components/account/AccountDetails";
+import { DashboardLayout } from "@/components/layouts/DashboardLayout";
 
 const Account = () => {
   const user = useUser();
@@ -58,14 +59,16 @@ const Account = () => {
   };
 
   return (
-    <div className="flex w-full">
-      <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="flex-1 p-8 overflow-auto">
-        <div className="max-w-4xl mx-auto">
-          {renderContent()}
-        </div>
-      </main>
-    </div>
+    <DashboardLayout>
+      <div className="flex w-full">
+        <AccountSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <main className="flex-1 p-8 overflow-auto">
+          <div className="max-w-4xl mx-auto">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
+    </DashboardLayout>
   );
 };
 
