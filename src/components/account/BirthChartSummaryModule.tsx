@@ -1,12 +1,77 @@
+import { useEffect, useState } from "react";
 import { Sun, Moon, ArrowUp } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@supabase/auth-helpers-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface BirthChartData {
+  sun_sign: string | null;
+  moon_sign: string | null;
+  ascendant_sign: string | null;
+}
 
 export const BirthChartSummaryModule = () => {
-  // This is placeholder data - in a real implementation, we'd fetch this from Supabase
-  const chartData = {
-    sunSign: "Libra",
-    moonSign: "Taurus",
-    risingSign: "Sagittarius"
-  };
+  const [chartData, setChartData] = useState<BirthChartData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const user = useUser();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchBirthChart = async () => {
+      if (!user) return;
+
+      try {
+        const { data: interpretations, error: interpretationsError } = await supabase
+          .from('interpretations')
+          .select('birth_chart_id')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (interpretationsError) throw interpretationsError;
+
+        if (interpretations && interpretations.length > 0) {
+          const { data: birthChart, error: birthChartError } = await supabase
+            .from('birth_charts')
+            .select('sun_sign, moon_sign, ascendant_sign')
+            .eq('id', interpretations[0].birth_chart_id)
+            .single();
+
+          if (birthChartError) throw birthChartError;
+          
+          setChartData(birthChart);
+        }
+      } catch (error) {
+        console.error('Error fetching birth chart:', error);
+        toast({
+          title: "Error",
+          description: "Could not load your birth chart data.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBirthChart();
+  }, [user, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
+        <h3 className="text-lg font-serif text-primary-dark mb-4">Loading your birth chart...</h3>
+      </div>
+    );
+  }
+
+  if (!chartData) {
+    return (
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
+        <h3 className="text-lg font-serif text-primary-dark mb-4">No birth chart found</h3>
+        <p className="text-sm text-primary/60">Generate your first birth chart to see it here!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
@@ -18,7 +83,7 @@ export const BirthChartSummaryModule = () => {
           </div>
           <div className="flex-1">
             <p className="text-sm text-primary/60 font-mono">Sun Sign</p>
-            <p className="text-base font-serif text-primary-dark">{chartData.sunSign}</p>
+            <p className="text-base font-serif text-primary-dark">{chartData.sun_sign || 'Unknown'}</p>
           </div>
         </div>
 
@@ -28,7 +93,7 @@ export const BirthChartSummaryModule = () => {
           </div>
           <div className="flex-1">
             <p className="text-sm text-primary/60 font-mono">Moon Sign</p>
-            <p className="text-base font-serif text-primary-dark">{chartData.moonSign}</p>
+            <p className="text-base font-serif text-primary-dark">{chartData.moon_sign || 'Unknown'}</p>
           </div>
         </div>
 
@@ -38,7 +103,7 @@ export const BirthChartSummaryModule = () => {
           </div>
           <div className="flex-1">
             <p className="text-sm text-primary/60 font-mono">Rising Sign</p>
-            <p className="text-base font-serif text-primary-dark">{chartData.risingSign}</p>
+            <p className="text-base font-serif text-primary-dark">{chartData.ascendant_sign || 'Unknown'}</p>
           </div>
         </div>
       </div>
