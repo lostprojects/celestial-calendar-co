@@ -1,14 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Configuration, OpenAIApi } from "https://esm.sh/openai@3.3.0";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
-// Initialize OpenAI with API key
-const openai = new OpenAIApi(
-  new Configuration({
-    apiKey: Deno.env.get('OPENAI_API_KEY')
-  })
-);
-
-// CORS headers for browser access
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -21,17 +13,22 @@ serve(async (req) => {
   }
 
   try {
-    // Parse request body
+    // Verify OpenAI API key exists
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAIApiKey) {
+      console.error('OpenAI API key not found');
+      throw new Error('OpenAI API key not configured');
+    }
+
+    // Parse and validate request body
     const { birthChart } = await req.json();
+    console.log('Received birth chart data:', birthChart);
     
     if (!birthChart) {
       throw new Error('Birth chart data is required');
     }
 
-    // Log input for debugging
-    console.log('Processing birth chart:', birthChart);
-
-    // Create prompt
+    // Construct the prompt
     const prompt = `Create an astrological reading based on:
 - Sun in ${birthChart.sunSign} at ${birthChart.sunDeg}°${birthChart.sunMin}'
 - Moon in ${birthChart.moonSign} at ${birthChart.moonDeg}°${birthChart.moonMin}'
@@ -45,28 +42,44 @@ Provide insights in these sections:
 
 Keep each section around 100 words. Be practical and positive.`;
 
-    // Make OpenAI request
-    const completion = await openai.createChatCompletion({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are a wise and insightful astrologer providing clear, actionable guidance."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 1000
+    console.log('Sending prompt to OpenAI:', prompt);
+
+    // Make OpenAI API request
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a wise and insightful astrologer providing clear, actionable guidance.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1000
+      }),
     });
 
-    // Extract and validate response
-    const interpretation = completion.data.choices[0]?.message?.content;
-    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    console.log('Received response from OpenAI:', data);
+
+    const interpretation = data.choices[0]?.message?.content;
     if (!interpretation) {
-      throw new Error('Failed to generate interpretation');
+      throw new Error('No interpretation generated');
     }
 
     // Return successful response
@@ -81,10 +94,7 @@ Keep each section around 100 words. Be practical and positive.`;
     );
 
   } catch (error) {
-    // Log error for debugging
     console.error('Edge function error:', error);
-
-    // Return error response
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Internal server error'
