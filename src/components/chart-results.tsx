@@ -16,21 +16,19 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
 
   if (!mainWestern) return null;
 
-  console.log("ChartResults received Western:", mainWestern);
-
   const formatPosition = (sign: string, deg: number, min: number) => {
     return `${Math.floor(deg)}°${String(Math.floor(min)).padStart(2, "0")}′`;
   };
 
   const descriptions = {
-    sun: "Your Sun sign represents your core identity and basic personality—the essence of who you are. It influences how you express yourself and your fundamental approach to life.",
-    moon: "Your Moon sign reflects your emotional nature, instincts, and subconscious patterns. It reveals how you process feelings and what makes you feel secure and comfortable.",
-    rising: "Your Rising sign (or Ascendant) is the mask you wear when meeting others. It influences your appearance and how you approach new situations and environments."
+    sun: "Your Sun sign represents your core identity and basic personality—the essence of who you are.",
+    moon: "Your Moon sign reflects your emotional nature, instincts, and subconscious patterns.",
+    rising: "Your Rising sign (or Ascendant) is the mask you wear when meeting others."
   };
 
   return (
-    <div className="w-screen">
-      <h2 className="text-4xl font-serif font-bold text-center text-primary-dark pt-4 pb-8">
+    <section className="py-24 text-center">
+      <h2 className="text-4xl font-serif font-bold text-primary-dark mb-12">
         Your Birth Signs
       </h2>
       
@@ -117,16 +115,18 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
         </div>
 
         {/* AI Interpretation Button */}
-        <div className="pt-12 text-center">
-          <Button
-            variant="ghost"
-            className="text-accent-orange hover:text-accent-orange/90 hover:bg-accent-orange/10 text-lg font-mono group relative"
-            onClick={() => setShowInterpretation(!showInterpretation)}
-          >
-            <span className="relative z-10">Get Your Personal Reading</span>
-            <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
-          </Button>
-        </div>
+        {interpretation && (
+          <div className="pt-12 text-center">
+            <Button
+              variant="ghost"
+              className="text-accent-orange hover:text-accent-orange/90 hover:bg-accent-orange/10 text-lg font-mono group relative"
+              onClick={() => setShowInterpretation(!showInterpretation)}
+            >
+              <span className="relative z-10">Get Your Personal Reading</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+            </Button>
+          </div>
+        )}
 
         {/* AI Interpretation Section */}
         {showInterpretation && interpretation && (
@@ -144,6 +144,6 @@ export function ChartResults({ mainWestern, interpretation }: ChartResultsProps)
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
