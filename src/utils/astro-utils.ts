@@ -33,40 +33,6 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
-function calculateAscendant(ramc: number, latitude: number, obliquity: number): number {
-  // Convert inputs to radians
-  const ramcRad = deg2rad(ramc);
-  const latRad = deg2rad(latitude);
-  const obliqRad = deg2rad(obliquity);
-  
-  // Calculate ascendant using spherical trigonometry
-  const tanAsc = -Math.cos(ramcRad) / 
-                 (Math.sin(obliqRad) * Math.tan(latRad) + 
-                  Math.cos(obliqRad) * Math.sin(ramcRad));
-  
-  let ascendant = rad2deg(Math.atan(tanAsc));
-  
-  // Adjust quadrant based on RAMC
-  if (ramc >= 180) {
-    ascendant += 180;
-  }
-  
-  return normalizeDegrees(ascendant);
-}
-
-function getZodiacPosition(longitude: number) {
-  const signIndex = Math.floor(longitude / 30);
-  const totalDegrees = longitude % 30;
-  const degrees = Math.floor(totalDegrees);
-  const minutes = Math.floor((totalDegrees - degrees) * 60);
-  
-  return {
-    sign: ZODIAC_SIGNS[signIndex],
-    degrees,
-    minutes
-  };
-}
-
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
@@ -111,7 +77,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonPos = getMoonPosition(jde);
   console.log("Raw Moon Position object:", moonPos);
   
-  const moonDistance = moonPos.distance;
+  const moonDistance = moonPos.range;
   const parallax = calculateLunarParallax(moonDistance);
   const geoLat = calculateGeocentricLatitude(data.latitude);
   
@@ -122,17 +88,13 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const deltaDec = -parallax * Math.sin(hourAngle) * Math.sin(geoLat);
   
   const topoMoonPos = {
-    ...moonPos,
     _ra: moonPos._ra + deltaRA,
     _dec: moonPos._dec + deltaDec
   };
   
   // Calculate Moon longitude in radians, normalize to [0, 2π)
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
-  const normalizedMoonLongRad = ((moonLongRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-  
-  // Convert to degrees only for final display/storage
-  const finalMoonLongitude = rad2deg(normalizedMoonLongRad);
+  const finalMoonLongitude = rad2deg(moonLongRad);
 
   const RAMC = lst * 15;
   const ascendant = calculateAscendant(RAMC, data.latitude, eps);
@@ -164,5 +126,39 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     moonMin: moonPosition.minutes,
     risingDeg: ascPosition.degrees,
     risingMin: ascPosition.minutes
+  };
+}
+
+function calculateAscendant(ramc: number, latitude: number, obliquity: number): number {
+  // Convert inputs to radians
+  const ramcRad = deg2rad(ramc);
+  const latRad = deg2rad(latitude);
+  const obliqRad = deg2rad(obliquity);
+  
+  // Calculate ascendant using spherical trigonometry
+  const tanAsc = -Math.cos(ramcRad) / 
+                 (Math.sin(obliqRad) * Math.tan(latRad) + 
+                  Math.cos(obliqRad) * Math.sin(ramcRad));
+  
+  let ascendant = rad2deg(Math.atan(tanAsc));
+  
+  // Adjust quadrant based on RAMC
+  if (ramc >= 180) {
+    ascendant += 180;
+  }
+  
+  return normalizeDegrees(ascendant);
+}
+
+function getZodiacPosition(longitude: number) {
+  const signIndex = Math.floor(longitude / 30);
+  const totalDegrees = longitude % 30;
+  const degrees = Math.floor(totalDegrees);
+  const minutes = Math.floor((totalDegrees - degrees) * 60);
+  
+  return {
+    sign: ZODIAC_SIGNS[signIndex],
+    degrees,
+    minutes
   };
 }
