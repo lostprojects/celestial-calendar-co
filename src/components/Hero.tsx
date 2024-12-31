@@ -26,16 +26,24 @@ export const Hero = () => {
 
   return (
     <section className="relative min-h-screen px-5 flex items-center">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: 'url("/lovable-uploads/d4f799ab-fbf7-48c8-a1be-2fb4d27c4664.png")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      />
+      {/* Background Image with Gradient Overlay */}
+      <div className="absolute inset-0 z-0">
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'url("/lovable-uploads/d4f799ab-fbf7-48c8-a1be-2fb4d27c4664.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to right, rgba(0, 16, 24, 0.75) 0%, rgba(0, 16, 24, 0) 100%)'
+          }}
+        />
+      </div>
       
       <div className="container mx-auto relative z-20">
         <div className="flex flex-col md:flex-row items-center gap-12">
