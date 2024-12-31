@@ -107,18 +107,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Get LST (Local Sidereal Time) in degrees
-  let lstDeg = (sidereal.apparent(jde) + data.longitude / 15) * 15;
-  lstDeg = normalizeDegrees(lstDeg);
+  // Get LST (Local Sidereal Time) following astronomia docs exactly
+  const gst = sidereal.apparent(jde); // Get Greenwich Sidereal Time in hours
+  const lst = gst + data.longitude/15; // Convert to Local Sidereal Time in hours
+  const lstDeg = lst * 15; // Convert hours to degrees
   const lstRad = deg2rad(lstDeg);
   
   console.log("LST calculation:", {
-    gstHours: sidereal.apparent(jde),
-    longitudeHours: data.longitude / 15,
-    combinedHours: sidereal.apparent(jde) + data.longitude / 15,
+    gstHours: gst,
+    longitudeHours: data.longitude/15,
+    lstHours: lst,
     lstDegrees: lstDeg,
-    lstRadians: lstRad,
-    cosineLST: Math.cos(lstRad)
+    lstRadians: lstRad
   });
   
   // Calculate Ascendant using atan2
