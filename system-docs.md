@@ -6,6 +6,24 @@ _Last Updated: March 19, 2024_
 
 ## File List
 
+### src/pages/Auth.tsx
+- **Purpose**: Handles user authentication using Supabase Auth UI
+- **Dependencies**: @supabase/auth-ui-react, @supabase/auth-ui-shared
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial implementation of authentication page
+  - Integration with Supabase Auth UI
+  - Automatic redirect when user is authenticated
+
+### src/pages/Account.tsx
+- **Purpose**: User account management page
+- **Dependencies**: @supabase/auth-helpers-react
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial implementation of account management
+  - Profile update functionality
+  - Sign out capability
+
 ### src/utils/astro-utils.ts
 - **Purpose**: Handles all astronomical calculations for birth chart positions
 - **Last Updated**: March 19, 2024
@@ -46,47 +64,17 @@ _Last Updated: March 19, 2024_
 - **Purpose**: Root component that handles routing and global app structure
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Initial setup with basic routing
-
-### src/components/BirthChartForm.tsx
-- **Purpose**: Form component for collecting birth chart data (name, date, time, location)
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Handles form submission to Supabase
-  - Integrates with LocationSearch for place selection
-  - Basic form validation
-
-### src/components/BirthChartSection.tsx
-- **Purpose**: Container component for the birth chart calculator section
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Layout and styling for the birth chart section
-  - Contains BirthChartForm component
-
-### src/components/Hero.tsx
-- **Purpose**: Landing page hero section with main call-to-action
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Responsive design implementation
-  - Social proof section
-  - Features list
-  - CTA button linking to form
-
-### src/components/LocationSearch.tsx
-- **Purpose**: Location search component using OpenCage API
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Integration with OpenCage geocoding
-  - Autocomplete suggestions
-  - Coordinates extraction
+  - Added authentication routes
+  - Integrated Supabase SessionContextProvider
+  - Added account management page route
 
 ### src/components/Navbar.tsx
 - **Purpose**: Navigation bar component
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Basic navigation structure
-  - Logo integration
-  - Responsive design
+  - Added authentication-aware navigation
+  - Account management link
+  - Dynamic sign in/out buttons
 
 ### src/integrations/supabase/client.ts
 - **Purpose**: Supabase client configuration
@@ -99,37 +87,18 @@ _Last Updated: March 19, 2024_
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
   - Types for birth_charts table
-
-### src/lib/utils.ts
-- **Purpose**: Utility functions for className merging
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Added className utility functions
-
-### src/pages/Index.tsx
-- **Purpose**: Main landing page component
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Layout structure with Hero and BirthChartSection
+  - Added profiles table types
 
 ### Database Schema
 #### birth_charts table
 - **Purpose**: Stores user birth chart information
 - **Last Updated**: March 19, 2024
-- **Columns**:
-  - id (uuid)
-  - created_at (timestamp)
-  - name (text)
-  - birth_date (date)
-  - birth_time (time)
-  - latitude (numeric)
-  - longitude (numeric)
-  - sun_sign (text, nullable)
-  - moon_sign (text, nullable)
-  - ascendant_sign (text, nullable)
 
-### Configuration Files
-- tailwind.config.ts
-- vite.config.ts
-- tsconfig.json
-- tsconfig.node.json
+#### profiles table
+- **Purpose**: Stores user profile information
+- **Last Updated**: March 19, 2024
+- **Columns**:
+  - id (uuid, references auth.users)
+  - username (text, unique)
+  - avatar_url (text)
+  - created_at (timestamp)
