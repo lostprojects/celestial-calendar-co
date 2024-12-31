@@ -47,6 +47,16 @@ function calculateJulianDay(utcDate: string, utcTime: string): number {
   return jdNoon + dayFraction;
 }
 
+function calculateMoonLongitude(moonPos: { _ra: number; _dec: number }, epsRad: number): number {
+  const { _ra: ra, _dec: dec } = moonPos;
+  const sinLambda = Math.sin(ra) * Math.cos(epsRad) + Math.tan(dec) * Math.sin(epsRad);
+  const cosLambda = Math.cos(ra);
+  const lambdaRad = Math.atan2(sinLambda, cosLambda);
+  const lambdaDeg = (lambdaRad * 180) / Math.PI;
+  const normalizedLambda = ((lambdaDeg % 360) + 360) % 360;
+  return normalizedLambda;
+}
+
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   // Parse input date/time
   const [year, month, day] = data.birthDate.split("-").map(Number);
@@ -96,24 +106,8 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonPos = getMoonPosition(jde);
   console.log("Raw Moon Position object:", moonPos);
   
-  // Classical formula for converting RA/Dec to ecliptic longitude
-  const tanLambda = (Math.sin(moonPos._ra) * Math.cos(epsRad) - Math.tan(moonPos._dec) * Math.sin(epsRad)) / Math.cos(moonPos._ra);
-  
-  // Corrected Moon Longitude Calculation
-  let moonLongRad = Math.atan(tanLambda);
-
-  // Quadrant adjustment in radians
-  if (Math.cos(moonPos._ra) < 0) {
-      moonLongRad += Math.PI;
-  }
-  if (moonLongRad < 0) {
-      moonLongRad += 2 * Math.PI;
-  }
-
-  // Convert to degrees
-  const moonLongDeg = (moonLongRad * 180) / Math.PI;
-
-  // No additional normalization needed
+  // Calculate Moon's longitude using the corrected formula
+  const moonLongDeg = calculateMoonLongitude(moonPos, epsRad);
   const finalMoonLongitude = moonLongDeg; // Already normalized
   
   // Calculate Local Sidereal Time and RAMC
