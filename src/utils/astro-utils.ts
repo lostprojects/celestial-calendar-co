@@ -31,25 +31,19 @@ const ZODIAC_SIGNS = [
 ];
 
 function calculateJulianDay(utcDate: string, utcTime: string): number {
-  // Basic validation
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(utcDate)) {
-    throw new Error("Invalid date format. Expected: YYYY-MM-DD");
-  }
-  if (!/^\d{1,2}:\d{2}$/.test(utcTime)) {
-    throw new Error("Invalid time format. Expected: HH:mm");
-  }
-
   const [year, month, day] = utcDate.split('-').map(Number);
   const [hour, minute] = utcTime.split(':').map(Number);
 
   // Get JD for noon on the given date
   const jdNoon = CalendarGregorianToJD(year, month, day);
-  
-  // Calculate fraction of day from noon
-  // Convert hours and minutes to decimal days, relative to noon
-  const dayFraction = (hour - 12 + minute / 60) / 24;
-  
-  // Add the fraction to noon JD
+
+  // Calculate hours since noon
+  const hoursSinceNoon = hour - 12 + minute / 60;
+
+  // If time is after noon, move to the next Julian epoch (+1 day)
+  const dayFraction = hoursSinceNoon >= 0 ? 1 + hoursSinceNoon / 24 : hoursSinceNoon / 24;
+
+  // Final JD
   return jdNoon + dayFraction;
 }
 
