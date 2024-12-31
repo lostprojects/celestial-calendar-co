@@ -33,7 +33,6 @@ export default {
           dark: "#001018",
         },
         accent: {
-          sage: "#D4DCCD",
           palm: "#5E5F34",
           lightpalm: "#6C783C",
         },
