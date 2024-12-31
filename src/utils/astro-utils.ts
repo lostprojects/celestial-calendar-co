@@ -59,24 +59,33 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log("Julian Day:", jd);
   console.log("Julian Ephemeris Day:", jde);
 
+  // Calculate mean obliquity and nutation
   const T = (jd - 2451545.0) / 36525;
   const meanEps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
   const meanEpsRad = deg2rad(meanEps);
   const { deltaObl } = nutation(T);
   const epsRad = meanEpsRad + deltaObl;
+  
+  console.log("Obliquity calculation:", {
+    T,
+    meanEps,
+    meanEpsRad,
+    deltaObl,
+    epsRad
+  });
 
-  // Sun calculation (keeping as is since it works)
+  // Sun calculation
   const sunLongRad = solar.apparentLongitude(jde);
   const sunLongDeg = rad2deg(sunLongRad);
   const normalizedSunLong = normalizeDegrees(sunLongDeg);
   
-  // Fixed Moon calculation - properly accessing _ra and _dec
+  // Moon calculation with proper property access
   const moonPos = getMoonPosition(jde);
   const moonLongRad = calculateMoonLongitude({ _ra: moonPos._ra, _dec: moonPos._dec }, epsRad);
   const moonLongDeg = rad2deg(moonLongRad);
   const normalizedMoonLong = normalizeDegrees(moonLongDeg);
 
-  // Fixed Rising sign calculation
+  // Rising sign calculation
   let ramc = sidereal.apparent(jde);
   ramc = ramc % 24;
   if (ramc < 0) ramc += 24;
