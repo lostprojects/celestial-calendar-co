@@ -45,10 +45,14 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lng: data.longitude
   });
 
-  // Calculate Julian Day directly from UTC
+  // Convert local time to UTC using moment-timezone
+  const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
+  const utcMoment = localMoment.utc();
+  
+  // Calculate Julian Day from UTC time
   const jd = calculateJulianDay(
-    data.birthDate,
-    data.birthTime
+    utcMoment.format("YYYY-MM-DD"),
+    utcMoment.format("HH:mm")
   );
   
   const deltaT = 67.2;
