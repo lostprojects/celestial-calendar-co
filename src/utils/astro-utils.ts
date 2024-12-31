@@ -42,20 +42,15 @@ function calculateJulianDay(utcDate: string, utcTime: string): number {
   const [year, month, day] = utcDate.split('-').map(Number);
   const [hour, minute] = utcTime.split(':').map(Number);
 
-  // Calculate the base Julian Day for the current date
-  const currentDayJD = CalendarGregorianToJD(year, month, day);
-
-  // Determine if the time is before or after noon
-  const hoursSinceNoon = hour + minute / 60 - 12;
-
-  if (hoursSinceNoon >= 0) {
-    // Time is after noon: Use current day's JD + fractional day
-    return currentDayJD + hoursSinceNoon / 24;
-  } else {
-    // Time is before noon: Use previous day's JD + fractional day
-    const previousDayJD = CalendarGregorianToJD(year, month, day - 1);
-    return previousDayJD + (hoursSinceNoon + 24) / 24;
-  }
+  // Get JD for noon on the given date
+  const jdNoon = CalendarGregorianToJD(year, month, day);
+  
+  // Calculate fraction of day from noon
+  // Convert hours and minutes to decimal days, relative to noon
+  const dayFraction = (hour - 12 + minute / 60) / 24;
+  
+  // Add the fraction to noon JD
+  return jdNoon + dayFraction;
 }
 
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
@@ -187,3 +182,4 @@ function deg2rad(degrees: number): number {
 function rad2deg(radians: number): number {
   return radians * 180 / Math.PI;
 }
+
