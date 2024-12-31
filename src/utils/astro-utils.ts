@@ -2,7 +2,7 @@ import moment from 'moment-timezone';
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as solar from "astronomia/solar";
 import * as sidereal from "astronomia/sidereal";
-import * as base from "astronomia/base";
+import { nutation } from "astronomia/nutation";
 import {
   ZODIAC_SIGNS,
   calculateJulianDay,
@@ -64,7 +64,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   // Calculate obliquity (mean + nutation = true)
   const T = (jd - 2451545.0) / 36525;
   const meanEps = 23.43929111 - (46.8150 * T + 0.00059 * T * T - 0.001813 * T * T * T) / 3600;
-  const { deltaEps } = base.nutation(T);
+  const { deltaEps } = nutation(T);
   const eps = meanEps + deltaEps;
   const epsRad = deg2rad(eps);
 
