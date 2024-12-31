@@ -7,6 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarHeader,
 } from "@/components/ui/sidebar";
 
 interface AccountSidebarProps {
@@ -23,7 +24,10 @@ export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) 
   ];
 
   return (
-    <Sidebar className="border-r border-border/10">
+    <Sidebar>
+      <SidebarHeader className="px-6 py-4">
+        <h1 className="text-xl font-serif">AstroChart</h1>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -33,7 +37,7 @@ export function AccountSidebar({ activeTab, onTabChange }: AccountSidebarProps) 
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.id)}
                     data-active={activeTab === item.id}
-                    className="font-mono text-base gap-4 px-4"
+                    className="w-full px-6 py-2 text-base gap-4"
                   >
                     <item.icon className="h-5 w-5" />
                     <span>{item.title}</span>

@@ -19,7 +19,6 @@ type ProfileFormValues = {
 export function AccountDetails({ userId, initialData }: { userId: string, initialData: ProfileFormValues }) {
   const supabase = useSupabaseClient();
   const { toast } = useToast();
-
   const form = useForm<ProfileFormValues>({
     defaultValues: initialData,
   });
@@ -47,13 +46,14 @@ export function AccountDetails({ userId, initialData }: { userId: string, initia
   };
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <h1 className="text-2xl font-serif mb-2">My Details</h1>
-        <p className="text-sm text-muted-foreground font-mono">
+    <div className="max-w-2xl">
+      <div className="mb-6">
+        <h1 className="text-3xl font-serif mb-2">My Details</h1>
+        <p className="text-sm text-muted-foreground">
           Update your personal information.
         </p>
       </div>
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
@@ -61,21 +61,22 @@ export function AccountDetails({ userId, initialData }: { userId: string, initia
             name="full_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-base font-mono">Full Name</FormLabel>
+                <FormLabel className="text-base">Full Name</FormLabel>
                 <FormControl>
                   <Input 
                     {...field} 
-                    placeholder="Enter your full name" 
-                    className="h-12 px-4 font-mono text-base"
+                    placeholder="Enter your full name"
+                    className="h-12"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          
           <Button 
             type="submit"
-            className="h-12 px-6 font-mono bg-primary hover:bg-primary/90"
+            className="h-12 px-6 bg-[#403E43] hover:bg-[#403E43]/90"
           >
             Save changes
           </Button>
