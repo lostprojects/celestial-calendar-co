@@ -36,8 +36,6 @@ export const Hero = () => {
           backgroundRepeat: 'no-repeat'
         }}
       />
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#FEC6A1]/90 via-[#FDE1D3]/85 to-transparent z-10" />
       
       <div className="container mx-auto px-4 py-24 relative z-20">
         <div className="flex flex-col md:flex-row items-center gap-12">
