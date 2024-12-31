@@ -84,15 +84,15 @@ export const Hero = () => {
               {/* Features List */}
               <div className="flex flex-col space-y-4 mb-8 animate-fade-up">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-background" />
+                  <Calendar className="w-4 h-4 text-accent-palm" strokeWidth={1.5} />
                   <span className="text-sm text-background">Google/Apple Calendar Sync</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-background" />
+                  <Lightbulb className="w-4 h-4 text-accent-palm" strokeWidth={1.5} />
                   <span className="text-sm text-background">Daily decision guidance</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-background" />
+                  <User className="w-4 h-4 text-accent-palm" strokeWidth={1.5} />
                   <span className="text-sm text-background">Personalized life phases</span>
                 </div>
               </div>
