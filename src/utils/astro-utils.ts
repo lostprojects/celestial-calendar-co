@@ -49,11 +49,31 @@ function calculateJulianDay(utcDate: string, utcTime: string): number {
 
 function calculateMoonLongitude(moonPos: { _ra: number; _dec: number }, epsRad: number): number {
   const { _ra: ra, _dec: dec } = moonPos;
+
+  // Compute sine and cosine of the ecliptic longitude
   const sinLambda = Math.sin(ra) * Math.cos(epsRad) + Math.tan(dec) * Math.sin(epsRad);
   const cosLambda = Math.cos(ra);
+
+  // Calculate the ecliptic longitude in radians
   const lambdaRad = Math.atan2(sinLambda, cosLambda);
+
+  // Convert to degrees
   const lambdaDeg = (lambdaRad * 180) / Math.PI;
+
+  // Normalize to [0, 360)
   const normalizedLambda = ((lambdaDeg % 360) + 360) % 360;
+
+  console.log("Moon calculation steps:", {
+    ra,
+    dec,
+    epsRad,
+    sinLambda,
+    cosLambda,
+    lambdaRad,
+    lambdaDeg,
+    normalizedLambda
+  });
+
   return normalizedLambda;
 }
 
