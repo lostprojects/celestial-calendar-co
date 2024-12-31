@@ -104,38 +104,6 @@ export const BirthChartSummaryModule = () => {
           </div>
         </div>
       </div>
-
-      {debugInfo && (
-        <div className="mt-6 bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
-          <h3 className="text-lg font-serif text-primary-dark mb-4">Debug Information</h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Field</TableHead>
-                <TableHead>Value</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>User ID</TableCell>
-                <TableCell>{user?.id || 'No user'}</TableCell>
-              </TableRow>
-              {debugInfo.birthCharts && (
-                <TableRow>
-                  <TableCell>Birth Charts Found</TableCell>
-                  <TableCell>{debugInfo.birthCharts.length}</TableCell>
-                </TableRow>
-              )}
-              {debugInfo.error && (
-                <TableRow>
-                  <TableCell>Error</TableCell>
-                  <TableCell>{JSON.stringify(debugInfo.error)}</TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
     </>
   );
 };
