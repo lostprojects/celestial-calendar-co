@@ -3,7 +3,7 @@ import { default as BirthChartForm } from "./birthchart-form";
 export const BirthChartSection = () => {
   return (
     <>
-      <section id="birth-chart-section" className="py-24 relative bg-background-sand">
+      <section id="birth-chart-section" className="py-24 relative">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center mb-12">
             <h2 className="text-4xl font-serif font-bold mb-6 text-primary-dark">
@@ -14,7 +14,9 @@ export const BirthChartSection = () => {
             </p>
           </div>
           
-          <BirthChartForm />
+          <div className="bg-background-sand rounded-3xl p-8 md:p-12">
+            <BirthChartForm />
+          </div>
         </div>
       </section>
     </>
