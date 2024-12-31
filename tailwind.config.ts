@@ -35,6 +35,7 @@ export default {
         accent: {
           palm: "#5E5F34",
           lightpalm: "#6C783C",
+          orange: "#D77145",
         },
       },
       fontFamily: {
