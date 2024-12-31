@@ -45,17 +45,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lng: data.longitude
   });
 
-  // Create moment in local timezone (Europe/London)
-  const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
-  console.log("Local time:", localMoment.format());
-  
-  // Convert to UTC
-  const utcMoment = localMoment.utc();
-  console.log("UTC time:", utcMoment.format());
-  
+  // Calculate Julian Day directly from UTC
   const jd = calculateJulianDay(
-    utcMoment.format('YYYY-MM-DD'),
-    utcMoment.format('H:mm')
+    data.birthDate,
+    data.birthTime
   );
   
   const deltaT = 67.2;
@@ -89,7 +82,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Get GST and normalize to [0, 24)
+  // Get GST using the same JDE and normalize to [0, 24)
   let greenwichSiderealTime = sidereal.apparent(jde);
   greenwichSiderealTime = greenwichSiderealTime % 24;
   if (greenwichSiderealTime < 0) greenwichSiderealTime += 24;
