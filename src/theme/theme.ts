@@ -63,16 +63,16 @@ export const defaultTheme: ThemeConfig = {
     lg: "1.5rem",
     xl: "2rem",
     "2xl": "3rem",
-    "hero-h1": "2.5rem",
-    "hero-h1-md": "3.25rem",
+    "hero-h1": "3.5rem",     // Updated from 2.5rem to 3.5rem (56px)
+    "hero-h1-md": "4rem",    // Updated from 3.25rem to 4rem (64px)
   },
   typography: {
     "hero-h1": {
-      fontSize: "2.5rem",
+      fontSize: "3.5rem",    // Updated to match spacing
       lineHeight: "1.1",
     },
     "hero-h1-md": {
-      fontSize: "3.25rem",
+      fontSize: "4rem",      // Updated to match spacing
       lineHeight: "1.1",
     },
     base: {
