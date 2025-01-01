@@ -83,6 +83,22 @@ export const GlossaryFunctions = () => {
       usage: ["Rising sign calculations"],
     },
     {
+      name: "generateCssVariables",
+      description: "Generates CSS variables from theme configuration",
+      location: "src/theme/theme.ts",
+      parameters: "theme: ThemeConfig",
+      returns: "string (CSS variable declarations)",
+      usage: ["Theme configuration", "Global CSS styling"],
+    },
+    {
+      name: "generateTailwindConfig",
+      description: "Generates Tailwind configuration from theme object",
+      location: "src/theme/theme.ts",
+      parameters: "theme: ThemeConfig",
+      returns: "object (Tailwind configuration object)",
+      usage: ["Tailwind configuration", "Theme integration"],
+    },
+    {
       name: "getAIInterpretation",
       description: "Generates AI interpretation of birth chart",
       location: "src/components/chart-results/ChartResults.tsx",

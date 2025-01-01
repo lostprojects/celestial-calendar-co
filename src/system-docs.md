@@ -16,6 +16,7 @@ _Last Updated: March 19, 2024_
   - Enhanced components and functions documentation
   - Added astronomia library function documentation
   - Added visual elements documentation
+  - Added theming system documentation
 
 ### src/components/glossary/*
 - **Purpose**: Individual glossary section components
@@ -29,6 +30,8 @@ _Last Updated: March 19, 2024_
   - Enhanced documentation coverage
   - Added astronomia library functions
   - Added visual components documentation
+  - Added theme configuration documentation
+  - Added CSS variable generation documentation
 
 ### src/components/chart-results/ChartResults.tsx
 - **Purpose**: Main component for displaying birth chart results and handling AI interpretation

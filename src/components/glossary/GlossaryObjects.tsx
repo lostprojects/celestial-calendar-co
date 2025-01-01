@@ -31,6 +31,30 @@ export const GlossaryObjects = () => {
       description: "Type definition for calculated chart results",
       usage: ["Chart calculations", "Display components"],
     },
+    {
+      name: "ThemeConfig",
+      type: "Interface",
+      location: "src/theme/theme.ts",
+      description: "Type definition for the app's theme configuration",
+      usage: [
+        "Theme generation",
+        "CSS variable generation",
+        "Tailwind configuration",
+        "Style guide customization"
+      ],
+    },
+    {
+      name: "defaultTheme",
+      type: "ThemeConfig",
+      location: "src/theme/theme.ts",
+      description: "Default theme configuration object with colors, fonts, spacing, and animations",
+      usage: [
+        "Base theme configuration",
+        "Style guide defaults",
+        "CSS variable generation",
+        "Tailwind configuration"
+      ],
+    },
   ];
 
   return (
