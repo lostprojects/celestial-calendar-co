@@ -148,12 +148,14 @@ export const ComponentsSection = () => {
                 modifiersStyles={{
                   hasEntry: {
                     backgroundColor: '#D77145',
+                    color: 'inherit',
                     borderRadius: '50%',
                     transform: 'scale(1.5)',
                   },
                   today: {
                     backgroundColor: '#F1F1F1',
                     borderRadius: '4px',
+                    color: 'inherit',
                   },
                 }}
               />

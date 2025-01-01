@@ -24,12 +24,14 @@ export const CalendarModule = () => {
   const modifiersStyles = {
     hasEntry: {
       backgroundColor: '#D77145',
+      color: 'inherit',  // Keep text color consistent
       borderRadius: '50%',
       transform: 'scale(1.5)',  // Makes the circle bigger than the text
     },
     today: {
       backgroundColor: '#F1F1F1',  // Light grey background for today
       borderRadius: '4px',
+      color: 'inherit',  // Keep text color consistent
     },
   };
 
