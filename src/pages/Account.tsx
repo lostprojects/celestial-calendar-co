@@ -44,12 +44,15 @@ const Account = () => {
     }
   }, [user, navigate, supabase, toast]);
 
+  // Get first name from full name
+  const firstName = profileData.full_name?.split(' ')[0] || 'Friend';
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FCFAF7]">
       <div className="container mx-auto px-4 pt-24 pb-8 flex-grow">
         <div className="mb-8">
           <h1 className="text-3xl font-serif text-primary-dark">
-            Welcome, {profileData.full_name || "Friend"}!
+            Welcome, {firstName}!
           </h1>
           <p className="text-primary/60 font-mono">Here is your celestial dashboard</p>
         </div>
@@ -85,6 +88,7 @@ const Account = () => {
         <div className="mt-12 bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg border border-[#403E43]/10">
           {user && <AccountDetails userId={user.id} initialData={profileData} />}
         </div>
+
       </div>
       <Footer />
     </div>
