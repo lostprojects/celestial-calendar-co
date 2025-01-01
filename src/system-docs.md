@@ -104,6 +104,18 @@ _Last Updated: March 19, 2024_
   - Integrated Supabase SessionContextProvider
   - Added account management page route
 
+### src/components/Footer.tsx
+- **Purpose**: Footer component for the application
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Added link to the new Glossary page
+
+### src/components/chart-results.tsx
+- **Purpose**: [DELETED] Legacy display component for birth chart calculation results
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Deleted file as it was replaced by the newer ChartResults component in chart-results/ChartResults.tsx
+
 ### src/components/Navbar.tsx
 - **Purpose**: Navigation bar component
 - **Last Updated**: March 19, 2024
@@ -156,3 +168,4 @@ _Last Updated: March 19, 2024_
   - Added typography preview
   - Added spacing visualization
   - Added animation preview
+
