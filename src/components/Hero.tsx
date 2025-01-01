@@ -52,7 +52,7 @@ export const Hero = () => {
             {/* Glass Card Background */}
             <div className="bg-primary-dark/45 backdrop-blur-md rounded-3xl p-8 shadow-xl">
               {/* Social Proof */}
-              <div className="flex items-center gap-3 mb-8 animate-fade-up">
+              <div className="flex items-center gap-3 mb-8">
                 <div className="flex -space-x-3">
                   <img 
                     src="https://randomuser.me/api/portraits/women/17.jpg" 
@@ -74,15 +74,15 @@ export const Hero = () => {
               </div>
 
               {/* Main Content */}
-              <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-background leading-[1.1] max-w-xl animate-fade-up">
+              <h1 className="text-[2.5rem] md:text-[3.25rem] font-serif font-medium mb-4 text-background leading-[1.1] max-w-xl">
                 Your Cosmic Blueprint for Success
               </h1>
-              <p className="text-base text-accent-lightpalm font-mono leading-relaxed max-w-lg mb-6 animate-fade-up">
+              <p className="text-base text-accent-lightpalm font-mono leading-relaxed max-w-lg mb-6">
                 Unlock the wisdom of the stars and make confident decisions in your career, relationships, and personal growth.
               </p>
               
               {/* Features List */}
-              <div className="flex flex-col space-y-3 mb-8 animate-fade-up">
+              <div className="flex flex-col space-y-3 mb-8">
                 <div className="flex items-center gap-2">
                   <Lightbulb className="w-4 h-4 text-[#E5D5C0]" strokeWidth={1.5} />
                   <span className="text-sm text-[#E5D5C0]">Daily decision guidance</span>
@@ -100,7 +100,7 @@ export const Hero = () => {
               {/* CTA */}
               <Button 
                 onClick={scrollToForm}
-                className="w-full bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group animate-fade-up"
+                className="w-full bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"
               >
                 <span className="relative z-10 font-bold">Receive Your Cosmic Blueprint</span>
                 <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/90 to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
