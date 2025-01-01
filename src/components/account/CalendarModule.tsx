@@ -29,8 +29,20 @@ export const CalendarModule = () => {
           mode="single"
           selected={date}
           onSelect={setDate}
-          className="rounded-xl [&_.rdp]:p-0 [&_.rdp-months]:gap-0 [&_.rdp-caption]:hidden [&_.rdp-cell]:p-0 [&_.rdp-button]:w-10 [&_.rdp-button]:h-10 [&_.rdp-button]:text-sm [&_.rdp-button]:font-normal [&_.rdp-nav]:hidden [&_.rdp-day_button]:relative [&_.rdp-day_button.hasEntry]:before:content-[''] [&_.rdp-day_button.hasEntry]:before:absolute [&_.rdp-day_button.hasEntry]:before:inset-0 [&_.rdp-day_button.hasEntry]:before:bg-accent-orange [&_.rdp-day_button.hasEntry]:before:rounded-full [&_.rdp-day_button.hasEntry]:before:transform [&_.rdp-day_button.hasEntry]:before:scale-[1.5] [&_.rdp-day_button.hasEntry]:before:-z-10 [&_.rdp-day_button.hasEntry]:text-white [&_.rdp-day_button.today]:bg-[#F1F1F1] [&_.rdp-day_button.today]:rounded-md [&_.rdp-head_cell]:font-mono [&_.rdp-head_cell]:text-xs [&_.rdp-head_cell]:text-primary/60 [&_.rdp-day]:font-serif"
+          className="rounded-xl"
           modifiers={modifiers}
+          modifiersStyles={{
+            today: {
+              backgroundColor: '#F1F1F1',
+              borderRadius: '4px',
+            },
+            hasEntry: {
+              backgroundColor: '#D77145',
+              color: 'white',
+              transform: 'scale(1.5)',
+              borderRadius: '50%',
+            },
+          }}
           showOutsideDays={false}
           disabled={(date) => date > new Date()}
         />
