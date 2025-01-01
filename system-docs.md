@@ -6,42 +6,51 @@ _Last Updated: March 19, 2024_
 
 ## File List
 
-### src/components/birthchart-form.tsx
-- **Purpose**: Main React component for birth chart form and database logic
-- **Dependencies**: @supabase/auth-helpers-react
+### src/pages/Glossary.tsx
+- **Purpose**: Displays comprehensive documentation of app components and functions
+- **Dependencies**: @/components/ui/tabs
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Added user_id to birth chart creation
-  - Enhanced error handling for database operations
-  - Added authentication integration
+  - Initial creation with tabbed interface
+  - Added comprehensive documentation sections
 
-### src/components/account/BirthChartSummaryModule.tsx
-- **Purpose**: Display component for user's most recent birth chart
-- **Dependencies**: @supabase/auth-helpers-react, lucide-react
+### src/components/glossary/*
+- **Purpose**: Individual glossary section components
+- **Dependencies**: @/components/ui/table
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Updated to fetch birth charts directly using user_id
-  - Added debug information display
-  - Enhanced error handling and loading states
+  - Created GlossaryFunctions.tsx
+  - Created GlossaryComponents.tsx
+  - Created GlossaryObjects.tsx
+  - Created GlossaryResources.tsx
 
-### src/utils/astro-utils.ts
-- **Purpose**: Handles all astronomical calculations for birth chart positions
+### src/components/glossary/GlossaryFunctions.tsx
+- **Purpose**: Displays a table of all functions used in the application
+- **Dependencies**: @/components/ui/table
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Initial file creation with purpose documentation
+  - Initial creation with function documentation
 
-### src/components/chart-results.tsx
-- **Purpose**: Display component for birth chart calculation results
+### src/components/glossary/GlossaryComponents.tsx
+- **Purpose**: Displays a table of all UI components used in the application
+- **Dependencies**: @/components/ui/table
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Added AI interpretation display section
-  - Enhanced typography for interpretation text
+  - Initial creation with component documentation
 
-### src/main.tsx
-- **Purpose**: Entry point of the application, renders the root App component
+### src/components/glossary/GlossaryObjects.tsx
+- **Purpose**: Displays a table of all reusable objects and constants
+- **Dependencies**: @/components/ui/table
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Initial setup with React root rendering
+  - Initial creation with object documentation
+
+### src/components/glossary/GlossaryResources.tsx
+- **Purpose**: Displays a table of all external resources and APIs used
+- **Dependencies**: @/components/ui/table
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial creation with resource documentation
 
 ### src/App.tsx
 - **Purpose**: Root component that handles routing and global app structure
@@ -50,34 +59,10 @@ _Last Updated: March 19, 2024_
   - Added authentication routes
   - Integrated Supabase SessionContextProvider
   - Added account management page route
+  - Added route for the new Glossary page
 
-### src/components/Navbar.tsx
-- **Purpose**: Navigation bar component
+### src/components/Footer.tsx
+- **Purpose**: Footer component for the application
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Added authentication-aware navigation
-  - Account management link
-  - Dynamic sign in/out buttons
-
-### src/integrations/supabase/client.ts
-- **Purpose**: Supabase client configuration
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Initial Supabase client setup
-
-### Database Schema
-#### birth_charts table
-- **Purpose**: Stores user birth chart information
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Added user_id column with foreign key to profiles
-  - Added RLS policies for user data access
-
-#### profiles table
-- **Purpose**: Stores user profile information
-- **Last Updated**: March 19, 2024
-- **Columns**:
-  - id (uuid, references auth.users)
-  - username (text, unique)
-  - avatar_url (text)
-  - created_at (timestamp)
+  - Added link to the new Glossary page

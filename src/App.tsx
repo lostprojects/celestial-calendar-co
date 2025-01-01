@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Account from "./pages/Account";
 import StyleGuide from "./pages/StyleGuide";
+import Glossary from "./pages/Glossary";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/style-guide" element={<StyleGuide />} />
+                <Route path="/glossary" element={<Glossary />} />
               </Routes>
             </main>
             <Footer />
