@@ -13,10 +13,17 @@ export type ThemeConfig = {
   spacing: {
     [key: string]: string;
   };
+  typography: {
+    [key: string]: {
+      fontSize: string;
+      lineHeight: string;
+    };
+  };
   animations: {
     [key: string]: {
       keyframes: { [key: string]: { [key: string]: string } };
       duration: string;
+      timing: string;
     };
   };
 };
@@ -30,6 +37,7 @@ export const defaultTheme: ThemeConfig = {
     primary: {
       DEFAULT: "#403E43",
       dark: "#001018",
+      light: "#E5D5C0",
     },
     accent: {
       palm: "#5E5F34",
@@ -55,21 +63,51 @@ export const defaultTheme: ThemeConfig = {
     lg: "1.5rem",
     xl: "2rem",
     "2xl": "3rem",
+    "hero-h1": "2.5rem",
+    "hero-h1-md": "3.25rem",
+  },
+  typography: {
+    "hero-h1": {
+      fontSize: "2.5rem",
+      lineHeight: "1.1",
+    },
+    "hero-h1-md": {
+      fontSize: "3.25rem",
+      lineHeight: "1.1",
+    },
+    base: {
+      fontSize: "1rem",
+      lineHeight: "1.5",
+    },
+    sm: {
+      fontSize: "0.875rem",
+      lineHeight: "1.25",
+    },
   },
   animations: {
     float: {
       keyframes: {
         "0%, 100%": { transform: "translateY(0)" },
-        "50%": { transform: "translateY(-10px)" },
+        "50%": { transform: "translateY(-5px)" },
       },
       duration: "6s",
+      timing: "ease-in-out",
     },
     "fade-up": {
       keyframes: {
         "0%": { opacity: "0", transform: "translateY(10px)" },
         "100%": { opacity: "1", transform: "translateY(0)" },
       },
-      duration: "0.5s",
+      duration: "0.3s",
+      timing: "ease-out",
+    },
+    "pulse-subtle": {
+      keyframes: {
+        "0%, 100%": { opacity: "0.8" },
+        "50%": { opacity: "0.9" },
+      },
+      duration: "4s",
+      timing: "ease-in-out",
     },
   },
 };

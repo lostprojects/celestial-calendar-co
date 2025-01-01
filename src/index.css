@@ -10,6 +10,7 @@
     --color-background-sand: #F5E6D3;
     --color-primary: #403E43;
     --color-primary-dark: #001018;
+    --color-primary-light: #E5D5C0;
     --color-accent-palm: #5E5F34;
     --color-accent-lightpalm: #7A8C44;
     --color-accent-orange: #D77145;
@@ -22,6 +23,8 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
+    --spacing-hero-h1: 2.5rem;
+    --spacing-hero-h1-md: 3.25rem;
   }
 
   body {
