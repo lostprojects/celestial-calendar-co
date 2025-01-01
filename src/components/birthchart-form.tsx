@@ -6,8 +6,11 @@ import {
   BirthChartData,
   BirthChartResult,
 } from "@/utils/astro-utils";
+import { ChartResults } from "./chart-results/ChartResults";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { LocationSearch } from "./LocationSearch";
 import { useToast } from "@/hooks/use-toast";
-import { StyledBirthChartForm } from "./birth-chart/StyledBirthChartForm";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -91,20 +94,68 @@ export default function BirthChartForm() {
   }
 
   return (
-    <StyledBirthChartForm
-      formData={formData}
-      onDateChange={(date) => {
-        console.log("Birth date changed:", date);
-        setFormData({ ...formData, birthDate: date });
-      }}
-      onTimeChange={(time) => {
-        console.log("Birth time changed:", time);
-        setFormData({ ...formData, birthTime: time });
-      }}
-      onLocationSelect={handleLocationSelect}
-      onSubmit={handleSubmit}
-      isCalculating={isCalculating}
-      westernResults={westernResults}
-    />
+    <>
+      <div className="birth-chart-form">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-primary-dark">Birth Date</label>
+            <Input
+              type="date"
+              className="w-full"
+              value={formData.birthDate}
+              onChange={(e) => {
+                console.log("Birth date changed:", e.target.value);
+                setFormData({ ...formData, birthDate: e.target.value });
+              }}
+              required
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-primary-dark">Birth Time</label>
+            <Input
+              type="time"
+              className="w-full"
+              value={formData.birthTime}
+              onChange={(e) => {
+                console.log("Birth time changed:", e.target.value);
+                setFormData({ ...formData, birthTime: e.target.value });
+              }}
+              required
+            />
+          </div>
+          
+          <LocationSearch onLocationSelect={handleLocationSelect} />
+          
+          <Button 
+            type="submit" 
+            className="w-full bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-base rounded-lg font-mono relative overflow-hidden group"
+            disabled={isCalculating}
+          >
+            {isCalculating ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
+                <span className="relative z-10 font-bold">Calculating...</span>
+              </div>
+            ) : (
+              <span className="relative z-10 font-bold">Calculate Birth Chart</span>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/90 to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </Button>
+        </form>
+      </div>
+
+      {westernResults && (
+        <section className="bg-background w-full py-16 mt-24">
+          <div className="container mx-auto px-4">
+            <ChartResults
+              mainWestern={westernResults}
+              mainVedic={null}
+              interpretation={undefined}
+            />
+          </div>
+        </section>
+      )}
+    </>
   );
 }
