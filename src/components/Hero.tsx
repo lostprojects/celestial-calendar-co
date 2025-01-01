@@ -47,7 +47,7 @@ export const Hero = () => {
       <div className="container mx-auto relative z-20">
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="flex-1 text-left max-w-[50%]">
-            <div className="bg-primary-dark/45 backdrop-blur-md rounded-3xl p-1 shadow-xl">
+            <div className="bg-primary-dark/45 backdrop-blur-md rounded-3xl p-8 shadow-xl">
               <div className="flex items-center gap-3 mb-8">
                 <div className="flex -space-x-3">
                   <img 
