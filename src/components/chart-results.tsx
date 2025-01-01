@@ -31,6 +31,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
   const getAIInterpretation = async () => {
     setIsLoading(true);
     try {
+      console.log("Starting AI interpretation request...");
       const { data: interpretationData, error: interpretationError } = await supabase.functions.invoke('generate-astro-advice', {
         body: { 
           birthChart: mainWestern,
@@ -46,15 +47,22 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
       });
 
       if (interpretationError) throw interpretationError;
-
       console.log("AI Interpretation received:", interpretationData);
+
+      if (!interpretationData?.interpretation) {
+        throw new Error('No interpretation generated');
+      }
+
+      setCurrentInterpretation(interpretationData.interpretation);
       
       if (user && birthData) {
-        // First, insert the birth chart with all required fields
+        console.log("Attempting to save birth chart and interpretation...");
+        
+        // First, insert the birth chart
         const { data: birthChartData, error: birthChartError } = await supabase
           .from('birth_charts')
           .insert({
-            name: birthData.birthPlace.split(',')[0], // Use first part of location as name
+            name: birthData.birthPlace.split(',')[0],
             birth_date: birthData.birthDate,
             birth_time: birthData.birthTime,
             birth_place: birthData.birthPlace,
@@ -96,9 +104,10 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
         }
 
         console.log("Interpretation stored successfully");
+      } else {
+        console.log("User not logged in or birth data missing, skipping database save");
       }
 
-      setCurrentInterpretation(interpretationData.interpretation);
     } catch (error) {
       console.error("Error getting or storing AI interpretation:", error);
       toast({
