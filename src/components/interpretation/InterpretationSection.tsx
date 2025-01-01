@@ -1,5 +1,5 @@
 import React from "react";
-import { Star, Heart, Gem, Leaf, Sparkles, Loader2 } from "lucide-react";
+import { Star, Heart, Gem, Leaf, Sparkles } from "lucide-react";
 import { useUser } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -62,7 +62,6 @@ export function InterpretationSection({ interpretation }: InterpretationSectionP
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 to-transparent backdrop-blur-[1px] rounded-3xl" />
               <div className="relative z-20 text-center max-w-lg p-6 mt-[-4rem]">
-                <Loader2 className="w-8 h-8 text-accent-orange animate-spin mx-auto mb-6" />
                 <h4 className="text-2xl font-serif font-bold text-primary-dark mb-4">
                   Unlock Your Complete Cosmic Journey
                 </h4>

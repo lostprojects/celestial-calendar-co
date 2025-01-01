@@ -143,7 +143,14 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
         />
 
         {/* AI Interpretation Section */}
-        {currentInterpretation && (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center p-8 space-y-4">
+            <Loader2 className="w-8 h-8 text-accent-orange animate-spin" />
+            <p className="text-primary-dark/60 font-mono text-sm">
+              Generating your cosmic reading...
+            </p>
+          </div>
+        ) : currentInterpretation && (
           <InterpretationSection interpretation={currentInterpretation} />
         )}
       </div>
