@@ -20,32 +20,18 @@ export const CalendarModule = () => {
     today: (date: Date) => date.toDateString() === new Date().toDateString(),
   };
 
-  // Custom modifier styles
-  const modifiersStyles = {
-    hasEntry: {
-      position: 'relative',
-      color: 'inherit',
-    },
-    today: {
-      backgroundColor: '#F1F1F1',
-      borderRadius: '4px',
-      color: 'inherit',
-    },
-  };
-
   return (
     <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
       <div className="flex flex-row items-center justify-between pb-4">
         <h3 className="text-lg font-serif text-accent-lightpalm font-bold">{currentMonth}</h3>
       </div>
-      <div className="bg-white rounded-xl [&_.rdp-day_button]:relative [&_.rdp-day_button.hasEntry]:before:content-[''] [&_.rdp-day_button.hasEntry]:before:absolute [&_.rdp-day_button.hasEntry]:before:inset-0 [&_.rdp-day_button.hasEntry]:before:bg-[#D77145] [&_.rdp-day_button.hasEntry]:before:rounded-full [&_.rdp-day_button.hasEntry]:before:transform [&_.rdp-day_button.hasEntry]:before:scale-[1.5] [&_.rdp-day_button.hasEntry]:before:-z-10">
+      <div className="bg-white rounded-xl [&_.rdp-day_button]:relative [&_.rdp-day_button.hasEntry]:before:content-[''] [&_.rdp-day_button.hasEntry]:before:absolute [&_.rdp-day_button.hasEntry]:before:inset-0 [&_.rdp-day_button.hasEntry]:before:bg-[#D77145] [&_.rdp-day_button.hasEntry]:before:rounded-full [&_.rdp-day_button.hasEntry]:before:transform [&_.rdp-day_button.hasEntry]:before:scale-[1.5] [&_.rdp-day_button.hasEntry]:before:-z-10 [&_.rdp-day_button.today]:bg-[#F1F1F1] [&_.rdp-day_button.today]:rounded-md">
         <Calendar
           mode="single"
           selected={date}
           onSelect={setDate}
           className="rounded-xl"
           modifiers={modifiers}
-          modifiersStyles={modifiersStyles}
         />
       </div>
     </div>
