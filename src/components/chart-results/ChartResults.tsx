@@ -72,6 +72,12 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
           await saveInterpretation(birthChartId, user.id, interpretationData.interpretation);
           
           console.log("[ChartResults] Successfully saved both birth chart and interpretation");
+          
+          toast({
+            title: "Success",
+            description: "Your birth chart and interpretation have been saved!",
+            variant: "default",
+          });
         } catch (dbError) {
           console.error("[ChartResults] Database operation failed:", dbError);
           throw new Error(`Failed to save chart or interpretation: ${dbError.message}`);
@@ -164,3 +170,4 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
       </div>
     </div>
   );
+}
