@@ -46,7 +46,11 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
         }
       });
 
-      if (interpretationError) throw interpretationError;
+      if (interpretationError) {
+        console.error("Error from generate-astro-advice:", interpretationError);
+        throw interpretationError;
+      }
+
       console.log("AI Interpretation received:", interpretationData);
 
       if (!interpretationData?.interpretation) {
@@ -58,61 +62,74 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
       if (user && birthData) {
         console.log("Attempting to save birth chart and interpretation...");
         
-        // First, insert the birth chart
-        const { data: birthChartData, error: birthChartError } = await supabase
-          .from('birth_charts')
-          .insert({
-            name: birthData.birthPlace.split(',')[0],
-            birth_date: birthData.birthDate,
-            birth_time: birthData.birthTime,
-            birth_place: birthData.birthPlace,
-            latitude: birthData.latitude,
-            longitude: birthData.longitude,
-            sun_sign: mainWestern.sunSign,
-            moon_sign: mainWestern.moonSign,
-            ascendant_sign: mainWestern.risingSign,
-            sun_degrees: mainWestern.sunDeg,
-            sun_minutes: mainWestern.sunMin,
-            moon_degrees: mainWestern.moonDeg,
-            moon_minutes: mainWestern.moonMin,
-            ascendant_degrees: mainWestern.risingDeg,
-            ascendant_minutes: mainWestern.risingMin,
-            user_id: user.id
-          })
-          .select('id')
-          .single();
+        try {
+          // First, insert the birth chart
+          const { data: birthChartData, error: birthChartError } = await supabase
+            .from('birth_charts')
+            .insert({
+              name: birthData.birthPlace.split(',')[0],
+              birth_date: birthData.birthDate,
+              birth_time: birthData.birthTime,
+              birth_place: birthData.birthPlace,
+              latitude: birthData.latitude,
+              longitude: birthData.longitude,
+              sun_sign: mainWestern.sunSign,
+              moon_sign: mainWestern.moonSign,
+              ascendant_sign: mainWestern.risingSign,
+              sun_degrees: mainWestern.sunDeg,
+              sun_minutes: mainWestern.sunMin,
+              moon_degrees: mainWestern.moonDeg,
+              moon_minutes: mainWestern.moonMin,
+              ascendant_degrees: mainWestern.risingDeg,
+              ascendant_minutes: mainWestern.risingMin,
+              user_id: user.id
+            })
+            .select('id')
+            .single();
 
-        if (birthChartError) {
-          console.error("Error storing birth chart:", birthChartError);
-          throw birthChartError;
+          if (birthChartError) {
+            console.error("Error storing birth chart:", birthChartError);
+            throw birthChartError;
+          }
+
+          console.log("Birth chart stored successfully:", birthChartData);
+
+          if (!birthChartData?.id) {
+            throw new Error('Birth chart ID not returned after insertion');
+          }
+
+          // Then, store the interpretation
+          const { data: interpretationInsertData, error: interpretationStoreError } = await supabase
+            .from('interpretations')
+            .insert({
+              birth_chart_id: birthChartData.id,
+              content: interpretationData.interpretation,
+              user_id: user.id
+            })
+            .select('id')
+            .single();
+
+          if (interpretationStoreError) {
+            console.error("Error storing interpretation:", interpretationStoreError);
+            throw interpretationStoreError;
+          }
+
+          console.log("Interpretation stored successfully:", interpretationInsertData);
+
+        } catch (dbError) {
+          console.error("Database operation failed:", dbError);
+          throw new Error(`Failed to save chart or interpretation: ${dbError.message}`);
         }
 
-        console.log("Birth chart stored successfully:", birthChartData);
-
-        // Then, store the interpretation
-        const { error: interpretationStoreError } = await supabase
-          .from('interpretations')
-          .insert({
-            birth_chart_id: birthChartData.id,
-            content: interpretationData.interpretation,
-            user_id: user.id
-          });
-
-        if (interpretationStoreError) {
-          console.error("Error storing interpretation:", interpretationStoreError);
-          throw interpretationStoreError;
-        }
-
-        console.log("Interpretation stored successfully");
       } else {
         console.log("User not logged in or birth data missing, skipping database save");
       }
 
     } catch (error) {
-      console.error("Error getting or storing AI interpretation:", error);
+      console.error("Error in getAIInterpretation:", error);
       toast({
         title: "Error",
-        description: "Failed to generate or save your personal reading. Please try again.",
+        description: error.message || "Failed to generate or save your personal reading. Please try again.",
         variant: "destructive",
       });
     } finally {
