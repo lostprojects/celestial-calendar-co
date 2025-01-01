@@ -3,7 +3,7 @@ import { Sun, Moon, ArrowUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@supabase/auth-helpers-react";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 interface BirthChartData {
   sun_sign: string | null;
@@ -69,9 +69,15 @@ export const BirthChartSummaryModule = () => {
 
   const formatBirthDateTime = () => {
     if (!chartData?.birth_date || !chartData?.birth_time) return null;
-    const date = format(new Date(chartData.birth_date), "MMMM d, yyyy");
-    const time = format(new Date(`2000-01-01T${chartData.birth_time}`), "h:mm a");
-    return `${date} at ${time}`;
+    
+    // Parse the date and time separately to avoid timezone issues
+    const date = format(parseISO(chartData.birth_date), "MMMM d, yyyy");
+    const time = chartData.birth_time.slice(0, 5); // Get HH:mm format
+    
+    // Get only the first part of the location (before the first comma)
+    const location = chartData.birth_place ? chartData.birth_place.split(',')[0].trim() : '';
+    
+    return `${date} at ${time} in ${location}`;
   };
 
   return (
@@ -79,7 +85,7 @@ export const BirthChartSummaryModule = () => {
       <h3 className="text-lg font-serif text-accent-lightpalm font-bold mb-1">Your Birth Chart</h3>
       {chartData && (
         <p className="text-sm text-primary/60 font-mono mb-4">
-          Born: {formatBirthDateTime()} {chartData.birth_place ? `in ${chartData.birth_place}` : ''}
+          Born: {formatBirthDateTime()}
         </p>
       )}
       <div className="space-y-3">
