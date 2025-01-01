@@ -75,9 +75,9 @@ export const defaultTheme: ThemeConfig = {
 };
 
 export const generateCssVariables = (theme: ThemeConfig): string => {
-  let css = ":root {\n";
+  let css = '';
   
-  // Colors
+  // Generate color variables
   Object.entries(theme.colors).forEach(([colorName, shades]) => {
     Object.entries(shades).forEach(([shade, value]) => {
       const variableName = shade === "DEFAULT" 
@@ -87,17 +87,16 @@ export const generateCssVariables = (theme: ThemeConfig): string => {
     });
   });
 
-  // Fonts
+  // Generate font variables
   Object.entries(theme.fonts).forEach(([fontName, font]) => {
     css += `  --font-${fontName}: "${font.family}", ${fontName === 'mono' ? 'monospace' : 'serif'};\n`;
   });
 
-  // Spacing
+  // Generate spacing variables
   Object.entries(theme.spacing).forEach(([size, value]) => {
     css += `  --spacing-${size}: ${value};\n`;
   });
 
-  css += "}\n";
   return css;
 };
 

@@ -6,8 +6,22 @@
 
 @layer base {
   :root {
-    /* Generated CSS Variables will be injected here */
-    ${generateCssVariables(defaultTheme)}
+    --color-background: #FCFAF7;
+    --color-background-sand: #F5E6D3;
+    --color-primary: #403E43;
+    --color-primary-dark: #001018;
+    --color-accent-palm: #5E5F34;
+    --color-accent-lightpalm: #7A8C44;
+    --color-accent-orange: #D77145;
+    --color-accent-lightorange: #E0815D;
+    --font-mono: "IBM Plex Mono", monospace;
+    --font-serif: "Playfair Display", serif;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
   }
 
   body {
