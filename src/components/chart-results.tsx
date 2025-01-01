@@ -43,40 +43,54 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
       console.log("AI Interpretation received:", interpretationData);
       
       if (user) {
-        // Get the current user's ID
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
-        
-        // Find the matching birth chart
-        const { data: birthChartData } = await supabase
+        // First, insert the birth chart
+        const { data: birthChartData, error: birthChartError } = await supabase
           .from('birth_charts')
+          .insert([{
+            sun_sign: mainWestern.sunSign,
+            moon_sign: mainWestern.moonSign,
+            ascendant_sign: mainWestern.risingSign,
+            sun_degrees: mainWestern.sunDeg,
+            sun_minutes: mainWestern.sunMin,
+            moon_degrees: mainWestern.moonDeg,
+            moon_minutes: mainWestern.moonMin,
+            ascendant_degrees: mainWestern.risingDeg,
+            ascendant_minutes: mainWestern.risingMin,
+            user_id: user.id
+          }])
           .select('id')
-          .eq('sun_sign', mainWestern.sunSign)
-          .eq('moon_sign', mainWestern.moonSign)
-          .eq('ascendant_sign', mainWestern.risingSign)
           .single();
 
-        if (birthChartData) {
-          // Store the interpretation
-          const { error: storageError } = await supabase
-            .from('interpretations')
-            .insert([{
-              birth_chart_id: birthChartData.id,
-              content: interpretationData.interpretation,
-              user_id: currentUser?.id || null
-            }]);
-
-          if (storageError) {
-            console.error("Error storing interpretation:", storageError);
-          }
+        if (birthChartError) {
+          console.error("Error storing birth chart:", birthChartError);
+          throw birthChartError;
         }
+
+        console.log("Birth chart stored successfully:", birthChartData);
+
+        // Then, store the interpretation
+        const { error: interpretationStoreError } = await supabase
+          .from('interpretations')
+          .insert([{
+            birth_chart_id: birthChartData.id,
+            content: interpretationData.interpretation,
+            user_id: user.id
+          }]);
+
+        if (interpretationStoreError) {
+          console.error("Error storing interpretation:", interpretationStoreError);
+          throw interpretationStoreError;
+        }
+
+        console.log("Interpretation stored successfully");
       }
 
       setCurrentInterpretation(interpretationData.interpretation);
     } catch (error) {
-      console.error("Error getting AI interpretation:", error);
+      console.error("Error getting or storing AI interpretation:", error);
       toast({
         title: "Error",
-        description: "Failed to generate your personal reading. Please try again.",
+        description: "Failed to generate or save your personal reading. Please try again.",
         variant: "destructive",
       });
     } finally {
