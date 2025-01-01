@@ -29,7 +29,7 @@ export const CalendarModule = () => {
           mode="single"
           selected={date}
           onSelect={setDate}
-          className="rounded-xl"
+          className="rounded-xl [&_.rdp-months]:gap-0 [&_.rdp-cell]:p-0 [&_.rdp-button]:w-10 [&_.rdp-button]:h-10 [&_.rdp-button]:font-serif [&_.rdp-head_cell]:font-mono [&_.rdp-head_cell]:text-xs [&_.rdp-head_cell]:text-primary/60"
           modifiers={modifiers}
           modifiersStyles={{
             today: {
@@ -37,7 +37,7 @@ export const CalendarModule = () => {
               borderRadius: '4px',
             },
             hasEntry: {
-              backgroundColor: '#D77145',
+              backgroundColor: '#FEC6A1',
               color: 'white',
               transform: 'scale(1.5)',
               borderRadius: '50%',
