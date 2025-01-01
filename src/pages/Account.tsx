@@ -8,7 +8,6 @@ import { UpcomingReadingsModule } from "@/components/account/UpcomingReadingsMod
 import { RecentChartsModule } from "@/components/account/RecentChartsModule";
 import { CommunityModule } from "@/components/account/CommunityModule";
 import { BirthChartSummaryModule } from "@/components/account/BirthChartSummaryModule";
-import { Footer } from "@/components/Footer";
 import { Calendar } from "lucide-react";
 
 const Account = () => {
@@ -90,7 +89,6 @@ const Account = () => {
         </div>
 
       </div>
-      <Footer />
     </div>
   );
 };
