@@ -6,7 +6,7 @@ import {
   BirthChartData,
   BirthChartResult,
 } from "@/utils/astro-utils";
-import { ChartResults } from "./chart-results";
+import { ChartResults } from "./chart-results/ChartResults";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
