@@ -53,7 +53,6 @@ const Account = () => {
           <h1 className="text-3xl font-serif text-primary-dark">
             Welcome, {firstName}!
           </h1>
-          <p className="text-primary/60 font-mono">Here is your celestial dashboard</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
