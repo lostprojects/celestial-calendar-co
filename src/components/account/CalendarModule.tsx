@@ -37,9 +37,9 @@ export const CalendarModule = () => {
               borderRadius: '4px',
             },
             hasEntry: {
-              backgroundColor: '#FEC6A1',
+              backgroundColor: '#D77145',
               color: 'white',
-              transform: 'scale(1.5)',
+              transform: 'scale(1.1)',
               borderRadius: '50%',
             },
           }}
