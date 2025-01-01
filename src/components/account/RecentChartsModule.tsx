@@ -9,7 +9,7 @@ export const RecentChartsModule = () => {
 
   return (
     <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
-      <h3 className="text-lg font-serif text-primary-dark mb-4">Recent Charts</h3>
+      <h3 className="text-lg font-serif text-accent-lightpalm font-bold mb-4">Recent Charts</h3>
       <div className="space-y-4">
         {charts.map((chart, index) => (
           <div key={index} className="flex items-center gap-3 bg-white/50 p-3 rounded-xl">

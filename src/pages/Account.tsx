@@ -59,7 +59,7 @@ const Account = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="space-y-6">
             <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
-              <h3 className="text-lg font-serif text-primary-dark mb-4">Upcoming Transits</h3>
+              <h3 className="text-lg font-serif text-accent-lightpalm font-bold mb-4">Upcoming Transits</h3>
               <div className="flex items-center gap-3 bg-white/50 p-3 rounded-xl">
                 <div className="flex h-8 w-8 items-center justify-center bg-accent-orange/10 rounded-full">
                   <Calendar className="h-5 w-5 text-accent-orange" />
