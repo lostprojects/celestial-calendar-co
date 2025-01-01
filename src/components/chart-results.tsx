@@ -11,10 +11,17 @@ import { useUser } from "@supabase/auth-helpers-react";
 interface ChartResultsProps {
   mainWestern: BirthChartResult | null;
   mainVedic: BirthChartResult | null;
+  birthData?: {
+    birthDate: string;
+    birthTime: string;
+    birthPlace: string;
+    latitude: number;
+    longitude: number;
+  };
   interpretation?: string;
 }
 
-export function ChartResults({ mainWestern }: ChartResultsProps) {
+export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResultsProps) {
   const [openSection, setOpenSection] = useState<string | null>(null);
   const [currentInterpretation, setCurrentInterpretation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,11 +49,17 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
 
       console.log("AI Interpretation received:", interpretationData);
       
-      if (user) {
-        // First, insert the birth chart
+      if (user && birthData) {
+        // First, insert the birth chart with all required fields
         const { data: birthChartData, error: birthChartError } = await supabase
           .from('birth_charts')
-          .insert([{
+          .insert({
+            name: birthData.birthPlace.split(',')[0], // Use first part of location as name
+            birth_date: birthData.birthDate,
+            birth_time: birthData.birthTime,
+            birth_place: birthData.birthPlace,
+            latitude: birthData.latitude,
+            longitude: birthData.longitude,
             sun_sign: mainWestern.sunSign,
             moon_sign: mainWestern.moonSign,
             ascendant_sign: mainWestern.risingSign,
@@ -57,7 +70,7 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
             ascendant_degrees: mainWestern.risingDeg,
             ascendant_minutes: mainWestern.risingMin,
             user_id: user.id
-          }])
+          })
           .select('id')
           .single();
 
@@ -71,11 +84,11 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
         // Then, store the interpretation
         const { error: interpretationStoreError } = await supabase
           .from('interpretations')
-          .insert([{
+          .insert({
             birth_chart_id: birthChartData.id,
             content: interpretationData.interpretation,
             user_id: user.id
-          }]);
+          });
 
         if (interpretationStoreError) {
           console.error("Error storing interpretation:", interpretationStoreError);
