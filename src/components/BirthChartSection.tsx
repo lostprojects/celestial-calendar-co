@@ -7,7 +7,7 @@ export const BirthChartSection = () => {
         <h2 className="text-4xl font-serif font-bold mb-6 text-primary-dark text-center">
           Calculate Your Birth Chart
         </h2>
-        <p className="text-lg text-primary-dark/80 font-mono mb-12">
+        <p className="text-lg text-primary-dark/80 font-mono mb-12 text-center">
           Enter your birth details to receive your personalized celestial roadmap
         </p>
         <BirthChartForm />
