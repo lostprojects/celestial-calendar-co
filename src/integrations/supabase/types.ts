@@ -122,24 +122,68 @@ export type Database = {
           },
         ]
       }
+      myers_briggs_results: {
+        Row: {
+          created_at: string
+          extroversion_score: number
+          id: string
+          intuition_score: number
+          judging_score: number
+          personality_type: string
+          thinking_score: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          extroversion_score: number
+          id?: string
+          intuition_score: number
+          judging_score: number
+          personality_type: string
+          thinking_score: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          extroversion_score?: number
+          id?: string
+          intuition_score?: number
+          judging_score?: number
+          personality_type?: string
+          thinking_score?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "myers_briggs_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
+          is_subscribed: boolean | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          is_subscribed?: boolean | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          is_subscribed?: boolean | null
         }
         Relationships: []
       }

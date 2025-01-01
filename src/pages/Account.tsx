@@ -8,6 +8,7 @@ import { UpcomingReadingsModule } from "@/components/account/UpcomingReadingsMod
 import { RecentChartsModule } from "@/components/account/RecentChartsModule";
 import { CommunityModule } from "@/components/account/CommunityModule";
 import { BirthChartSummaryModule } from "@/components/account/BirthChartSummaryModule";
+import { ProgressListCard } from "@/components/account/ProgressListCard";
 import { Calendar } from "lucide-react";
 
 const Account = () => {
@@ -69,6 +70,7 @@ const Account = () => {
                 </div>
               </div>
             </div>
+            <ProgressListCard />
             <CalendarModule />
             <UpcomingReadingsModule />
           </div>
