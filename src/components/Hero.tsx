@@ -69,7 +69,7 @@ export const Hero = () => {
                 <span className="text-sm font-mono text-accent-lightorange">Join 10,000+ seekers of cosmic wisdom</span>
               </div>
 
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-medium mb-4 text-background leading-tight max-w-xl">
+              <h1 className="text-3xl md:text-[2.5rem] lg:text-[3.25rem] font-serif font-medium mb-4 text-background leading-tight max-w-xl">
                 Your Cosmic Blueprint for Success
               </h1>
               <p className="text-base text-accent-lightpalm font-mono leading-relaxed max-w-lg mb-6">
