@@ -23,15 +23,13 @@ export const CalendarModule = () => {
   // Custom modifier styles
   const modifiersStyles = {
     hasEntry: {
-      backgroundColor: '#D77145',
-      color: 'inherit',  // Keep text color consistent
-      borderRadius: '50%',
-      transform: 'scale(1.5)',  // Makes the circle bigger than the text
+      position: 'relative',
+      color: 'inherit',
     },
     today: {
-      backgroundColor: '#F1F1F1',  // Light grey background for today
+      backgroundColor: '#F1F1F1',
       borderRadius: '4px',
-      color: 'inherit',  // Keep text color consistent
+      color: 'inherit',
     },
   };
 
@@ -40,7 +38,7 @@ export const CalendarModule = () => {
       <div className="flex flex-row items-center justify-between pb-4">
         <h3 className="text-lg font-serif text-accent-lightpalm font-bold">{currentMonth}</h3>
       </div>
-      <div className="bg-white rounded-xl">
+      <div className="bg-white rounded-xl [&_.rdp-day_button]:relative [&_.rdp-day_button.hasEntry]:before:content-[''] [&_.rdp-day_button.hasEntry]:before:absolute [&_.rdp-day_button.hasEntry]:before:inset-0 [&_.rdp-day_button.hasEntry]:before:bg-[#D77145] [&_.rdp-day_button.hasEntry]:before:rounded-full [&_.rdp-day_button.hasEntry]:before:transform [&_.rdp-day_button.hasEntry]:before:scale-[1.5] [&_.rdp-day_button.hasEntry]:before:-z-10">
         <Calendar
           mode="single"
           selected={date}
