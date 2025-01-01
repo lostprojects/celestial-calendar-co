@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BirthChartResult } from "@/utils/astro-utils";
 import { Sun, Moon, Sunrise, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BirthSignCard } from "./birth-signs/BirthSignCard";
 import { InterpretationSection } from "./interpretation/InterpretationSection";
+import { useUser } from "@supabase/auth-helpers-react";
 
 interface ChartResultsProps {
   mainWestern: BirthChartResult | null;
@@ -18,16 +19,7 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
   const [currentInterpretation, setCurrentInterpretation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-
-  if (!mainWestern) return null;
-
-  console.log("ChartResults received Western:", mainWestern);
-
-  const descriptions = {
-    sun: "Your Sun sign represents your core identity and basic personality—the essence of who you are. It influences how you express yourself and your fundamental approach to life.",
-    moon: "Your Moon sign reflects your emotional nature, instincts, and subconscious patterns. It reveals how you process feelings and what makes you feel secure and comfortable.",
-    rising: "Your Rising sign (or Ascendant) is the mask you wear when meeting others. It influences your appearance and how you approach new situations and environments."
-  };
+  const user = useUser();
 
   const getAIInterpretation = async () => {
     setIsLoading(true);
@@ -50,30 +42,32 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
 
       console.log("AI Interpretation received:", interpretationData);
       
-      // Get the current user's ID
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      // Find the matching birth chart
-      const { data: birthChartData } = await supabase
-        .from('birth_charts')
-        .select('id')
-        .eq('sun_sign', mainWestern.sunSign)
-        .eq('moon_sign', mainWestern.moonSign)
-        .eq('ascendant_sign', mainWestern.risingSign)
-        .single();
+      if (user) {
+        // Get the current user's ID
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        
+        // Find the matching birth chart
+        const { data: birthChartData } = await supabase
+          .from('birth_charts')
+          .select('id')
+          .eq('sun_sign', mainWestern.sunSign)
+          .eq('moon_sign', mainWestern.moonSign)
+          .eq('ascendant_sign', mainWestern.risingSign)
+          .single();
 
-      if (birthChartData) {
-        // Store the interpretation
-        const { error: storageError } = await supabase
-          .from('interpretations')
-          .insert([{
-            birth_chart_id: birthChartData.id,
-            content: interpretationData.interpretation,
-            user_id: user?.id || null
-          }]);
+        if (birthChartData) {
+          // Store the interpretation
+          const { error: storageError } = await supabase
+            .from('interpretations')
+            .insert([{
+              birth_chart_id: birthChartData.id,
+              content: interpretationData.interpretation,
+              user_id: currentUser?.id || null
+            }]);
 
-        if (storageError) {
-          console.error("Error storing interpretation:", storageError);
+          if (storageError) {
+            console.error("Error storing interpretation:", storageError);
+          }
         }
       }
 
@@ -88,6 +82,21 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Automatically generate interpretation when birth chart is available
+  useEffect(() => {
+    if (mainWestern && !currentInterpretation && !isLoading) {
+      getAIInterpretation();
+    }
+  }, [mainWestern]);
+
+  if (!mainWestern) return null;
+
+  const descriptions = {
+    sun: "Your Sun sign represents your core identity and basic personality—the essence of who you are. It influences how you express yourself and your fundamental approach to life.",
+    moon: "Your Moon sign reflects your emotional nature, instincts, and subconscious patterns. It reveals how you process feelings and what makes you feel secure and comfortable.",
+    rising: "Your Rising sign (or Ascendant) is the mask you wear when meeting others. It influences your appearance and how you approach new situations and environments."
   };
 
   return (
@@ -132,30 +141,6 @@ export function ChartResults({ mainWestern }: ChartResultsProps) {
           description={descriptions.rising}
           onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
         />
-
-        {/* AI Interpretation Button */}
-        <div className="pt-12 text-center">
-          <Button
-            onClick={getAIInterpretation}
-            disabled={isLoading}
-            className="bg-accent-orange hover:bg-accent-orange/90 text-white px-8 py-6 text-lg rounded-lg font-mono relative overflow-hidden group animate-float"
-          >
-            <span className="relative z-10 font-bold flex items-center gap-2">
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Generating Your Reading...
-                </>
-              ) : (
-                <>
-                  Get Your Personal Reading
-                  <Sparkles className="w-5 h-5" />
-                </>
-              )}
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-t from-accent-orange/90 to-accent-orange opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </Button>
-        </div>
 
         {/* AI Interpretation Section */}
         {currentInterpretation && (
