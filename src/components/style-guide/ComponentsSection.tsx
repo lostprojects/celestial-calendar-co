@@ -139,8 +139,27 @@ export const ComponentsSection = () => {
               <p className="text-sm font-mono text-primary/60">&lt;Input className="bg-white"&gt; from @/components/ui/input</p>
             </div>
             <div className="space-y-2">
-              <Calendar mode="single" />
-              <p className="text-sm font-mono text-primary/60">&lt;Calendar mode="single"&gt; from @/components/ui/calendar</p>
+              <Calendar 
+                mode="single"
+                modifiers={{
+                  hasEntry: (date: Date) => date.toDateString() === new Date(2025, 0, 15).toDateString(),
+                  today: (date: Date) => date.toDateString() === new Date().toDateString(),
+                }}
+                modifiersStyles={{
+                  hasEntry: {
+                    backgroundColor: '#D77145',
+                    borderRadius: '50%',
+                    transform: 'scale(1.5)',
+                  },
+                  today: {
+                    backgroundColor: '#F1F1F1',
+                    borderRadius: '4px',
+                  },
+                }}
+              />
+              <p className="text-sm font-mono text-primary/60">
+                &lt;Calendar mode="single" with custom modifiers for entries and today indicator&gt;
+              </p>
             </div>
           </div>
         </div>

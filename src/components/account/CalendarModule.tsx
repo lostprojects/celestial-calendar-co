@@ -25,7 +25,7 @@ export const CalendarModule = () => {
     hasEntry: {
       backgroundColor: '#D77145',
       borderRadius: '50%',
-      transform: 'scale(0.35)',  // Makes the circle smaller
+      transform: 'scale(1.5)',  // Makes the circle bigger than the text
     },
     today: {
       backgroundColor: '#F1F1F1',  // Light grey background for today
