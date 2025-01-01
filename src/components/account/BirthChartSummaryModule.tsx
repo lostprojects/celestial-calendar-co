@@ -3,11 +3,15 @@ import { Sun, Moon, ArrowUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@supabase/auth-helpers-react";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 interface BirthChartData {
   sun_sign: string | null;
   moon_sign: string | null;
   ascendant_sign: string | null;
+  birth_date: string;
+  birth_time: string;
+  birth_place: string | null;
 }
 
 export const BirthChartSummaryModule = () => {
@@ -27,7 +31,7 @@ export const BirthChartSummaryModule = () => {
         console.log("Fetching birth charts for user:", user.id);
         const { data: birthCharts, error: birthChartsError } = await supabase
           .from('birth_charts')
-          .select('sun_sign, moon_sign, ascendant_sign')
+          .select('sun_sign, moon_sign, ascendant_sign, birth_date, birth_time, birth_place')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1);
@@ -63,9 +67,21 @@ export const BirthChartSummaryModule = () => {
     );
   }
 
+  const formatBirthDateTime = () => {
+    if (!chartData?.birth_date || !chartData?.birth_time) return null;
+    const date = format(new Date(chartData.birth_date), "MMMM d, yyyy");
+    const time = format(new Date(`2000-01-01T${chartData.birth_time}`), "h:mm a");
+    return `${date} at ${time}`;
+  };
+
   return (
     <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
-      <h3 className="text-lg font-serif text-accent-lightpalm font-bold mb-4">Your Birth Chart</h3>
+      <h3 className="text-lg font-serif text-accent-lightpalm font-bold mb-1">Your Birth Chart</h3>
+      {chartData && (
+        <p className="text-sm text-primary/60 font-mono mb-4">
+          Born: {formatBirthDateTime()} {chartData.birth_place ? `in ${chartData.birth_place}` : ''}
+        </p>
+      )}
       <div className="space-y-3">
         <div className="flex items-center gap-3 bg-white/50 p-3 rounded-xl">
           <div className="flex h-8 w-8 items-center justify-center bg-accent-orange/10 rounded-full">
