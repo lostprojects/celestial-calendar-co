@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BirthChartResult } from "@/utils/astro-utils";
-import { Sun, Moon, Sunrise, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { BirthSignCard } from "../birth-signs/BirthSignCard";
-import { InterpretationSection } from "../interpretation/InterpretationSection";
 import { useUser } from "@supabase/auth-helpers-react";
 import { supabase } from "@/integrations/supabase/client";
 import { saveBirthChart, saveInterpretation } from "./SaveChartLogic";
+import { StyledChartResults } from "./StyledChartResults";
 
 interface ChartResultsProps {
   mainWestern: BirthChartResult | null;
@@ -114,60 +112,13 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
   };
 
   return (
-    <div className="w-screen">
-      <h2 className="text-4xl font-serif font-bold text-center text-primary-dark pt-4 pb-8">
-        Your Birth Signs
-      </h2>
-      
-      <div className="max-w-2xl mx-auto px-4 space-y-6">
-        <BirthSignCard
-          sign={mainWestern.sunSign}
-          position={`${mainWestern.sunDeg}°${mainWestern.sunMin}'`}
-          icon={Sun}
-          iconColor="accent-orange"
-          degrees={mainWestern.sunDeg}
-          minutes={mainWestern.sunMin}
-          isOpen={openSection === 'sun'}
-          description={descriptions.sun}
-          onClick={() => setOpenSection(openSection === 'sun' ? null : 'sun')}
-        />
-
-        <BirthSignCard
-          sign={mainWestern.moonSign}
-          position={`${mainWestern.moonDeg}°${mainWestern.moonMin}'`}
-          icon={Moon}
-          iconColor="accent-lightpalm"
-          degrees={mainWestern.moonDeg}
-          minutes={mainWestern.moonMin}
-          isOpen={openSection === 'moon'}
-          description={descriptions.moon}
-          onClick={() => setOpenSection(openSection === 'moon' ? null : 'moon')}
-        />
-
-        <BirthSignCard
-          sign={mainWestern.risingSign}
-          position={`${mainWestern.risingDeg}°${mainWestern.risingMin}'`}
-          icon={Sunrise}
-          iconColor="accent-palm"
-          degrees={mainWestern.risingDeg}
-          minutes={mainWestern.risingMin}
-          isOpen={openSection === 'rising'}
-          description={descriptions.rising}
-          onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
-        />
-
-        {/* AI Interpretation Section */}
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center p-8 space-y-4">
-            <Loader2 className="w-8 h-8 text-accent-orange animate-spin" />
-            <p className="text-primary-dark/60 font-mono text-sm">
-              Generating your cosmic reading...
-            </p>
-          </div>
-        ) : currentInterpretation && (
-          <InterpretationSection interpretation={currentInterpretation} />
-        )}
-      </div>
-    </div>
+    <StyledChartResults
+      mainWestern={mainWestern}
+      openSection={openSection}
+      setOpenSection={setOpenSection}
+      isLoading={isLoading}
+      currentInterpretation={currentInterpretation}
+      descriptions={descriptions}
+    />
   );
 }

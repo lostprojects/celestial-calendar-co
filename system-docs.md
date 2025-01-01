@@ -66,3 +66,22 @@ _Last Updated: March 19, 2024_
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
   - Added link to the new Glossary page
+
+### src/components/chart-results/ChartResults.tsx
+- **Purpose**: Handles all logic for birth chart results display and interpretation
+- **Dependencies**: @/utils/astro-utils, @/hooks/use-toast, @supabase/auth-helpers-react
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Separated presentation logic into StyledChartResults.tsx
+  - Maintained all existing functionality and logging
+  - Restructured for better separation of concerns
+
+### src/components/chart-results/StyledChartResults.tsx
+- **Purpose**: Handles presentation layer for birth chart results
+- **Dependencies**: @/utils/astro-utils, lucide-react, ../birth-signs/BirthSignCard
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial creation
+  - Extracted presentation logic from ChartResults.tsx
+  - Implemented pure presentational component
+
