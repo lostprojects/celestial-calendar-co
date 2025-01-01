@@ -1,5 +1,4 @@
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 
 export const CalendarModule = () => {
@@ -25,13 +24,15 @@ export const CalendarModule = () => {
       <div className="flex flex-row items-center justify-between pb-4">
         <h3 className="text-lg font-serif text-accent-lightpalm font-bold">{currentMonth}</h3>
       </div>
-      <div className="bg-white rounded-xl [&_.rdp-day_button]:relative [&_.rdp-day_button.hasEntry]:before:content-[''] [&_.rdp-day_button.hasEntry]:before:absolute [&_.rdp-day_button.hasEntry]:before:inset-0 [&_.rdp-day_button.hasEntry]:before:bg-[#D77145] [&_.rdp-day_button.hasEntry]:before:rounded-full [&_.rdp-day_button.hasEntry]:before:transform [&_.rdp-day_button.hasEntry]:before:scale-[1.5] [&_.rdp-day_button.hasEntry]:before:-z-10 [&_.rdp-day_button.today]:bg-[#F1F1F1] [&_.rdp-day_button.today]:rounded-md">
+      <div className="bg-white rounded-xl">
         <Calendar
           mode="single"
           selected={date}
           onSelect={setDate}
-          className="rounded-xl"
+          className="rounded-xl [&_.rdp]:p-0 [&_.rdp-months]:gap-0 [&_.rdp-caption]:hidden [&_.rdp-cell]:p-0 [&_.rdp-button]:w-10 [&_.rdp-button]:h-10 [&_.rdp-button]:text-sm [&_.rdp-button]:font-normal [&_.rdp-nav]:hidden [&_.rdp-day_button]:relative [&_.rdp-day_button.hasEntry]:before:content-[''] [&_.rdp-day_button.hasEntry]:before:absolute [&_.rdp-day_button.hasEntry]:before:inset-0 [&_.rdp-day_button.hasEntry]:before:bg-accent-orange [&_.rdp-day_button.hasEntry]:before:rounded-full [&_.rdp-day_button.hasEntry]:before:transform [&_.rdp-day_button.hasEntry]:before:scale-[1.5] [&_.rdp-day_button.hasEntry]:before:-z-10 [&_.rdp-day_button.hasEntry]:text-white [&_.rdp-day_button.today]:bg-[#F1F1F1] [&_.rdp-day_button.today]:rounded-md [&_.rdp-head_cell]:font-mono [&_.rdp-head_cell]:text-xs [&_.rdp-head_cell]:text-primary/60 [&_.rdp-day]:font-serif"
           modifiers={modifiers}
+          showOutsideDays={false}
+          disabled={(date) => date > new Date()}
         />
       </div>
     </div>
