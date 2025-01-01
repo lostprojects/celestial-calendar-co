@@ -25,7 +25,7 @@ export function InterpretationSection({ interpretation }: InterpretationSectionP
             <div className="h-px flex-1 bg-accent-orange/20" />
           </div>
           
-          <div className={`prose prose-slate max-w-none space-y-12 ${!user ? 'blur-sm' : ''}`}>
+          <div className={`prose prose-slate max-w-none space-y-12 relative ${!user ? 'blur-none' : ''}`}>
             {interpretation.split('\n\n').map((section, index) => {
               const icons = [
                 <Star key="star" className="w-8 h-8 text-accent-orange" />,
@@ -60,8 +60,13 @@ export function InterpretationSection({ interpretation }: InterpretationSectionP
 
           {!user && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 to-transparent backdrop-blur-[1px] rounded-3xl" />
-              <div className="relative z-20 text-center max-w-lg p-6 mt-[-4rem]">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/60 to-white/95 backdrop-blur-[2px] rounded-3xl" 
+                   style={{
+                     maskImage: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.5) 15%, rgba(0, 0, 0, 1) 30%)',
+                     WebkitMaskImage: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.5) 15%, rgba(0, 0, 0, 1) 30%)'
+                   }}
+              />
+              <div className="relative z-20 text-center max-w-lg p-6 mt-[-12rem]">
                 <h4 className="text-2xl font-serif font-bold text-primary-dark mb-4">
                   Unlock Your Complete Cosmic Journey
                 </h4>
