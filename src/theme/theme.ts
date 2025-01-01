@@ -63,17 +63,17 @@ export const defaultTheme: ThemeConfig = {
     lg: "1.5rem",
     xl: "2rem",
     "2xl": "3rem",
-    "hero-h1": "3.5rem",     // Updated from 2.5rem to 3.5rem (56px)
-    "hero-h1-md": "4rem",    // Updated from 3.25rem to 4rem (64px)
+    "hero-h1": "2.5rem",      /* Updated from 3.5rem to match theme */
+    "hero-h1-md": "3.25rem",  /* Updated from 4rem to match theme */
   },
   typography: {
     "hero-h1": {
-      fontSize: "3.5rem",    // Updated to match spacing
-      lineHeight: "1.1",
+      fontSize: "2.5rem",    /* Updated to match spacing */
+      lineHeight: "1.15",    /* Updated for tighter spacing */
     },
     "hero-h1-md": {
-      fontSize: "4rem",      // Updated to match spacing
-      lineHeight: "1.1",
+      fontSize: "3.25rem",   /* Updated to match spacing */
+      lineHeight: "1.15",    /* Updated for tighter spacing */
     },
     base: {
       fontSize: "1rem",
