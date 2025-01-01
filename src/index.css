@@ -27,7 +27,6 @@
 
 .birth-chart-form {
   @apply bg-white/80 backdrop-blur-md rounded-2xl p-8 shadow-lg max-w-md mx-auto;
-  border: 1px solid rgba(64, 62, 67, 0.1);
 }
 
 @keyframes pulse-subtle {
