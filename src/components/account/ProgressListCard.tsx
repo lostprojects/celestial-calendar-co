@@ -68,7 +68,7 @@ export const ProgressListCard = () => {
   }, [user, toast]);
 
   return (
-    <Card className="bg-white/80 backdrop-blur-md shadow-lg border border-[#403E43]/10">
+    <Card className="bg-white/80 backdrop-blur-md shadow-lg">
       <CardHeader>
         <CardTitle className="text-lg font-serif text-accent-lightpalm font-bold flex items-center gap-2">
           <ListTodo className="h-5 w-5" />

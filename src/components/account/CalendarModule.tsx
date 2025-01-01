@@ -3,7 +3,6 @@ import { useState } from "react";
 
 export const CalendarModule = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
 
   // Dummy calendar entry for demonstration
   const dummyEntry = new Date(2025, 0, 15); // January 15, 2025
@@ -20,10 +19,8 @@ export const CalendarModule = () => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
-      <div className="flex flex-row items-center justify-between pb-4">
-        <h3 className="text-lg font-serif text-accent-lightpalm font-bold">{currentMonth}</h3>
-      </div>
+    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg">
+      <h3 className="text-lg font-serif text-accent-lightpalm font-bold mb-4">Your Calendar</h3>
       <div className="bg-white rounded-xl">
         <Calendar
           mode="single"

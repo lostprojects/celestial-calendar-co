@@ -9,7 +9,7 @@ export const CommunityModule = () => {
   ];
 
   return (
-    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#403E43]/10">
+    <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg">
       <h3 className="text-lg font-serif text-accent-lightpalm font-bold mb-4">Community Members</h3>
       <div className="space-y-4">
         {members.map((member, index) => (
