@@ -1,4 +1,7 @@
 import type { Config } from "tailwindcss";
+import { defaultTheme, generateTailwindConfig } from "./src/theme/theme";
+
+const themeConfig = generateTailwindConfig(defaultTheme);
 
 export default {
   darkMode: ["class"],
@@ -18,44 +21,7 @@ export default {
       },
     },
     extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: {
-          DEFAULT: "#FCFAF7",
-          sand: "#F5E6D3",
-        },
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "#403E43",
-          dark: "#001018",
-        },
-        accent: {
-          palm: "#5E5F34",
-          lightpalm: "#7A8C44",  // Brightened from #6C783C while keeping the natural tone
-          orange: "#D77145",
-          lightorange: "#E0815D",
-        },
-      },
-      fontFamily: {
-        mono: ["IBM Plex Mono", "monospace"],
-        serif: ["Playfair Display", "serif"],
-      },
-      keyframes: {
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-      },
-      animation: {
-        float: "float 6s ease-in-out infinite",
-        "fade-up": "fade-up 0.5s ease-out forwards",
-      },
+      ...themeConfig.theme.extend,
     },
   },
   plugins: [require("tailwindcss-animate")],

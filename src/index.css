@@ -5,8 +5,13 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Generated CSS Variables will be injected here */
+    ${generateCssVariables(defaultTheme)}
+  }
+
   body {
-    @apply bg-[#FCFAF7] text-primary-dark font-mono antialiased;
+    @apply bg-background text-primary-dark font-mono antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -15,7 +20,7 @@
 }
 
 .celestial-bg {
-  background: radial-gradient(circle at center, #F2FCE2 0%, #FCFAF7 100%);
+  background: radial-gradient(circle at center, var(--color-background) 0%, var(--color-background-sand) 100%);
   position: absolute;
   top: 0;
   left: 0;

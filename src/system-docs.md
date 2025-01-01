@@ -132,3 +132,24 @@ _Last Updated: March 19, 2024_
   - avatar_url (text)
   - created_at (timestamp)
 
+
+### src/theme/theme.ts
+- **Purpose**: Centralized theme configuration and utilities
+- **Dependencies**: None
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial creation with theme configuration
+  - Added CSS variables generation
+  - Added Tailwind config generation
+  - Added theme types and interfaces
+
+### src/components/style-guide/ThemeSection.tsx
+- **Purpose**: Theme configuration UI in the style guide
+- **Dependencies**: @/theme/theme, @/components/ui/*
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial creation with theme preview and editing capabilities
+  - Added color picker and input fields
+  - Added typography preview
+  - Added spacing visualization
+  - Added animation preview
