@@ -7,23 +7,29 @@ export const CalendarModule = () => {
   const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
 
   // Dummy calendar entry for demonstration
-  const dummyEntry = new Date(2024, 2, 25); // March 25, 2024
+  const dummyEntry = new Date(2025, 0, 15); // January 15, 2025
 
   // Function to check if a date has an entry
   const hasEntry = (date: Date) => {
     return date.toDateString() === dummyEntry.toDateString();
   };
 
-  // Custom modifier for dates with entries
+  // Custom modifier for dates with entries and today
   const modifiers = {
     hasEntry: (date: Date) => hasEntry(date),
+    today: (date: Date) => date.toDateString() === new Date().toDateString(),
   };
 
   // Custom modifier styles
   const modifiersStyles = {
     hasEntry: {
-      border: '2px solid #D77145',
+      backgroundColor: '#D77145',
       borderRadius: '50%',
+      transform: 'scale(0.35)',  // Makes the circle smaller
+    },
+    today: {
+      backgroundColor: '#F1F1F1',  // Light grey background for today
+      borderRadius: '4px',
     },
   };
 
