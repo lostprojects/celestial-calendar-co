@@ -27,6 +27,18 @@ export const GlossaryComponents = () => {
       variations: ["With/without interpretation"],
     },
     {
+      name: "HeroButton",
+      description: "Primary call-to-action button with gradient hover effect",
+      location: "src/components/Hero.tsx",
+      props: "onClick, children",
+      usage: ["Hero section CTA", "Primary action buttons"],
+      variations: [
+        "Default orange gradient",
+        "With hover animation",
+        "Full width variant"
+      ],
+    },
+    {
       name: "BirthSignCard",
       description: "Displays individual birth sign information",
       location: "src/components/birth-signs/BirthSignCard.tsx",
@@ -42,6 +54,54 @@ export const GlossaryComponents = () => {
       usage: ["BirthChartForm"],
       variations: ["Default search input"],
     },
+    {
+      name: "AccountDetails",
+      description: "User account information display and management",
+      location: "src/components/account/AccountDetails.tsx",
+      props: "user",
+      usage: ["Account page"],
+      variations: ["Default view"],
+    },
+    {
+      name: "BirthChartSummaryModule",
+      description: "Summary view of user's most recent birth chart",
+      location: "src/components/account/BirthChartSummaryModule.tsx",
+      props: "userId",
+      usage: ["Account dashboard"],
+      variations: ["Loading state", "Error state", "Data view"],
+    },
+    {
+      name: "CalendarModule",
+      description: "Calendar display for astrological events",
+      location: "src/components/account/CalendarModule.tsx",
+      props: "userId",
+      usage: ["Account dashboard"],
+      variations: ["Monthly view", "With events"],
+    },
+    {
+      name: "InterpretationSection",
+      description: "Displays AI-generated chart interpretations",
+      location: "src/components/interpretation/InterpretationSection.tsx",
+      props: "chartData, interpretation",
+      usage: ["Chart results page"],
+      variations: ["Loading state", "With interpretation"],
+    },
+    {
+      name: "Footer",
+      description: "Application footer with navigation links",
+      location: "src/components/Footer.tsx",
+      props: "None",
+      usage: ["All pages"],
+      variations: ["Default layout"],
+    },
+    {
+      name: "Navbar",
+      description: "Main navigation bar",
+      location: "src/components/Navbar.tsx",
+      props: "None",
+      usage: ["All pages"],
+      variations: ["Authenticated", "Unauthenticated"],
+    }
   ];
 
   return (

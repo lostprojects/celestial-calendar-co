@@ -6,6 +6,30 @@ _Last Updated: March 19, 2024_
 
 ## File List
 
+### src/pages/Glossary.tsx
+- **Purpose**: Displays comprehensive documentation of app components and functions
+- **Dependencies**: @/components/ui/tabs
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial creation with tabbed interface
+  - Added comprehensive documentation sections
+  - Enhanced components and functions documentation
+  - Added astronomia library function documentation
+  - Added visual elements documentation
+
+### src/components/glossary/*
+- **Purpose**: Individual glossary section components
+- **Dependencies**: @/components/ui/table
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Created GlossaryFunctions.tsx
+  - Created GlossaryComponents.tsx
+  - Created GlossaryObjects.tsx
+  - Created GlossaryResources.tsx
+  - Enhanced documentation coverage
+  - Added astronomia library functions
+  - Added visual components documentation
+
 ### src/components/chart-results/ChartResults.tsx
 - **Purpose**: Main component for displaying birth chart results and handling AI interpretation
 - **Dependencies**: 
@@ -107,3 +131,4 @@ _Last Updated: March 19, 2024_
   - username (text, unique)
   - avatar_url (text)
   - created_at (timestamp)
+
