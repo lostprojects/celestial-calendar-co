@@ -2,195 +2,110 @@ import { CalendarGregorianToJD } from "astronomia/julian";
 import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as sidereal from "astronomia/sidereal";
+import { CelestialPosition } from './astro/types';
 
-/** 
- * Astronomical constants 
+/**
+ * Fundamental astronomical constants
+ * Only including constants we can verify from the library or calculate
  */
 export const ASTRONOMICAL_CONSTANTS = {
-  EARTH_RADIUS_KM: 6378.14,
-  J2000_EPOCH: 2451545.0,
-  DEG_TO_RAD: Math.PI / 180,
-  RAD_TO_DEG: 180 / Math.PI,
-  HOURS_TO_DEGREES: 15, // 360° / 24h
-  OBLIQUITY_J2000: 23.4392911,
-  FLATTENING_FACTOR: 0.1924 // For geocentric latitude calculation
+    // WGS84 reference ellipsoid constants (verified)
+    EARTH_F: 1/298.257223563,
+    EARTH_RADIUS_EQ: 6378137.0, // meters
+    EARTH_RADIUS_POLAR: 6356752.3142, // meters
+    C: 299792458 // Speed of light in m/s
 } as const;
 
 /**
- * Zodiac signs in standard order
+ * Zodiac signs with their traditional boundaries
  */
 export const ZODIAC_SIGNS = [
-  "Aries", "Taurus", "Gemini", "Cancer", 
-  "Leo", "Virgo", "Libra", "Scorpio", 
-  "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+    "Aries", "Taurus", "Gemini", "Cancer", 
+    "Leo", "Virgo", "Libra", "Scorpio", 
+    "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ] as const;
 
 /**
- * Type for celestial object position
- */
-export interface CelestialPosition {
-  _ra: number;  // Right ascension in radians
-  _dec: number; // Declination in radians
-  range?: number; // Distance in kilometers (optional for compatibility)
-}
-
-/**
- * Calculates Julian Day number for given UTC date and time
+ * Calculates Julian Day number
+ * Uses verified Gregorian calendar conversion from astronomia/julian
  */
 export function calculateJulianDay(utcDate: string, utcTime: string): number {
-  // Validate input formats
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(utcDate)) {
-    throw new Error('Invalid date format. Expected YYYY-MM-DD');
-  }
-  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(utcTime)) {
-    throw new Error('Invalid time format. Expected HH:mm');
-  }
-
-  const [year, month, day] = utcDate.split('-').map(Number);
-  const [hour, minute] = utcTime.split(':').map(Number);
-
-  // Validate date components
-  if (month < 1 || month > 12) throw new Error('Invalid month');
-  if (day < 1 || day > 31) throw new Error('Invalid day');
-  
-  try {
-    // Get JD for noon on the given date
-    const jdNoon = CalendarGregorianToJD(year, month, day);
+    const [year, month, day] = utcDate.split('-').map(Number);
+    const [hour, minute, second = 0] = utcTime.split(':').map(Number);
     
-    // Calculate hours since noon (positive after noon, negative before)
-    const hoursSinceNoon = hour - 12 + minute / 60;
+    // Convert time to decimal hours with subsecond precision
+    const decimalHours = hour + minute/60 + second/3600;
     
-    // Calculate day fraction based on time
-    const dayFraction = hoursSinceNoon >= 0 
-      ? 1 + hoursSinceNoon / 24 
-      : hoursSinceNoon / 24;
+    // Calculate Julian Day for 0h using astronomia's verified function
+    const jd0h = CalendarGregorianToJD(year, month, day);
     
-    const jd = jdNoon + dayFraction;
-
-    console.log('Julian Day calculation:', {
-      input: { utcDate, utcTime },
-      components: { year, month, day, hour, minute },
-      calculation: { jdNoon, hoursSinceNoon, dayFraction },
-      result: jd
-    });
-
-    return jd;
-  } catch (error) {
-    console.error('Julian Day calculation error:', error);
-    throw error; // Re-throw to maintain existing error handling
-  }
+    // Add time fraction with standard precision
+    const fraction = (decimalHours - 12)/24;
+    
+    return jd0h + fraction;
 }
 
 /**
- * Calculates lunar parallax angle based on moon's distance
- */
-export function calculateLunarParallax(moonDistance: number): number {
-  if (moonDistance <= ASTRONOMICAL_CONSTANTS.EARTH_RADIUS_KM) {
-    throw new Error('Moon distance cannot be less than Earth radius');
-  }
-  
-  const parallax = Math.asin(ASTRONOMICAL_CONSTANTS.EARTH_RADIUS_KM / moonDistance);
-  
-  console.log('Lunar parallax calculation:', {
-    moonDistance,
-    earthRadius: ASTRONOMICAL_CONSTANTS.EARTH_RADIUS_KM,
-    parallaxRadians: parallax,
-    parallaxDegrees: rad2deg(parallax)
-  });
-
-  return parallax;
-}
-
-/**
- * Converts geographic latitude to geocentric latitude
+ * Calculate geocentric latitude using verified WGS84 parameters
  */
 export function calculateGeocentricLatitude(geographicLat: number): number {
-  if (geographicLat < -90 || geographicLat > 90) {
-    throw new Error('Geographic latitude must be between -90 and 90 degrees');
-  }
-
-  const latRad = deg2rad(geographicLat);
-  const geoLat = latRad - (ASTRONOMICAL_CONSTANTS.FLATTENING_FACTOR * Math.sin(2 * latRad));
-
-  console.log('Geocentric latitude calculation:', {
-    geographicLatDeg: geographicLat,
-    geographicLatRad: latRad,
-    geocentricLatRad: geoLat,
-    geocentricLatDeg: rad2deg(geoLat)
-  });
-
-  return geoLat;
+    const f = ASTRONOMICAL_CONSTANTS.EARTH_F;
+    const latRad = deg2rad(geographicLat);
+    
+    // Use first-order approximation which is sufficient for most purposes
+    const sin2Lat = Math.sin(2 * latRad);
+    return latRad - f * sin2Lat * (1 - f/4);
 }
 
 /**
- * Calculates moon's ecliptic longitude from its equatorial coordinates
+ * Calculate moon longitude using available moonposition function
  */
 export function calculateMoonLongitude(moonPos: CelestialPosition, epsRad: number): number {
-  // Input validation
-  if (!moonPos._ra || !moonPos._dec) {
-    throw new Error('Invalid moon position: missing right ascension or declination');
-  }
-  if (epsRad < 0 || epsRad > Math.PI) {
-    throw new Error('Invalid obliquity value');
-  }
-
-  // Compute ecliptic coordinates
-  const sinLambda = Math.sin(moonPos._ra) * Math.cos(epsRad) + 
-                    Math.tan(moonPos._dec) * Math.sin(epsRad);
-  const cosLambda = Math.cos(moonPos._ra);
-  
-  // Calculate ecliptic longitude and normalize to [0, 2π)
-  const lambdaRad = Math.atan2(sinLambda, cosLambda);
-  const normalizedLambdaRad = normalizeRadians(lambdaRad);
-
-  console.log('Moon longitude calculation:', {
-    input: {
-      rightAscension: moonPos._ra,
-      declination: moonPos._dec,
-      obliquity: epsRad
-    },
-    intermediate: {
-      sinLambda,
-      cosLambda,
-      lambdaRad
-    },
-    result: {
-      longitudeRad: normalizedLambdaRad,
-      longitudeDeg: rad2deg(normalizedLambdaRad)
-    }
-  });
-
-  return normalizedLambdaRad;
+    const { _ra: ra, _dec: dec } = moonPos;
+    
+    // Standard calculation for ecliptic coordinates
+    const sinLambda = Math.sin(ra) * Math.cos(epsRad) + 
+                      Math.tan(dec) * Math.sin(epsRad);
+    const cosLambda = Math.cos(ra);
+    
+    return normalizeRadians(Math.atan2(sinLambda, cosLambda));
 }
 
 /**
- * Converts degrees to radians
+ * Calculate basic obliquity of the ecliptic
+ * Using simplified model suitable for most purposes
+ */
+export function calculateObliquity(jd: number): number {
+    // T is centuries since J2000.0
+    const T = (jd - 2451545.0) / 36525;
+    
+    // Mean obliquity (truncated Laskar's formula)
+    const eps0 = 23.43929111 - (46.8150 * T) / 3600;
+    
+    return deg2rad(eps0);
+}
+
+/**
+ * Angle conversion utilities
  */
 export function deg2rad(degrees: number): number {
-  return degrees * ASTRONOMICAL_CONSTANTS.DEG_TO_RAD;
+    return degrees * Math.PI / 180;
 }
 
-/**
- * Converts radians to degrees
- */
 export function rad2deg(radians: number): number {
-  return radians * ASTRONOMICAL_CONSTANTS.RAD_TO_DEG;
+    return radians * 180 / Math.PI;
 }
 
 /**
- * Normalizes angle in degrees to range [0, 360)
+ * Normalize angles to standard ranges
  */
 export function normalizeDegrees(degrees: number): number {
-  return ((degrees % 360) + 360) % 360;
+    return ((degrees % 360) + 360) % 360;
 }
 
-/**
- * Normalizes angle in radians to range [0, 2π)
- */
 export function normalizeRadians(radians: number): number {
-  return ((radians % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    const TWO_PI = 2 * Math.PI;
+    return ((radians % TWO_PI) + TWO_PI) % TWO_PI;
 }
 
-// Export types for external use
 export type ZodiacSign = typeof ZODIAC_SIGNS[number];
-export type { CelestialPosition };

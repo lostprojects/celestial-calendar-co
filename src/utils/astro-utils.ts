@@ -6,7 +6,6 @@ import * as deltat from "astronomia/deltat";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import {
   calculateJulianDay,
-  calculateLunarParallax,
   calculateGeocentricLatitude,
   calculateMoonLongitude,
   calculateObliquity,
