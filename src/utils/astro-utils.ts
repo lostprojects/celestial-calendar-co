@@ -77,15 +77,14 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const deltaT = calculateDeltaT(jd);
   const jde = jd + deltaT / 86400;
   const eot = calculateEquationOfTime(jde);
-  const correctedJde = jde + eot;
   
   logJulianCalculations(jd, deltaT, jde, eot);
 
   const eps = 23.4392911;
   const epsRad = deg2rad(eps);
 
-  const sunLongRad = solar.apparentLongitude(correctedJde);
-  let normalizedSunLong = rad2deg(sunLongRad);  // Removed the -180 here
+  const sunLongRad = solar.apparentLongitude(jde);
+  let normalizedSunLong = rad2deg(sunLongRad);
   normalizedSunLong = ((normalizedSunLong % 360) + 360) % 360;
   
   logSunPosition(sunLongRad, normalizedSunLong, normalizedSunLong);
@@ -108,7 +107,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  const gst = sidereal.apparent(correctedJde) % 24;
+  const gst = sidereal.apparent(jde) % 24;
   const localSiderealTime = gst + data.longitude/15;
   const localSiderealDeg = localSiderealTime * 15;
   const localSiderealRad = deg2rad(localSiderealDeg);
