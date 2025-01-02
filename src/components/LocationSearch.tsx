@@ -24,7 +24,6 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
 
     setIsLoading(true);
     try {
-      // Get the OpenCage API key from Supabase secrets
       const { data: secretData, error: secretError } = await supabase.functions.invoke('get-config', {
         body: { key: 'OPENCAGE_API_KEY' }
       });
@@ -78,27 +77,28 @@ export const LocationSearch = ({ onLocationSelect }: LocationSearchProps) => {
   return (
     <div className="space-y-2 relative">
       <label className="text-sm font-medium text-primary-dark">Birth Place</label>
-      <Input
-        type="text"
-        value={searchTerm}
-        onChange={handlePlaceChange}
-        className={`w-full ${isLoading ? 'opacity-50' : ''}`}
-        placeholder="City, Country"
-        required
-        autoComplete="off"
-        disabled={isLoading}
-      />
-      {isLoading && (
-        <div className="absolute right-3 top-9">
-          <div className="animate-spin h-4 w-4 border-2 border-primary rounded-full border-t-transparent" />
-        </div>
-      )}
+      <div className="relative">
+        <Input
+          type="text"
+          value={searchTerm}
+          onChange={handlePlaceChange}
+          className="w-full"
+          placeholder="City, Country"
+          required
+          autoComplete="off"
+        />
+        {isLoading && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <div className="animate-spin h-4 w-4 border-2 border-primary rounded-full border-t-transparent" />
+          </div>
+        )}
+      </div>
       {showSuggestions && suggestions.length > 0 && (
-        <ul className="absolute z-50 w-full bg-white/95 backdrop-blur-sm border border-primary/10 rounded-md shadow-lg mt-1 max-h-60 overflow-auto">
+        <ul className="absolute z-50 w-full bg-white/95 backdrop-blur-sm border border-primary/10 rounded-md shadow-lg mt-1 max-h-60 overflow-auto divide-y divide-primary/5">
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
-              className="px-4 py-2 hover:bg-accent-sage/20 cursor-pointer text-sm"
+              className="px-4 py-3 hover:bg-accent-sage/10 cursor-pointer text-sm transition-colors duration-150"
               onClick={() => handleSuggestionClick(suggestion)}
             >
               {suggestion.place_name}
