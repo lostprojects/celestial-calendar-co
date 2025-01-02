@@ -51,6 +51,14 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
   const utcMoment = localMoment.utc();
   
+  console.log("Time conversion details:", {
+    detectedTimezone: timezone,
+    localTime: localMoment.format("YYYY-MM-DD HH:mm Z"),
+    utcTime: utcMoment.format("YYYY-MM-DD HH:mm [UTC]"),
+    offset: localMoment.format("Z"),
+    isDST: localMoment.isDST()
+  });
+  
   const jd = calculateJulianDay(
     utcMoment.format("YYYY-MM-DD"),
     utcMoment.format("HH:mm")
