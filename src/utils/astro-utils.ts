@@ -70,12 +70,12 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 
   // Calculate sun position
   const sunLongRad = solar.apparentLongitude(jde);
-  const sunLongDeg = rad2deg(sunLongRad);
-  const normalizedSunLong = normalizeDegrees(sunLongDeg);
+  const normalizedRad = ((sunLongRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  const normalizedSunLong = rad2deg(normalizedRad);
   
   console.log("Sun position:", {
     longitudeRad: sunLongRad,
-    longitudeDeg: sunLongDeg,
+    longitudeDeg: normalizedSunLong,
     normalizedDeg: normalizedSunLong
   });
 
