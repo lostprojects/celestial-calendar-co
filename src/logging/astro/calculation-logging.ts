@@ -18,6 +18,14 @@ interface CalculationLog {
   finalResult: BirthChartResult;
 }
 
+type AstroFunction = typeof calculateJulianDay | 
+                     typeof calculateDeltaT | 
+                     typeof calculateMeanSolarLongitude | 
+                     typeof calculateEquationOfTime | 
+                     typeof calculateLunarParallax | 
+                     typeof calculateGeocentricLatitude | 
+                     typeof calculateMoonLongitude;
+
 export function logAllAstroCalculations(
   data: BirthChartData,
   calculationFunction: (data: BirthChartData) => BirthChartResult
@@ -44,7 +52,7 @@ export function logAllAstroCalculations(
 
   // Create wrapped versions that log everything
   const wrappedFunctions = Object.entries(originalFunctions).reduce((acc, [name, fn]) => {
-    acc[name] = (...args: Parameters<typeof fn>) => {
+    acc[name] = function(this: any, ...args: Parameters<AstroFunction>) {
       const step: CalculationStep = {
         functionName: name,
         inputs: { args },
@@ -53,12 +61,12 @@ export function logAllAstroCalculations(
       };
 
       try {
-        const result = fn(...args);
+        const result = fn.apply(this, args);
         step.outputs = { result };
         steps.push(step);
         return result;
       } catch (error) {
-        step.outputs = { error: error.message };
+        step.outputs = { error: error instanceof Error ? error.message : 'Unknown error' };
         steps.push(step);
         throw error;
       }
