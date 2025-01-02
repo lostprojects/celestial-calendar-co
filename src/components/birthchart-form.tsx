@@ -38,7 +38,6 @@ export default function BirthChartForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsCalculating(true);
-    console.log("Form submitted with data:", formData);
     
     try {
       const wChart = calculateBirthChart(formData);
@@ -50,7 +49,6 @@ export default function BirthChartForm() {
         description: "Birth chart calculated successfully!",
       });
     } catch (err) {
-      console.error("Form submission error:", err);
       toast({
         title: "Error",
         description: err instanceof Error ? err.message : "Failed to calculate birth chart",

@@ -28,23 +28,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
   const { toast } = useToast();
   const user = useUser();
 
-  useEffect(() => {
-    if (mainWestern) {
-      console.log("Rendering chart results:", {
-        sunSign: mainWestern.sunSign,
-        moonSign: mainWestern.moonSign,
-        risingSign: mainWestern.risingSign
-      });
-    }
-  }, [mainWestern]);
-
   const getAIInterpretation = async () => {
-    console.log("[ChartResults] Starting AI interpretation request");
-    console.log("[ChartResults] User state:", { 
-      isAuthenticated: !!user, 
-      userId: user?.id 
-    });
-    
     setIsLoading(true);
     try {
       const { data: interpretationData, error: interpretationError } = await supabase.functions.invoke('generate-astro-advice', {
@@ -61,12 +45,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
         }
       });
 
-      if (interpretationError) {
-        console.error("[ChartResults] Error from generate-astro-advice:", interpretationError);
-        throw interpretationError;
-      }
-
-      console.log("[ChartResults] AI Interpretation received:", interpretationData);
+      if (interpretationError) throw interpretationError;
 
       if (!interpretationData?.interpretation) {
         throw new Error('No interpretation generated');
@@ -75,29 +54,17 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
       setCurrentInterpretation(interpretationData.interpretation);
       
       if (user && birthData) {
-        console.log("[ChartResults] Attempting to save birth chart and interpretation");
+        const birthChartId = await saveBirthChart(user, birthData, mainWestern);
+        await saveInterpretation(birthChartId, user.id, interpretationData.interpretation);
         
-        try {
-          const birthChartId = await saveBirthChart(user, birthData, mainWestern);
-          await saveInterpretation(birthChartId, user.id, interpretationData.interpretation);
-          
-          console.log("[ChartResults] Successfully saved both birth chart and interpretation");
-          
-          toast({
-            title: "Success",
-            description: "Your birth chart and interpretation have been saved!",
-            variant: "default",
-          });
-        } catch (dbError) {
-          console.error("[ChartResults] Database operation failed:", dbError);
-          throw new Error(`Failed to save chart or interpretation: ${dbError.message}`);
-        }
-      } else {
-        console.log("[ChartResults] Skipping database save - User:", !!user, "Birth data:", !!birthData);
+        toast({
+          title: "Success",
+          description: "Your birth chart and interpretation have been saved!",
+          variant: "default",
+        });
       }
 
     } catch (error) {
-      console.error("[ChartResults] Error in getAIInterpretation:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to generate or save your personal reading. Please try again.",
@@ -110,7 +77,6 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
 
   useEffect(() => {
     if (mainWestern && !currentInterpretation && !isLoading) {
-      console.log("[ChartResults] Triggering AI interpretation due to mainWestern update");
       getAIInterpretation();
     }
   }, [mainWestern]);
