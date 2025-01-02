@@ -1,7 +1,7 @@
 import moment from 'moment-timezone';
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as sidereal from "astronomia/sidereal";
-import * as nutation from "astronomia/nutation";
+import { nutation } from "astronomia/nutation";
 import {
   ZODIAC_SIGNS,
   calculateJulianDay,
@@ -68,7 +68,8 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   console.log('Time calculations:', { jd, deltaT, jde, eot });
 
   const meanLongitude = calculateMeanSolarLongitude(jde);
-  const nutationCorr = nutation.nutation(jde).deltaPsi;
+  const { Δψ: deltaPsi } = nutation(jde);
+  const nutationCorr = deltaPsi;
   const sunLongRad = deg2rad(meanLongitude + nutationCorr);
   const normalizedSunLong = normalizeDegrees(rad2deg(sunLongRad));
 
