@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import { PDFDocument } from 'https://cdn.skypack.dev/pdf-lib'
+import * as pdfjs from 'https://cdn.skypack.dev/pdfjs-dist@3.11.174/build/pdf.js'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,26 +33,21 @@ serve(async (req) => {
 
     // Read the PDF file
     const arrayBuffer = await file.arrayBuffer()
-    const pdfDoc = await PDFDocument.load(arrayBuffer)
-    const pages = pdfDoc.getPages()
+    
+    // Set up the worker and load the PDF
+    const loadingTask = pdfjs.getDocument({ data: arrayBuffer })
+    const pdf = await loadingTask.promise
     const extractedData = []
     
-    console.log(`Processing ${pages.length} pages`)
+    console.log(`Processing ${pdf.numPages} pages`)
 
-    for (let i = 0; i < pages.length; i++) {
-      const page = pages[i]
-      // Get the text content directly from the page
-      const text = await page.doc.getPage(i + 1).getTextContent()
-      let pageText = ''
+    // Process each page
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i)
+      const textContent = await page.getTextContent()
+      let pageText = textContent.items.map((item) => item.str).join(' ')
       
-      // Extract text from the PDF content
-      for (const item of text.items) {
-        if ('str' in item) {
-          pageText += item.str + ' '
-        }
-      }
-      
-      console.log(`Processing text from page ${i + 1}:`, pageText)
+      console.log(`Processing text from page ${i}:`, pageText)
       
       // Split text into lines and process each line
       const lines = pageText.split('\n')
