@@ -15,10 +15,11 @@ import {
   rad2deg,
   normalizeDegrees
 } from './astro-core';
-import { logTimeInputs, logTimezoneDetection, logTimeConversion, logJulianCalculations } from '@/logging/astro/time-logging';
-import { logSunPosition, logMoonCalculations, logSolarComponents } from '@/logging/astro/position-logging';
-import { logZodiacPosition, logFinalPositions } from '@/logging/astro/zodiac-logging';
-import { logCoordinateCalculations } from '@/logging/astro/coordinate-logging';
+import { 
+  logBirthChartCalculation,
+  logZodiacPosition,
+  logTimezoneDetection
+} from '@/logging/astro/utils-logging';
 
 export interface BirthChartData {
   birthDate: string;
@@ -41,19 +42,18 @@ export interface BirthChartResult {
 }
 
 function findTimezoneFromCoords(lat: number, lng: number) {
-  const timezones = moment.tz.names();
-  
-  if (lng >= -12 && lng <= 0 && lat >= 35 && lat <= 60) {
-    return 'Europe/London';
-  } else if (lng >= 0 && lng <= 20 && lat >= 35 && lat <= 60) {
-    return 'Europe/Paris';
-  } else if (lng >= -180 && lng <= -50 && lat >= 24 && lat <= 50) {
-    return 'America/New_York';
-  } else if (lng >= 100 && lng <= 145 && lat >= -45 && lat <= -10) {
-    return 'Australia/Sydney';
-  }
-  
-  return 'UTC';
+  const timezone = lng >= -12 && lng <= 0 && lat >= 35 && lat <= 60 ? 'Europe/London' :
+                   lng >= 0 && lng <= 20 && lat >= 35 && lat <= 60 ? 'Europe/Paris' :
+                   lng >= -180 && lng <= -50 && lat >= 24 && lat <= 50 ? 'America/New_York' :
+                   lng >= 100 && lng <= 145 && lat >= -45 && lat <= -10 ? 'Australia/Sydney' :
+                   'UTC';
+
+  logTimezoneDetection({
+    input: { latitude: lat, longitude: lng },
+    result: timezone
+  });
+
+  return timezone;
 }
 
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
@@ -156,12 +156,22 @@ function getZodiacPosition(longitude: number) {
   const degrees = Math.floor(totalDegrees);
   const minutes = Math.floor((totalDegrees - degrees) * 60);
   
-  const sign = ZODIAC_SIGNS[signIndex];
-  logZodiacPosition(longitude, signIndex, sign, degrees, minutes);
-  
-  return {
-    sign,
+  const result = {
+    sign: ZODIAC_SIGNS[signIndex],
     degrees,
     minutes
   };
+
+  logZodiacPosition({
+    input: { longitude },
+    intermediate: {
+      signIndex,
+      totalDegrees,
+      degrees,
+      minutes
+    },
+    result
+  });
+  
+  return result;
 }

@@ -3,7 +3,15 @@ import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as sidereal from "astronomia/sidereal";
 import * as nutation from "astronomia/nutation";
-import { logSunPosition } from "@/logging/astro/position-logging";
+import {
+  logJulianDayCalculation,
+  logDeltaTCalculation,
+  logMeanSolarLongitude,
+  logEquationOfTime,
+  logLunarParallax,
+  logGeocentricLatitude,
+  logMoonLongitude
+} from "@/logging/astro/core-logging";
 
 export const ZODIAC_SIGNS = [
   "Aries", "Taurus", "Gemini", "Cancer", 
@@ -11,18 +19,35 @@ export const ZODIAC_SIGNS = [
   "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
-export function calculateDeltaT(jd: number): number {
-  const T = (jd - 2451545.0) / 36525;  // Julian centuries since J2000.0
-  return 62.92 + 0.32217 * T + 0.005589 * Math.pow(T, 2);
-}
-
 export function calculateJulianDay(utcDate: string, utcTime: string): number {
   const [year, month, day] = utcDate.split('-').map(Number);
   const [hour, minute] = utcTime.split(':').map(Number);
   const jdNoon = CalendarGregorianToJD(year, month, day);
   const hoursSinceNoon = hour - 12 + minute / 60;
   const dayFraction = hoursSinceNoon >= 0 ? 1 + hoursSinceNoon / 24 : hoursSinceNoon / 24;
-  return jdNoon + dayFraction;
+  const result = jdNoon + dayFraction;
+
+  logJulianDayCalculation({
+    input: { utcDate, utcTime },
+    parsed: { year, month, day, hour, minute },
+    intermediate: { jdNoon, hoursSinceNoon, dayFraction },
+    result
+  });
+
+  return result;
+}
+
+export function calculateDeltaT(jd: number): number {
+  const T = (jd - 2451545.0) / 36525;
+  const result = 62.92 + 0.32217 * T + 0.005589 * Math.pow(T, 2);
+
+  logDeltaTCalculation({
+    input: { jd },
+    intermediate: { julianCenturies: T },
+    result
+  });
+
+  return result;
 }
 
 export function calculateMeanSolarLongitude(jde: number): number {
