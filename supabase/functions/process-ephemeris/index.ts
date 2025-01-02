@@ -41,10 +41,16 @@ serve(async (req) => {
 
     for (let i = 0; i < pages.length; i++) {
       const page = pages[i]
-      // Get the text content using the correct method
-      const textContent = await page.getTextContent()
-      const items = textContent.items || []
-      let pageText = items.map(item => item.str).join(' ')
+      // Get the text content directly from the page
+      const text = await page.doc.getPage(i + 1).getTextContent()
+      let pageText = ''
+      
+      // Extract text from the PDF content
+      for (const item of text.items) {
+        if ('str' in item) {
+          pageText += item.str + ' '
+        }
+      }
       
       console.log(`Processing text from page ${i + 1}:`, pageText)
       
