@@ -18,6 +18,9 @@ import {
 
 import { logAstroUtils } from '@/logging/astro/utils-logging';
 import { dumpLogs } from '../logging/utils/file-logger';
+import { logTimeInputs, logTimezoneDetection, logTimeConversion, logJulianCalculations } from "@/logging/astro/time-logging";
+import { logSunPosition, logSolarComponents, logMoonCalculations } from "@/logging/astro/position-logging";
+import { logZodiacPosition, logFinalPositions } from "@/logging/astro/zodiac-logging";
 
 export interface BirthChartData {
   birthDate: string;
@@ -64,60 +67,36 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
       timestamp: new Date().toISOString()
     });
 
+    // Log initial input data
+    logTimeInputs(data);
+
+    // Detect and log timezone
+    const timezone = findTimezoneFromCoords(data.latitude, data.longitude);
+    logTimezoneDetection(timezone, { lat: data.latitude, lng: data.longitude });
+
+    // Convert and log time
     const [year, month, day] = data.birthDate.split("-").map(Number);
     const [hour, minute] = data.birthTime.split(":").map(Number);
-    
-    const timezone = findTimezoneFromCoords(data.latitude, data.longitude);
     const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
     const utcMoment = localMoment.utc();
-    
-    logAstroUtils({
-      event: 'TIME_CONVERSION',
-      inputs: { localDateTime: localMoment.format() },
-      outputs: { 
-        utcDateTime: utcMoment.format(),
-        offset: localMoment.format("Z"),
-        isDST: localMoment.isDST()
-      },
-      timestamp: new Date().toISOString()
-    });
+    logTimeConversion(localMoment, utcMoment);
 
-    const jd = calculateJulianDay(
-      utcMoment.format("YYYY-MM-DD"),
-      utcMoment.format("HH:mm")
-    );
-    
+    // Calculate and log Julian dates
+    const jd = calculateJulianDay(utcMoment.format("YYYY-MM-DD"), utcMoment.format("HH:mm"));
     const deltaT = calculateDeltaT(jd);
     const jde = jd + deltaT / 86400;
     const eot = calculateEquationOfTime(jde);
-    
-    logAstroUtils({
-      event: 'JULIAN_CALCULATIONS',
-      inputs: { utcDateTime: utcMoment.format() },
-      outputs: { julianDay: jd, deltaT, julianEphemerisDay: jde, equationOfTime: eot },
-      timestamp: new Date().toISOString()
-    });
+    logJulianCalculations(jd, deltaT, jde, eot);
 
-    const eps = 23.4392911;
-    const epsRad = deg2rad(eps);
-
+    // Calculate and log solar position
     const meanLongitude = calculateMeanSolarLongitude(jde);
     const nutationCorr = nutation.nutation(jde).deltaPsi;
     const sunLongRad = deg2rad(meanLongitude + nutationCorr);
     const normalizedSunLong = normalizeDegrees(rad2deg(sunLongRad));
-    
-    logAstroUtils({
-      event: 'SOLAR_CALCULATION',
-      inputs: { julianEphemerisDay: jde },
-      outputs: {
-        meanLongitudeDeg: meanLongitude,
-        apparentLongitudeDeg: rad2deg(sunLongRad),
-        nutationCorrectionDeg: rad2deg(nutationCorr),
-        obliquity: eps
-      },
-      timestamp: new Date().toISOString()
-    });
+    logSunPosition(sunLongRad, rad2deg(sunLongRad), normalizedSunLong);
+    logSolarComponents(meanLongitude, rad2deg(sunLongRad), rad2deg(nutationCorr), 23.4392911);
 
+    // Calculate and log lunar position
     const moonPos = getMoonPosition(jde);
     const moonDistance = moonPos.range;
     const parallax = calculateLunarParallax(moonDistance);
@@ -130,61 +109,29 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
       _ra: moonPos._ra + deltaRA,
       _dec: moonPos._dec + deltaDec
     };
-    
-    const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
-    const finalMoonLongitude = rad2deg(moonLongRad);
-    
-    logAstroUtils({
-      event: 'LUNAR_CALCULATION',
-      inputs: { julianEphemerisDay: jde },
-      outputs: { 
-        moonLongitude: finalMoonLongitude,
-        moonPosition: moonPos
-      },
-      timestamp: new Date().toISOString()
-    });
+    logMoonCalculations(moonDistance, parallax, geoLat, lst, hourAngle, deltaRA, deltaDec, topoMoonPos);
 
-    const gst = sidereal.apparent(jde) % 24;
-    const localSiderealTime = gst + data.longitude/15;
-    const localSiderealDeg = localSiderealTime * 15;
-    const localSiderealRad = deg2rad(localSiderealDeg);
-    
-    const latRad = deg2rad(data.latitude);
-    const y = Math.cos(localSiderealRad);
-    const x = Math.sin(localSiderealRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
-    let ascendant = rad2deg(Math.atan2(x, y));
-    ascendant = normalizeDegrees(ascendant);
+    // Log coordinate calculations
+    logCoordinateCalculations(data.latitude, data.longitude, geoLat, lst);
 
-    const sunPosition = getZodiacPosition(normalizedSunLong);
-    const moonPosition = getZodiacPosition(finalMoonLongitude);
-    const ascPosition = getZodiacPosition(ascendant);
-
-    logAstroUtils({
-      event: 'FINAL_POSITIONS',
-      inputs: {
-        sunLongitude: normalizedSunLong,
-        moonLongitude: finalMoonLongitude,
-        ascendant: ascendant
-      },
-      outputs: {
-        sun: sunPosition,
-        moon: moonPosition,
-        ascendant: ascPosition
-      },
-      timestamp: new Date().toISOString()
-    });
-
+    // Calculate final positions and log them
     const result = {
-      sunSign: sunPosition.sign,
-      moonSign: moonPosition.sign,
-      risingSign: ascPosition.sign,
-      sunDeg: sunPosition.degrees,
-      sunMin: sunPosition.minutes,
-      moonDeg: moonPosition.degrees,
-      moonMin: moonPosition.minutes,
-      risingDeg: ascPosition.degrees,
-      risingMin: ascPosition.minutes
+      sunSign: getZodiacPosition(normalizedSunLong).sign,
+      moonSign: getZodiacPosition(finalMoonLongitude).sign,
+      risingSign: getZodiacPosition(ascendant).sign,
+      sunDeg: getZodiacPosition(normalizedSunLong).degrees,
+      sunMin: getZodiacPosition(normalizedSunLong).minutes,
+      moonDeg: getZodiacPosition(finalMoonLongitude).degrees,
+      moonMin: getZodiacPosition(finalMoonLongitude).minutes,
+      risingDeg: getZodiacPosition(ascendant).degrees,
+      risingMin: getZodiacPosition(ascendant).minutes
     };
+
+    logFinalPositions(
+      { sign: result.sunSign, degrees: result.sunDeg, minutes: result.sunMin },
+      { sign: result.moonSign, degrees: result.moonDeg, minutes: result.moonMin },
+      { sign: result.risingSign, degrees: result.risingDeg, minutes: result.risingMin }
+    );
 
     logAstroUtils({
       event: 'BIRTH_CHART_CALCULATION_COMPLETE',
@@ -195,7 +142,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 
     return result;
   } finally {
-    dumpLogs(); // Dump logs after calculation completes
+    dumpLogs();
   }
 }
 
