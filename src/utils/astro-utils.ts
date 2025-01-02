@@ -2,6 +2,7 @@ import moment from 'moment-timezone';
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as solar from "astronomia/solar";
 import * as sidereal from "astronomia/sidereal";
+import * as nutation from "astronomia/nutation";
 import {
   ZODIAC_SIGNS,
   calculateJulianDay,
@@ -15,7 +16,7 @@ import {
   normalizeDegrees
 } from './astro-core';
 import { logTimeInputs, logTimezoneDetection, logTimeConversion, logJulianCalculations } from '@/logging/astro/time-logging';
-import { logSunPosition, logMoonCalculations } from '@/logging/astro/position-logging';
+import { logSunPosition, logMoonCalculations, logSolarComponents } from '@/logging/astro/position-logging';
 import { logZodiacPosition, logFinalPositions } from '@/logging/astro/zodiac-logging';
 import { logCoordinateCalculations } from '@/logging/astro/coordinate-logging';
 
@@ -83,7 +84,17 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const eps = 23.4392911;
   const epsRad = deg2rad(eps);
 
+  const meanLongitude = solar.meanLongitude(jde);
+  const nutationCorr = nutation.nutation(jde).deltaPsi;
   const sunLongRad = solar.apparentLongitude(jde);
+  
+  logSolarComponents(
+    rad2deg(meanLongitude),
+    rad2deg(sunLongRad),
+    rad2deg(nutationCorr),
+    eps
+  );
+
   let normalizedSunLong = rad2deg(sunLongRad);
   normalizedSunLong = ((normalizedSunLong % 360) + 360) % 360;
   

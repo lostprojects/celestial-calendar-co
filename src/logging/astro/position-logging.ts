@@ -8,6 +8,21 @@ export function logSunPosition(longitudeRad: number, longitudeDeg: number, norma
   });
 }
 
+export function logSolarComponents(
+  meanLongitude: number,
+  apparentLongitude: number,
+  nutationCorrection: number,
+  obliquity: number
+) {
+  console.log("Solar Position Components:", {
+    meanLongitude,
+    apparentLongitude,
+    nutationCorrection,
+    obliquity,
+    timestamp: new Date().toISOString()
+  });
+}
+
 export function logMoonCalculations(
   distance: number,
   parallax: number,
