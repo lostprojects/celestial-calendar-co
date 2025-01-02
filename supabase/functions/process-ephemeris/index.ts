@@ -21,18 +21,8 @@ serve(async (req) => {
   }
 
   try {
-    // Get the form data from the request body
-    const formData = await req.formData()
-    const file = formData.get('file')
-
-    if (!file || !(file instanceof File)) {
-      return new Response(
-        JSON.stringify({ error: 'No valid file uploaded' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      )
-    }
-
-    console.log('Processing file:', file.name)
+    const { filePath } = await req.json()
+    console.log('Processing file from storage path:', filePath)
 
     // Create Supabase client
     const supabase = createClient(
@@ -40,12 +30,21 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Read the PDF file
-    const arrayBuffer = await file.arrayBuffer()
+    console.log('Downloading file from storage...')
+    const { data: fileData, error: downloadError } = await supabase
+      .storage
+      .from('ephemeris_pdfs')
+      .download(filePath)
+
+    if (downloadError) {
+      console.error('Error downloading file:', downloadError)
+      throw new Error('Failed to download file from storage')
+    }
+
+    console.log('File downloaded successfully, converting to ArrayBuffer...')
+    const arrayBuffer = await fileData.arrayBuffer()
     
     console.log('Loading PDF document...')
-    
-    // Load the PDF document
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(arrayBuffer),
       useWorkerFetch: false,
@@ -104,6 +103,16 @@ serve(async (req) => {
         JSON.stringify({ error: 'Failed to insert data', details: error }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
+    }
+
+    // Clean up: Delete the processed file
+    const { error: deleteError } = await supabase
+      .storage
+      .from('ephemeris_pdfs')
+      .remove([filePath])
+
+    if (deleteError) {
+      console.warn('Warning: Failed to delete processed file:', deleteError)
     }
 
     return new Response(

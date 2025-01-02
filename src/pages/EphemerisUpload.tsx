@@ -35,13 +35,26 @@ const EphemerisUpload = () => {
 
     try {
       for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
+        // First, upload to storage
+        const fileName = `${crypto.randomUUID()}.pdf`;
+        console.log('Uploading file to storage:', fileName);
+        
+        const { data: uploadData, error: uploadError } = await supabase
+          .storage
+          .from('ephemeris_pdfs')
+          .upload(fileName, file);
 
+        if (uploadError) {
+          throw new Error(`Failed to upload file: ${uploadError.message}`);
+        }
+
+        console.log('File uploaded successfully:', uploadData.path);
+
+        // Then process the file
         const { data, error: functionError } = await supabase.functions.invoke(
           'process-ephemeris',
           {
-            body: formData,
+            body: { filePath: uploadData.path }
           }
         );
 
