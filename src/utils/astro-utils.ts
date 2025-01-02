@@ -35,6 +35,34 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
+function findTimezoneFromCoords(lat: number, lng: number) {
+  const timezones = moment.tz.names();
+  let closestZone = null;
+  let minDistance = Infinity;
+
+  timezones.forEach(zoneName => {
+    const zone = moment.tz.zone(zoneName);
+    if (!zone) return;
+    
+    // Get zone coordinates (many zones have them)
+    const zoneCoords = zone.countries?.[0]?.coords;
+    if (!zoneCoords) return;
+    
+    const [zoneLat, zoneLng] = zoneCoords.split(',').map(Number);
+    const distance = Math.sqrt(
+      Math.pow(lat - zoneLat, 2) + 
+      Math.pow(lng - zoneLng, 2)
+    );
+    
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestZone = zoneName;
+    }
+  });
+
+  return closestZone || 'UTC';
+}
+
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
@@ -47,7 +75,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lng: data.longitude
   });
 
-  const timezone = moment.tz.guess();
+  const timezone = findTimezoneFromCoords(data.latitude, data.longitude);
   const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
   const utcMoment = localMoment.utc();
   
@@ -58,7 +86,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     offset: localMoment.format("Z"),
     isDST: localMoment.isDST()
   });
-  
+
   const jd = calculateJulianDay(
     utcMoment.format("YYYY-MM-DD"),
     utcMoment.format("HH:mm")
