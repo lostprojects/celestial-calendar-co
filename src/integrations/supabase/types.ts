@@ -187,6 +187,66 @@ export type Database = {
         }
         Relationships: []
       }
+      western_sun_signs: {
+        Row: {
+          approx_sun_end: string
+          approx_sun_start: string
+          classic_ruler: string
+          created_at: string
+          ecliptic_end_deg: number
+          ecliptic_start_deg: number
+          gloss: string
+          house: number
+          id: string
+          modality: string
+          modern_ruler: string
+          northern_hemisphere_season: string
+          polarity: string
+          sign: string
+          southern_hemisphere_season: string
+          triplicity: string
+          unicode_character: string
+        }
+        Insert: {
+          approx_sun_end: string
+          approx_sun_start: string
+          classic_ruler: string
+          created_at?: string
+          ecliptic_end_deg: number
+          ecliptic_start_deg: number
+          gloss: string
+          house: number
+          id?: string
+          modality: string
+          modern_ruler: string
+          northern_hemisphere_season: string
+          polarity: string
+          sign: string
+          southern_hemisphere_season: string
+          triplicity: string
+          unicode_character: string
+        }
+        Update: {
+          approx_sun_end?: string
+          approx_sun_start?: string
+          classic_ruler?: string
+          created_at?: string
+          ecliptic_end_deg?: number
+          ecliptic_start_deg?: number
+          gloss?: string
+          house?: number
+          id?: string
+          modality?: string
+          modern_ruler?: string
+          northern_hemisphere_season?: string
+          polarity?: string
+          sign?: string
+          southern_hemisphere_season?: string
+          triplicity?: string
+          unicode_character?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
