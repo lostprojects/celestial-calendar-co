@@ -27,16 +27,12 @@ export const GlossaryComponents = () => {
       variations: ["With/without interpretation"],
     },
     {
-      name: "HeroButton",
-      description: "Primary call-to-action button with gradient hover effect",
+      name: "Hero",
+      description: "Hero section with main call-to-action",
       location: "src/components/Hero.tsx",
-      props: "onClick, children",
-      usage: ["Hero section CTA", "Primary action buttons"],
-      variations: [
-        "Default orange gradient",
-        "With hover animation",
-        "Full width variant"
-      ],
+      props: "None",
+      usage: ["Homepage hero section"],
+      variations: ["Default layout"],
     },
     {
       name: "BirthSignCard",
@@ -71,14 +67,6 @@ export const GlossaryComponents = () => {
       variations: ["Loading state", "Error state", "Data view"],
     },
     {
-      name: "CalendarModule",
-      description: "Calendar display for astrological events",
-      location: "src/components/account/CalendarModule.tsx",
-      props: "userId",
-      usage: ["Account dashboard"],
-      variations: ["Monthly view", "With events"],
-    },
-    {
       name: "InterpretationSection",
       description: "Displays AI-generated chart interpretations",
       location: "src/components/interpretation/InterpretationSection.tsx",
@@ -101,6 +89,14 @@ export const GlossaryComponents = () => {
       props: "None",
       usage: ["All pages"],
       variations: ["Authenticated", "Unauthenticated"],
+    },
+    {
+      name: "BirthChartSection",
+      description: "Container for birth chart form and results",
+      location: "src/components/BirthChartSection.tsx",
+      props: "None",
+      usage: ["Homepage"],
+      variations: ["Default layout"],
     }
   ];
 

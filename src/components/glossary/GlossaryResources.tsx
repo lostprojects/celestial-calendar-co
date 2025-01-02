@@ -31,6 +31,20 @@ export const GlossaryResources = () => {
       usage: ["User profiles", "Birth charts", "Interpretations"],
       frequency: "Regular CRUD operations",
     },
+    {
+      name: "Astronomia Library",
+      type: "NPM Package",
+      description: "Astronomical calculation library",
+      usage: ["Birth chart calculations", "Celestial positions"],
+      frequency: "During all astronomical calculations",
+    },
+    {
+      name: "Moment Timezone",
+      type: "NPM Package",
+      description: "Timezone handling library",
+      usage: ["Birth time conversions", "UTC calculations"],
+      frequency: "During chart calculations",
+    }
   ];
 
   return (

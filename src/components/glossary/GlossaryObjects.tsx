@@ -18,43 +18,40 @@ export const GlossaryObjects = () => {
       usage: ["Birth chart calculations", "Sign determinations"],
     },
     {
+      name: "ASTRONOMICAL_CONSTANTS",
+      type: "Object",
+      location: "src/utils/astro-core.ts",
+      description: "Constants used in astronomical calculations",
+      usage: ["Position calculations", "Angle conversions"],
+    },
+    {
       name: "BirthChartData",
       type: "Interface",
-      location: "src/utils/astro-utils.ts",
+      location: "src/utils/astro/types.ts",
       description: "Type definition for birth chart input data",
       usage: ["Form data structure", "API requests"],
     },
     {
       name: "BirthChartResult",
       type: "Interface",
-      location: "src/utils/astro-utils.ts",
+      location: "src/utils/astro/types.ts",
       description: "Type definition for calculated chart results",
       usage: ["Chart calculations", "Display components"],
     },
     {
-      name: "ThemeConfig",
+      name: "CelestialPosition",
       type: "Interface",
-      location: "src/theme/theme.ts",
-      description: "Type definition for the app's theme configuration",
-      usage: [
-        "Theme generation",
-        "CSS variable generation",
-        "Tailwind configuration",
-        "Style guide customization"
-      ],
+      location: "src/utils/astro/types.ts",
+      description: "Type for celestial body positions",
+      usage: ["Position calculations", "Chart results"],
     },
     {
-      name: "defaultTheme",
-      type: "ThemeConfig",
-      location: "src/theme/theme.ts",
-      description: "Default theme configuration object with colors, fonts, spacing, and animations",
-      usage: [
-        "Base theme configuration",
-        "Style guide defaults",
-        "CSS variable generation",
-        "Tailwind configuration"
-      ],
-    },
+      name: "AstronomicalError",
+      type: "Class",
+      location: "src/utils/astro-utils.ts",
+      description: "Custom error class for astronomical calculations",
+      usage: ["Error handling", "Debugging"],
+    }
   ];
 
   return (
