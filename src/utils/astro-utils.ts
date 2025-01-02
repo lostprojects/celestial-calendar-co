@@ -155,7 +155,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 }
 
 function getZodiacPosition(longitude: number) {
-  const signIndex = Math.floor(longitude / 30);
+  const signIndex = Math.round(longitude / 30);
   const totalDegrees = longitude % 30;
   const degrees = Math.floor(totalDegrees);
   const minutes = Math.floor((totalDegrees - degrees) * 60);
