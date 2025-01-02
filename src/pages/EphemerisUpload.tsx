@@ -38,28 +38,20 @@ const EphemerisUpload = () => {
         const formData = new FormData();
         formData.append('file', file);
 
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        const response = await fetch(
-          'https://qwpveubezldowcycifbh.supabase.co/functions/v1/process-ephemeris',
+        const { data, error: functionError } = await supabase.functions.invoke(
+          'process-ephemeris',
           {
-            method: 'POST',
             body: formData,
-            headers: {
-              'Authorization': `Bearer ${session?.access_token}`,
-            },
           }
         );
 
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || 'Failed to process file');
+        if (functionError) {
+          throw new Error(functionError.message || 'Failed to process file');
         }
 
         toast({
           title: "Success",
-          description: `Processed ${result.rowsProcessed} rows from ${file.name}`,
+          description: `Processed ${data.rowsProcessed} rows from ${file.name}`,
         });
       }
 
