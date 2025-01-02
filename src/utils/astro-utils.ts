@@ -85,7 +85,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const epsRad = deg2rad(eps);
 
   const sunLongRad = solar.apparentLongitude(correctedJde);
-  let normalizedSunLong = rad2deg(sunLongRad) - 180;
+  let normalizedSunLong = rad2deg(sunLongRad);  // Removed the -180 here
   normalizedSunLong = ((normalizedSunLong % 360) + 360) % 360;
   
   logSunPosition(sunLongRad, normalizedSunLong, normalizedSunLong);
