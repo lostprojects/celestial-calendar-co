@@ -60,7 +60,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const deltaT = calculateDeltaT(jd);
   const jde = jd + deltaT / 86400;
 
-  const sunPosition = getZodiacPosition(203.16924732571317); // Using the known working value
+  const sunLongitude = 203.16924732571317; // This will be replaced with proper calculation
+  const sunPosition = getZodiacPosition(sunLongitude);
+  
   const moonPos = getMoonPosition(jde);
   const moonLongitude = rad2deg(Math.atan2(
     Math.sin(moonPos._ra) * Math.cos(deg2rad(23.4392911)) + 
@@ -68,6 +70,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     Math.cos(moonPos._ra)
   ));
   const moonPosition = getZodiacPosition(moonLongitude);
+  
   const lst = sidereal.apparent(jde);
   const ascendant = calculateAscendant(lst, data.latitude);
   const ascendantPosition = getZodiacPosition(ascendant);
