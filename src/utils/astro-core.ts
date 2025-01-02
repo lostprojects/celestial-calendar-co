@@ -2,7 +2,7 @@ import { CalendarGregorianToJD } from "astronomia/julian";
 import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as sidereal from "astronomia/sidereal";
-import * as eqtime from "astronomia/eqtime";
+import * as nutation from "astronomia/nutation";
 
 export const ZODIAC_SIGNS = [
   "Aries", "Taurus", "Gemini", "Cancer", 
@@ -25,7 +25,31 @@ export function calculateJulianDay(utcDate: string, utcTime: string): number {
 }
 
 export function calculateEquationOfTime(jde: number): number {
-  return eqtime.equation(jde);
+  // Calculate mean longitude of the Sun (L0)
+  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
+  const L0 = solar.meanLongitude(T);
+  
+  // Calculate apparent longitude of the Sun
+  const lambdaApp = solar.apparentLongitude(jde);
+  
+  // Calculate nutation in longitude and mean obliquity
+  const deltaPsi = nutation.nutation(jde);
+  const epsilon = nutation.meanObliquity(T);
+  
+  // Calculate equation of time in degrees
+  // EOT = -0.0057183 - L0 + λapp + Δψ·cos(ε)
+  const eot = -0.0057183 - L0 + lambdaApp + deltaPsi * Math.cos(deg2rad(epsilon));
+  
+  console.log("Equation of Time calculation:", {
+    julianCenturies: T,
+    meanLongitude: L0,
+    apparentLongitude: lambdaApp,
+    nutation: deltaPsi,
+    meanObliquity: epsilon,
+    result: eot
+  });
+  
+  return eot;
 }
 
 export function calculateLunarParallax(moonDistance: number): number {
