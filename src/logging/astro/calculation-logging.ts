@@ -155,9 +155,10 @@ export function logAllAstroCalculations(
     return result;
   };
 
-  // Override global logging function to capture everything
+  // Override window logging function to capture everything
   const originalLogAstroUtils = logAstroUtils;
-  (global as any).logAstroUtils = (logData: any) => {
+  const windowAny = window as any;
+  windowAny.logAstroUtils = (logData: any) => {
     log.steps.push({
       functionName: logData.event,
       inputs: logData.inputs || {},
@@ -180,6 +181,6 @@ export function logAllAstroCalculations(
     return { result, log };
   } finally {
     // Restore original logging function
-    (global as any).logAstroUtils = originalLogAstroUtils;
+    windowAny.logAstroUtils = originalLogAstroUtils;
   }
 }
