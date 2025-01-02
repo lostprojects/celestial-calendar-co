@@ -36,26 +36,17 @@ const EphemerisUpload = () => {
 
     try {
       for (const file of files) {
-        // First, upload to storage
         const fileName = `${crypto.randomUUID()}.csv`;
-        console.log('Uploading file to storage:', fileName);
         
-        const { data: uploadData, error: uploadError } = await supabase
-          .storage
-          .from('ephemeris_files')
-          .upload(fileName, file);
-
-        if (uploadError) {
-          throw new Error(`Failed to upload file: ${uploadError.message}`);
-        }
-
-        console.log('File uploaded successfully:', uploadData.path);
-
-        // Then process the file
+        // Create form data for the file upload
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Call the edge function to process the CSV
         const { data, error: functionError } = await supabase.functions.invoke(
           'process-ephemeris',
           {
-            body: { filePath: uploadData.path }
+            body: formData,
           }
         );
 
@@ -65,7 +56,7 @@ const EphemerisUpload = () => {
 
         toast({
           title: "Success",
-          description: `Processed ${data.rowsProcessed} rows from ${file.name}`,
+          description: `Processed ${data?.rowsProcessed || 0} rows from ${file.name}`,
         });
       }
 
@@ -149,7 +140,10 @@ const EphemerisUpload = () => {
                 Processing...
               </>
             ) : (
-              'Process Files'
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                Process Files
+              </>
             )}
           </Button>
         </div>

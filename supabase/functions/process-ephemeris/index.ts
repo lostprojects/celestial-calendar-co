@@ -1,18 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import * as pdfjs from 'https://cdn.skypack.dev/pdfjs-dist@3.11.174/build/pdf.js'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
-
-// Configure pdf.js for server-side usage
-const pdfjsWorker = await import('https://cdn.skypack.dev/pdfjs-dist@3.11.174/build/pdf.worker.js')
-globalThis.pdfjsWorker = pdfjsWorker
-
-// Initialize pdf.js
-pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.skypack.dev/pdfjs-dist@3.11.174/build/pdf.worker.js'
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -21,8 +13,12 @@ serve(async (req) => {
   }
 
   try {
-    const { filePath } = await req.json()
-    console.log('Processing file from storage path:', filePath)
+    const formData = await req.formData()
+    const file = formData.get('file')
+    
+    if (!file) {
+      throw new Error('No file provided')
+    }
 
     // Create Supabase client
     const supabase = createClient(
@@ -30,69 +26,104 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Downloading file from storage...')
-    const { data: fileData, error: downloadError } = await supabase
-      .storage
-      .from('ephemeris_pdfs')
-      .download(filePath)
+    // Read the file content
+    const text = await file.text()
+    const rows = text.split('\n')
+    
+    // Process header row to find column indices
+    const headers = rows[0].split(',').map(h => h.trim().toLowerCase())
+    const dateIndex = headers.findIndex(h => h.includes('date'))
+    const planetIndex = headers.findIndex(h => h.includes('planet'))
+    const longitudeIndex = headers.findIndex(h => 
+      h.includes('longitude') || h.includes('position') || h.includes('degree')
+    )
+    const retrogradeIndex = headers.findIndex(h => 
+      h.includes('retrograde') || h.includes('direction')
+    )
 
-    if (downloadError) {
-      console.error('Error downloading file:', downloadError)
-      throw new Error('Failed to download file from storage')
+    if (dateIndex === -1 || planetIndex === -1 || longitudeIndex === -1) {
+      throw new Error('Required columns not found in CSV. Need date, planet, and longitude/position columns.')
     }
 
-    console.log('File downloaded successfully, converting to ArrayBuffer...')
-    const arrayBuffer = await fileData.arrayBuffer()
-    
-    console.log('Loading PDF document...')
-    const loadingTask = pdfjs.getDocument({
-      data: new Uint8Array(arrayBuffer),
-      useWorkerFetch: false,
-      isEvalSupported: false,
-      useSystemFonts: true
-    })
-    
-    const pdf = await loadingTask.promise
-    const extractedData = []
-    
-    console.log(`Processing ${pdf.numPages} pages`)
+    const processedData = []
+    const errors = []
 
-    // Process each page
-    for (let i = 1; i <= pdf.numPages; i++) {
-      console.log(`Getting page ${i}...`)
-      const page = await pdf.getPage(i)
+    // Process each data row
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i].trim()
+      if (!row) continue // Skip empty rows
       
-      console.log(`Extracting text from page ${i}...`)
-      const textContent = await page.getTextContent()
-      let pageText = textContent.items.map((item) => item.str).join(' ')
+      const columns = row.split(',').map(c => c.trim())
       
-      console.log(`Processing text from page ${i}:`, pageText)
-      
-      // Split text into lines and process each line
-      const lines = pageText.split('\n')
-      
-      for (const line of lines) {
-        const parsed = parseLine(line)
-        if (parsed) {
-          console.log('Parsed data:', parsed)
-          extractedData.push(parsed)
+      try {
+        // Parse and validate date
+        const dateStr = columns[dateIndex]
+        const date = new Date(dateStr)
+        if (isNaN(date.getTime())) {
+          throw new Error(`Invalid date format in row ${i + 1}: ${dateStr}`)
         }
+
+        // Normalize planet name
+        const planet = columns[planetIndex].toLowerCase()
+        const validPlanets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto']
+        if (!validPlanets.includes(planet)) {
+          throw new Error(`Invalid planet in row ${i + 1}: ${planet}`)
+        }
+
+        // Parse and validate longitude
+        const longitude = parseFloat(columns[longitudeIndex])
+        if (isNaN(longitude) || longitude < 0 || longitude >= 360) {
+          throw new Error(`Invalid longitude in row ${i + 1}: ${columns[longitudeIndex]}`)
+        }
+
+        // Check for retrograde status
+        let retrograde = false
+        if (retrogradeIndex !== -1) {
+          const retrogradeValue = columns[retrogradeIndex].toLowerCase()
+          retrograde = retrogradeValue === 'r' || 
+                      retrogradeValue === 'true' || 
+                      retrogradeValue === 'retrograde' ||
+                      retrogradeValue === '1'
+        }
+
+        processedData.push({
+          date: date.toISOString().split('T')[0],
+          planet,
+          longitude,
+          retrograde
+        })
+      } catch (error) {
+        errors.push(error.message)
       }
     }
 
-    console.log(`Total parsed entries: ${extractedData.length}`)
-
-    if (extractedData.length === 0) {
+    if (errors.length > 0) {
       return new Response(
-        JSON.stringify({ error: 'No valid data found in PDF' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        JSON.stringify({ 
+          error: 'Some rows could not be processed', 
+          details: errors 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 400 
+        }
+      )
+    }
+
+    if (processedData.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'No valid data found in CSV' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 400 
+        }
       )
     }
 
     // Insert data into Supabase
     const { data, error } = await supabase
       .from('ephemeris_data')
-      .upsert(extractedData, {
+      .upsert(processedData, {
         onConflict: 'date,planet',
         ignoreDuplicates: true
       })
@@ -101,80 +132,34 @@ serve(async (req) => {
       console.error('Error inserting data:', error)
       return new Response(
         JSON.stringify({ error: 'Failed to insert data', details: error }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500 
+        }
       )
-    }
-
-    // Clean up: Delete the processed file
-    const { error: deleteError } = await supabase
-      .storage
-      .from('ephemeris_pdfs')
-      .remove([filePath])
-
-    if (deleteError) {
-      console.warn('Warning: Failed to delete processed file:', deleteError)
     }
 
     return new Response(
       JSON.stringify({ 
         message: 'File processed successfully', 
-        rowsProcessed: extractedData.length 
+        rowsProcessed: processedData.length 
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 200 
+      }
     )
   } catch (error) {
     console.error('Processing error:', error)
     return new Response(
-      JSON.stringify({ error: 'An unexpected error occurred', details: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ 
+        error: 'An unexpected error occurred', 
+        details: error.message 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 500 
+      }
     )
   }
 })
-
-function parseLine(line: string): any {
-  // Enhanced parsing logic for ephemeris data
-  // Example format: "01/01/2024  Sun  280.5  R"
-  const matches = line.match(/(\d{2}\/\d{2}\/\d{4})\s+([A-Za-z]+)\s+(\d+\.\d+)\s*(R)?/)
-  
-  if (matches) {
-    const [_, dateStr, planet, longitude, retrograde] = matches
-    
-    // Validate the planet is one of the allowed celestial bodies
-    const validPlanets = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']
-    const normalizedPlanet = planet.charAt(0).toUpperCase() + planet.slice(1).toLowerCase()
-    
-    if (!validPlanets.includes(normalizedPlanet)) {
-      console.log(`Skipping invalid planet: ${planet}`)
-      return null
-    }
-
-    try {
-      // Parse and validate the date
-      const [month, day, year] = dateStr.split('/')
-      const date = new Date(Number(year), Number(month) - 1, Number(day))
-      
-      if (isNaN(date.getTime())) {
-        console.log(`Skipping invalid date: ${dateStr}`)
-        return null
-      }
-
-      // Parse and validate the longitude
-      const parsedLongitude = parseFloat(longitude)
-      if (isNaN(parsedLongitude) || parsedLongitude < 0 || parsedLongitude >= 360) {
-        console.log(`Skipping invalid longitude: ${longitude}`)
-        return null
-      }
-
-      return {
-        date: date.toISOString().split('T')[0],
-        planet: normalizedPlanet,
-        longitude: parsedLongitude,
-        retrograde: !!retrograde,
-      }
-    } catch (error) {
-      console.error('Error parsing line:', error)
-      return null
-    }
-  }
-  return null
-}
