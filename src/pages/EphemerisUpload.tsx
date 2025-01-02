@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { Upload, FileType, AlertCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Upload, FileType, AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 const EphemerisUpload = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -26,6 +28,55 @@ const EphemerisUpload = () => {
       setError("Please upload PDF files only");
     }
   });
+
+  const processFiles = async () => {
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        const response = await fetch(
+          'https://qwpveubezldowcycifbh.supabase.co/functions/v1/process-ephemeris',
+          {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Authorization': `Bearer ${session?.access_token}`,
+            },
+          }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to process file');
+        }
+
+        toast({
+          title: "Success",
+          description: `Processed ${result.rowsProcessed} rows from ${file.name}`,
+        });
+      }
+
+      // Clear files after successful processing
+      setFiles([]);
+    } catch (err) {
+      console.error('Error processing files:', err);
+      setError(err.message || 'Failed to process files');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to process files. Please try again.",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="container py-8 space-y-6">
@@ -83,15 +134,17 @@ const EphemerisUpload = () => {
             ))}
           </ul>
           <Button
-            onClick={() => {
-              // This will be implemented in the next step
-              toast({
-                title: "Coming soon",
-                description: "File processing will be implemented in the next step",
-              });
-            }}
+            onClick={processFiles}
+            disabled={isProcessing}
           >
-            Process Files
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              'Process Files'
+            )}
           </Button>
         </div>
       )}

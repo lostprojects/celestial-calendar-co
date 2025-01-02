@@ -8,12 +8,23 @@ _Last Updated: March 19, 2024_
 
 ### src/pages/EphemerisUpload.tsx
 - **Purpose**: Provides interface for uploading and processing ephemeris PDF files
-- **Dependencies**: react-dropzone, @/components/ui/*
+- **Dependencies**: react-dropzone, @/components/ui/*, @supabase/supabase-js
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Initial creation with drag-and-drop interface
-  - Added file validation and error handling
-  - Implemented file list display
+  - Added file processing functionality
+  - Integrated with Supabase Edge Function
+  - Added loading states and error handling
+  - Implemented success notifications
+
+### supabase/functions/process-ephemeris/index.ts
+- **Purpose**: Edge Function for processing PDF files and inserting data into Supabase
+- **Dependencies**: pdf-lib, @supabase/supabase-js
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial creation
+  - Implemented PDF parsing logic
+  - Added data insertion with duplicate handling
+  - Added error handling and validation
 
 ### src/pages/Glossary.tsx
 - **Purpose**: Displays comprehensive documentation of app components and functions
