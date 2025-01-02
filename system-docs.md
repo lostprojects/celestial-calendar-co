@@ -66,3 +66,14 @@ _Last Updated: March 19, 2024_
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
   - Added link to the new Glossary page
+
+### src/utils/astro/core.ts
+- **Purpose**: Core astronomical calculations and constants
+- **Dependencies**: astronomia/julian, astronomia/solar, astronomia/moonposition, astronomia/sidereal
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Improved Julian Day calculation with subsecond precision
+  - Updated to use verified WGS84 constants
+  - Simplified geocentric latitude calculation for better maintainability
+  - Enhanced documentation with source references
+  - Removed unverified constants for better reliability
