@@ -6,26 +6,6 @@ _Last Updated: March 19, 2024_
 
 ## File List
 
-### src/pages/EphemerisUpload.tsx
-- **Purpose**: Provides interface for uploading and processing ephemeris PDF files
-- **Dependencies**: react-dropzone, @/components/ui/*, @supabase/supabase-js
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Added file processing functionality
-  - Integrated with Supabase Edge Function
-  - Added loading states and error handling
-  - Implemented success notifications
-
-### supabase/functions/process-ephemeris/index.ts
-- **Purpose**: Edge Function for processing PDF files and inserting data into Supabase
-- **Dependencies**: pdf-lib, @supabase/supabase-js
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Initial creation
-  - Implemented PDF parsing logic
-  - Added data insertion with duplicate handling
-  - Added error handling and validation
-
 ### src/pages/Glossary.tsx
 - **Purpose**: Displays comprehensive documentation of app components and functions
 - **Dependencies**: @/components/ui/tabs
@@ -80,25 +60,36 @@ _Last Updated: March 19, 2024_
   - Integrated Supabase SessionContextProvider
   - Added account management page route
   - Added route for the new Glossary page
-  - Added route for the new EphemerisUpload page
 
 ### src/components/Footer.tsx
 - **Purpose**: Footer component for the application
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
   - Added link to the new Glossary page
-  - Added link to the new EphemerisUpload page
 
-### src/utils/astro/core.ts
-- **Purpose**: Core astronomical calculations and constants
-- **Dependencies**: astronomia/julian, astronomia/solar, astronomia/moonposition, astronomia/sidereal
+### src/utils/astro-core.ts
+- **Purpose**: Core astronomical calculations and utilities
+- **Dependencies**: astronomia
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
-  - Improved Julian Day calculation with subsecond precision
-  - Updated to use verified WGS84 constants
-  - Simplified geocentric latitude calculation for better maintainability
-  - Enhanced documentation with source references
-  - Removed unverified constants for better reliability
+  - Added ASTRONOMICAL_CONSTANTS object for better organization
+  - Enhanced error handling and validation
+  - Added structured logging for debugging
+  - Added CelestialPosition interface
+  - Added normalizeRadians utility function
+  - Improved type safety with const assertions
+
+### supabase/functions/process-ephemeris/index.ts
+- **Purpose**: Edge Function for processing PDF files and inserting data into Supabase
+- **Dependencies**: pdf-lib, @supabase/supabase-js
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Enhanced PDF parsing logic with validation
+  - Added detailed logging for debugging
+  - Improved error handling and data validation
+  - Added support for retrograde planet detection
+  - Implemented planet name normalization
+  - Added longitude range validation
 
 ### src/utils/astro/types.ts
 - **Purpose**: Type definitions for astronomical calculations
@@ -121,3 +112,4 @@ _Last Updated: March 19, 2024_
   - Added detailed calculation metadata to results
   - Fixed type exports
   - Added extensive logging for debugging
+
