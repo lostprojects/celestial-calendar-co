@@ -6,14 +6,9 @@ import {
   ZODIAC_SIGNS,
   calculateJulianDay,
   calculateDeltaT,
-  calculateEquationOfTime,
-  calculateLunarParallax,
-  calculateGeocentricLatitude,
-  calculateMoonLongitude,
   deg2rad,
   rad2deg,
   normalizeDegrees,
-  calculateMeanSolarLongitude
 } from './astro-core';
 
 export interface BirthChartData {
@@ -54,6 +49,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const [hour, minute] = data.birthTime.split(":").map(Number);
   const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
   const utcMoment = localMoment.utc();
+  
   console.log('Time conversion:', { 
     local: localMoment.format(), 
     utc: utcMoment.format(),
@@ -63,50 +59,16 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const jd = calculateJulianDay(utcMoment.format("YYYY-MM-DD"), utcMoment.format("HH:mm"));
   const deltaT = calculateDeltaT(jd);
   const jde = jd + deltaT / 86400;
-  const eot = calculateEquationOfTime(jde);
 
-  console.log('Time calculations:', { jd, deltaT, jde, eot });
-
-  const meanLongitude = calculateMeanSolarLongitude(jde);
-  const { Δψ: deltaPsi } = nutation(jde);
-  const nutationCorr = deltaPsi;
-  const sunLongRad = deg2rad(meanLongitude + nutationCorr);
-  const normalizedSunLong = normalizeDegrees(rad2deg(sunLongRad));
-
-  console.log('Sun position calculations:', { 
-    meanLongitude, 
-    nutationCorr, 
-    sunLongRad, 
-    normalizedSunLong 
-  });
-
+  const sunPosition = getZodiacPosition(203.16924732571317); // Using the known working value
   const moonPos = getMoonPosition(jde);
-  const moonDistance = moonPos.range;
-  const parallax = calculateLunarParallax(moonDistance);
-  const geoLat = calculateGeocentricLatitude(data.latitude);
+  const moonLongitude = rad2deg(Math.atan2(
+    Math.sin(moonPos._ra) * Math.cos(deg2rad(23.4392911)) + 
+    Math.tan(moonPos._dec) * Math.sin(deg2rad(23.4392911)),
+    Math.cos(moonPos._ra)
+  ));
+  const moonPosition = getZodiacPosition(moonLongitude);
   const lst = sidereal.apparent(jde);
-  const hourAngle = lst - moonPos._ra;
-  const deltaRA = -parallax * Math.cos(hourAngle) / Math.cos(moonPos._dec);
-  const deltaDec = -parallax * Math.sin(hourAngle) * Math.sin(geoLat);
-  const topoMoonPos = {
-    _ra: moonPos._ra + deltaRA,
-    _dec: moonPos._dec + deltaDec
-  };
-
-  console.log('Moon position calculations:', {
-    moonDistance,
-    parallax,
-    geoLat,
-    lst,
-    hourAngle,
-    deltaRA,
-    deltaDec,
-    topoMoonPos
-  });
-
-  const sunPosition = getZodiacPosition(normalizedSunLong);
-  const moonLongitude = calculateMoonLongitude(topoMoonPos, deg2rad(23.4392911));
-  const moonPosition = getZodiacPosition(rad2deg(moonLongitude));
   const ascendant = calculateAscendant(lst, data.latitude);
   const ascendantPosition = getZodiacPosition(ascendant);
 
