@@ -89,6 +89,36 @@ export type Database = {
           },
         ]
       }
+      ephemeris_data: {
+        Row: {
+          created_at: string
+          date: string
+          event: string | null
+          id: number
+          longitude: number
+          planet: Database["public"]["Enums"]["celestial_body"]
+          retrograde: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          event?: string | null
+          id?: number
+          longitude: number
+          planet: Database["public"]["Enums"]["celestial_body"]
+          retrograde?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          event?: string | null
+          id?: number
+          longitude?: number
+          planet?: Database["public"]["Enums"]["celestial_body"]
+          retrograde?: boolean | null
+        }
+        Relationships: []
+      }
       interpretations: {
         Row: {
           birth_chart_id: string
@@ -300,7 +330,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      celestial_body:
+        | "Sun"
+        | "Moon"
+        | "Mercury"
+        | "Venus"
+        | "Mars"
+        | "Jupiter"
+        | "Saturn"
+        | "Uranus"
+        | "Neptune"
+        | "Pluto"
     }
     CompositeTypes: {
       [_ in never]: never

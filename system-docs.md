@@ -6,6 +6,15 @@ _Last Updated: March 19, 2024_
 
 ## File List
 
+### src/pages/EphemerisUpload.tsx
+- **Purpose**: Provides interface for uploading and processing ephemeris PDF files
+- **Dependencies**: react-dropzone, @/components/ui/*
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Initial creation with drag-and-drop interface
+  - Added file validation and error handling
+  - Implemented file list display
+
 ### src/pages/Glossary.tsx
 - **Purpose**: Displays comprehensive documentation of app components and functions
 - **Dependencies**: @/components/ui/tabs
@@ -60,12 +69,14 @@ _Last Updated: March 19, 2024_
   - Integrated Supabase SessionContextProvider
   - Added account management page route
   - Added route for the new Glossary page
+  - Added route for the new EphemerisUpload page
 
 ### src/components/Footer.tsx
 - **Purpose**: Footer component for the application
 - **Last Updated**: March 19, 2024
 - **Recent Changes**:
   - Added link to the new Glossary page
+  - Added link to the new EphemerisUpload page
 
 ### src/utils/astro/core.ts
 - **Purpose**: Core astronomical calculations and constants
@@ -99,4 +110,3 @@ _Last Updated: March 19, 2024_
   - Added detailed calculation metadata to results
   - Fixed type exports
   - Added extensive logging for debugging
-

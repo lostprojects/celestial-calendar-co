@@ -11,6 +11,9 @@ export const Footer = () => {
           <Link to="/style-guide" className="hover:text-primary transition-colors">
             Style Guide
           </Link>
+          <Link to="/ephemeris-upload" className="hover:text-primary transition-colors">
+            Ephemeris Upload
+          </Link>
         </nav>
         <p className="text-xs text-primary/60">
           © 2024 All rights reserved.

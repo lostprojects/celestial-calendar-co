@@ -12,6 +12,7 @@ import Auth from "./pages/Auth";
 import Account from "./pages/Account";
 import StyleGuide from "./pages/StyleGuide";
 import Glossary from "./pages/Glossary";
+import EphemerisUpload from "./pages/EphemerisUpload";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
                 <Route path="/account" element={<Account />} />
                 <Route path="/style-guide" element={<StyleGuide />} />
                 <Route path="/glossary" element={<Glossary />} />
+                <Route path="/ephemeris-upload" element={<EphemerisUpload />} />
               </Routes>
             </main>
             <Footer />
