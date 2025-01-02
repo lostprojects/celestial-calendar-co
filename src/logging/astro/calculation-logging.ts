@@ -44,7 +44,7 @@ export function logAllAstroCalculations(
 
   // Create wrapped versions that log everything
   const wrappedFunctions = Object.entries(originalFunctions).reduce((acc, [name, fn]) => {
-    acc[name] = (...args: any[]) => {
+    acc[name] = (...args: Parameters<typeof fn>) => {
       const step: CalculationStep = {
         functionName: name,
         inputs: { args },
@@ -67,7 +67,10 @@ export function logAllAstroCalculations(
   }, {} as typeof originalFunctions);
 
   // Replace the original functions with wrapped versions
-  Object.assign(global, wrappedFunctions);
+  const tempWindow = window as any;
+  Object.entries(wrappedFunctions).forEach(([key, value]) => {
+    tempWindow[key] = value;
+  });
 
   try {
     // Run calculation with wrapped functions
@@ -84,7 +87,9 @@ export function logAllAstroCalculations(
     return { result, log };
   } finally {
     // Restore original functions and dump logs
-    Object.assign(global, originalFunctions);
+    Object.entries(originalFunctions).forEach(([key, value]) => {
+      tempWindow[key] = value;
+    });
     dumpLogs();
   }
 }
