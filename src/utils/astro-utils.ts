@@ -21,6 +21,7 @@ import { dumpLogs } from '../logging/utils/file-logger';
 import { logTimeInputs, logTimezoneDetection, logTimeConversion, logJulianCalculations } from "@/logging/astro/time-logging";
 import { logSunPosition, logSolarComponents, logMoonCalculations } from "@/logging/astro/position-logging";
 import { logZodiacPosition, logFinalPositions } from "@/logging/astro/zodiac-logging";
+import { logAllAstroCalculations } from "@/logging/astro/calculation-logging";
 
 export interface BirthChartData {
   birthDate: string;
@@ -67,8 +68,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
       timestamp: new Date().toISOString()
     });
 
-    // Log initial input data
-    logTimeInputs(data);
+    logAllAstroCalculations(data);
 
     // Detect and log timezone
     const timezone = findTimezoneFromCoords(data.latitude, data.longitude);
@@ -111,20 +111,23 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     };
     logMoonCalculations(moonDistance, parallax, geoLat, lst, hourAngle, deltaRA, deltaDec, topoMoonPos);
 
-    // Log coordinate calculations
-    logCoordinateCalculations(data.latitude, data.longitude, geoLat, lst);
+    // Calculate final positions
+    const sunPosition = getZodiacPosition(normalizedSunLong);
+    const moonLongitude = calculateMoonLongitude(topoMoonPos, deg2rad(23.4392911));
+    const moonPosition = getZodiacPosition(rad2deg(moonLongitude));
+    const ascendant = calculateAscendant(lst, data.latitude);
+    const ascendantPosition = getZodiacPosition(ascendant);
 
-    // Calculate final positions and log them
     const result = {
-      sunSign: getZodiacPosition(normalizedSunLong).sign,
-      moonSign: getZodiacPosition(finalMoonLongitude).sign,
-      risingSign: getZodiacPosition(ascendant).sign,
-      sunDeg: getZodiacPosition(normalizedSunLong).degrees,
-      sunMin: getZodiacPosition(normalizedSunLong).minutes,
-      moonDeg: getZodiacPosition(finalMoonLongitude).degrees,
-      moonMin: getZodiacPosition(finalMoonLongitude).minutes,
-      risingDeg: getZodiacPosition(ascendant).degrees,
-      risingMin: getZodiacPosition(ascendant).minutes
+      sunSign: sunPosition.sign,
+      moonSign: moonPosition.sign,
+      risingSign: ascendantPosition.sign,
+      sunDeg: sunPosition.degrees,
+      sunMin: sunPosition.minutes,
+      moonDeg: moonPosition.degrees,
+      moonMin: moonPosition.minutes,
+      risingDeg: ascendantPosition.degrees,
+      risingMin: ascendantPosition.minutes
     };
 
     logFinalPositions(
@@ -172,4 +175,14 @@ function getZodiacPosition(longitude: number) {
   });
   
   return result;
+}
+
+function calculateAscendant(lst: number, latitude: number): number {
+  const obliquity = 23.4392911;
+  const ascRad = Math.atan2(
+    Math.cos(lst),
+    -(Math.sin(lst) * Math.cos(deg2rad(obliquity)) + 
+      Math.tan(deg2rad(latitude)) * Math.sin(deg2rad(obliquity)))
+  );
+  return normalizeDegrees(rad2deg(ascRad));
 }

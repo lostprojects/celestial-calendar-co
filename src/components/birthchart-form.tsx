@@ -11,7 +11,6 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
 import { useToast } from "@/hooks/use-toast";
-import { logAllAstroCalculations } from "@/logging/astro/calculation-logging";
 
 export default function BirthChartForm() {
   const [formData, setFormData] = useState<BirthChartData>({
@@ -42,8 +41,7 @@ export default function BirthChartForm() {
     console.log("Form submitted with data:", formData);
     
     try {
-      const { result: wChart, log } = logAllAstroCalculations(formData, calculateBirthChart);
-      console.log("Calculation log:", log);
+      const wChart = calculateBirthChart(formData);
       setWesternResults(wChart);
       await supabaseInsert(formData, wChart);
 
