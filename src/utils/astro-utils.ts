@@ -74,8 +74,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const eps = 23.4392911;
   const epsRad = deg2rad(eps);
 
+  // The only change is here - we normalize the longitude after converting to degrees
   const sunLongRad = solar.apparentLongitude(correctedJde);
-  const normalizedSunLong = rad2deg(sunLongRad);
+  let normalizedSunLong = rad2deg(sunLongRad);
+  normalizedSunLong = ((normalizedSunLong % 360) + 360) % 360;
   
   console.log("Sun position:", {
     longitudeRad: sunLongRad,
