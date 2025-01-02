@@ -24,7 +24,7 @@ export function calculateJulianDay(utcDate: string, utcTime: string): number {
 }
 
 export function calculateEquationOfTime(jde: number): number {
-  return solar.equationOfTime(jde);
+  return solar.eot(jde);
 }
 
 export function calculateLunarParallax(moonDistance: number): number {
