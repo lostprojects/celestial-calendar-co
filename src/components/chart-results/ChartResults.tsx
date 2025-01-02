@@ -29,6 +29,12 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
   const user = useUser();
 
   const getAIInterpretation = async () => {
+    console.log("[ChartResults] Starting AI interpretation request");
+    console.log("[ChartResults] User state:", { 
+      isAuthenticated: !!user, 
+      userId: user?.id 
+    });
+    
     setIsLoading(true);
     try {
       const { data: interpretationData, error: interpretationError } = await supabase.functions.invoke('generate-astro-advice', {
@@ -45,7 +51,12 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
         }
       });
 
-      if (interpretationError) throw interpretationError;
+      if (interpretationError) {
+        console.error("[ChartResults] Error from generate-astro-advice:", interpretationError);
+        throw interpretationError;
+      }
+
+      console.log("[ChartResults] AI Interpretation received:", interpretationData);
 
       if (!interpretationData?.interpretation) {
         throw new Error('No interpretation generated');
@@ -54,17 +65,29 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
       setCurrentInterpretation(interpretationData.interpretation);
       
       if (user && birthData) {
-        const birthChartId = await saveBirthChart(user, birthData, mainWestern);
-        await saveInterpretation(birthChartId, user.id, interpretationData.interpretation);
+        console.log("[ChartResults] Attempting to save birth chart and interpretation");
         
-        toast({
-          title: "Success",
-          description: "Your birth chart and interpretation have been saved!",
-          variant: "default",
-        });
+        try {
+          const birthChartId = await saveBirthChart(user, birthData, mainWestern);
+          await saveInterpretation(birthChartId, user.id, interpretationData.interpretation);
+          
+          console.log("[ChartResults] Successfully saved both birth chart and interpretation");
+          
+          toast({
+            title: "Success",
+            description: "Your birth chart and interpretation have been saved!",
+            variant: "default",
+          });
+        } catch (dbError) {
+          console.error("[ChartResults] Database operation failed:", dbError);
+          throw new Error(`Failed to save chart or interpretation: ${dbError.message}`);
+        }
+      } else {
+        console.log("[ChartResults] Skipping database save - User:", !!user, "Birth data:", !!birthData);
       }
 
     } catch (error) {
+      console.error("[ChartResults] Error in getAIInterpretation:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to generate or save your personal reading. Please try again.",
@@ -77,6 +100,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
 
   useEffect(() => {
     if (mainWestern && !currentInterpretation && !isLoading) {
+      console.log("[ChartResults] Triggering AI interpretation due to mainWestern update");
       getAIInterpretation();
     }
   }, [mainWestern]);
@@ -98,7 +122,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
       <div className="max-w-2xl mx-auto px-4 space-y-6">
         <BirthSignCard
           sign={mainWestern.sunSign}
-          position="Sun"
+          position={`${mainWestern.sunDeg}°${mainWestern.sunMin}'`}
           icon={Sun}
           iconColor="accent-orange"
           degrees={mainWestern.sunDeg}
@@ -110,7 +134,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
 
         <BirthSignCard
           sign={mainWestern.moonSign}
-          position="Moon"
+          position={`${mainWestern.moonDeg}°${mainWestern.moonMin}'`}
           icon={Moon}
           iconColor="accent-lightpalm"
           degrees={mainWestern.moonDeg}
@@ -122,7 +146,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
 
         <BirthSignCard
           sign={mainWestern.risingSign}
-          position="Rising"
+          position={`${mainWestern.risingDeg}°${mainWestern.risingMin}'`}
           icon={Sunrise}
           iconColor="accent-palm"
           degrees={mainWestern.risingDeg}
@@ -132,6 +156,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
           onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
         />
 
+        {/* AI Interpretation Section */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center p-8 space-y-4">
             <Loader2 className="w-8 h-8 text-accent-orange animate-spin" />

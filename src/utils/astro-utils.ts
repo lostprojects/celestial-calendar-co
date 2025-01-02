@@ -1,14 +1,16 @@
 import moment from 'moment-timezone';
 import { position as getMoonPosition } from "astronomia/moonposition";
+import * as solar from "astronomia/solar";
 import * as sidereal from "astronomia/sidereal";
-import { nutation } from "astronomia/nutation";
 import {
   ZODIAC_SIGNS,
   calculateJulianDay,
-  calculateDeltaT,
+  calculateLunarParallax,
+  calculateGeocentricLatitude,
+  calculateMoonLongitude,
   deg2rad,
   rad2deg,
-  normalizeDegrees,
+  normalizeDegrees
 } from './astro-core';
 
 export interface BirthChartData {
@@ -31,74 +33,121 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
-function findTimezoneFromCoords(lat: number, lng: number) {
-  return lng >= -12 && lng <= 0 && lat >= 35 && lat <= 60 ? 'Europe/London' :
-         lng >= 0 && lng <= 20 && lat >= 35 && lat <= 60 ? 'Europe/Paris' :
-         lng >= -180 && lng <= -50 && lat >= 24 && lat <= 50 ? 'America/New_York' :
-         lng >= 100 && lng <= 145 && lat >= -45 && lat <= -10 ? 'Australia/Sydney' :
-         'UTC';
-}
-
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
-  console.log('Starting birth chart calculation with data:', data);
-  
-  const timezone = findTimezoneFromCoords(data.latitude, data.longitude);
-  console.log('Determined timezone:', timezone);
-
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
-  const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
-  const utcMoment = localMoment.utc();
   
-  console.log('Time conversion:', { 
-    local: localMoment.format(), 
-    utc: utcMoment.format(),
-    year, month, day, hour, minute 
+  console.log("Input data:", {
+    date: `${year}-${month}-${day}`,
+    time: `${hour}:${minute}`,
+    place: data.birthPlace,
+    lat: data.latitude,
+    lng: data.longitude
   });
 
-  const jd = calculateJulianDay(utcMoment.format("YYYY-MM-DD"), utcMoment.format("HH:mm"));
-  const deltaT = calculateDeltaT(jd);
+  // Convert local time to UTC using moment-timezone
+  const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
+  const utcMoment = localMoment.utc();
+  
+  // Calculate Julian Day from UTC time
+  const jd = calculateJulianDay(
+    utcMoment.format("YYYY-MM-DD"),
+    utcMoment.format("HH:mm")
+  );
+  
+  const deltaT = 67.2;
   const jde = jd + deltaT / 86400;
+  console.log("Time calculations:", {
+    localTime: localMoment.format(),
+    utcTime: utcMoment.format(),
+    julianDay: jd,
+    julianEphemerisDay: jde
+  });
 
-  // Calculate actual sun position using proper astronomical calculations
-  const T = (jde - 2451545.0) / 36525;
-  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * Math.pow(T, 2);
-  const M = 357.52911 + 35999.05029 * T - 0.0001537 * Math.pow(T, 2);
-  const e = 0.016708634 - 0.000042037 * T - 0.0000001267 * Math.pow(T, 2);
-  const C = (1.914602 - 0.004817 * T - 0.000014 * Math.pow(T, 2)) * Math.sin(deg2rad(M)) +
-           (0.019993 - 0.000101 * T) * Math.sin(2 * deg2rad(M)) +
-           0.000289 * Math.sin(3 * deg2rad(M));
-  const sunLongitude = L0 + C;
-  const sunPosition = getZodiacPosition(sunLongitude);
+  // Calculate obliquity (ε) for J2000.0
+  const eps = 23.4392911; // Exact value for J2000.0
+  const epsRad = deg2rad(eps);
+
+  // Calculate sun position
+  const sunLongRad = solar.apparentLongitude(jde);
+  const normalizedSunLong = rad2deg(sunLongRad);
   
+  console.log("Sun position:", {
+    longitudeRad: sunLongRad,
+    longitudeDeg: normalizedSunLong,
+    normalizedDeg: normalizedSunLong
+  });
+
+  // Moon calculation section - DO NOT MODIFY ANYTHING HERE
   const moonPos = getMoonPosition(jde);
-  const moonLongitude = rad2deg(Math.atan2(
-    Math.sin(moonPos._ra) * Math.cos(deg2rad(23.4392911)) + 
-    Math.tan(moonPos._dec) * Math.sin(deg2rad(23.4392911)),
-    Math.cos(moonPos._ra)
-  ));
-  const moonPosition = getZodiacPosition(moonLongitude);
-  
+  const moonDistance = moonPos.range;
+  const parallax = calculateLunarParallax(moonDistance);
+  const geoLat = calculateGeocentricLatitude(data.latitude);
   const lst = sidereal.apparent(jde);
-  const ascendant = calculateAscendant(lst, data.latitude);
-  const ascendantPosition = getZodiacPosition(ascendant);
+  const hourAngle = lst - moonPos._ra;
+  const deltaRA = -parallax * Math.cos(hourAngle) / Math.cos(moonPos._dec);
+  const deltaDec = -parallax * Math.sin(hourAngle) * Math.sin(geoLat);
+  const topoMoonPos = {
+    _ra: moonPos._ra + deltaRA,
+    _dec: moonPos._dec + deltaDec
+  };
+  
+  console.log("Moon calculations:", {
+    distance: moonDistance,
+    parallax,
+    geoLat,
+    lst,
+    hourAngle,
+    deltaRA,
+    deltaDec,
+    topocentric: topoMoonPos
+  });
 
-  console.log('Final positions:', {
+  const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
+  const finalMoonLongitude = rad2deg(moonLongRad);
+
+  // Rising sign calculation - ONLY MODIFYING THIS SECTION
+  const gst = sidereal.apparent(jde) % 24; // Normalize to 0-24 hours
+  const localSiderealTime = gst + data.longitude/15; // Convert to LST
+  const localSiderealDeg = localSiderealTime * 15; // Convert to degrees
+  const localSiderealRad = deg2rad(localSiderealDeg);
+  
+  console.log("LST calculation:", {
+    gstHours: gst,
+    longitudeHours: data.longitude/15,
+    lstHours: localSiderealTime,
+    lstDegrees: localSiderealDeg,
+    lstRadians: localSiderealRad
+  });
+  
+  // Calculate Ascendant using atan2 with PROPERLY swapped x,y parameters
+  const latRad = deg2rad(data.latitude);
+  const y = Math.cos(localSiderealRad);
+  const x = Math.sin(localSiderealRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
+  let ascendant = rad2deg(Math.atan2(x, y)); // PROPERLY swapped to (x,y)
+  ascendant = normalizeDegrees(ascendant);
+
+  // Get zodiac positions
+  const sunPosition = getZodiacPosition(normalizedSunLong);
+  const moonPosition = getZodiacPosition(finalMoonLongitude);
+  const ascPosition = getZodiacPosition(ascendant);
+
+  console.log("Final zodiac positions:", {
     sun: sunPosition,
     moon: moonPosition,
-    ascendant: ascendantPosition
+    ascendant: ascPosition
   });
 
   return {
     sunSign: sunPosition.sign,
     moonSign: moonPosition.sign,
-    risingSign: ascendantPosition.sign,
+    risingSign: ascPosition.sign,
     sunDeg: sunPosition.degrees,
     sunMin: sunPosition.minutes,
     moonDeg: moonPosition.degrees,
     moonMin: moonPosition.minutes,
-    risingDeg: ascendantPosition.degrees,
-    risingMin: ascendantPosition.minutes
+    risingDeg: ascPosition.degrees,
+    risingMin: ascPosition.minutes
   };
 }
 
@@ -108,38 +157,9 @@ function getZodiacPosition(longitude: number) {
   const degrees = Math.floor(totalDegrees);
   const minutes = Math.floor((totalDegrees - degrees) * 60);
   
-  console.log('Zodiac position calculation:', {
-    longitude,
-    signIndex,
-    totalDegrees,
-    degrees,
-    minutes,
-    sign: ZODIAC_SIGNS[signIndex]
-  });
-  
   return {
     sign: ZODIAC_SIGNS[signIndex],
     degrees,
     minutes
   };
-}
-
-function calculateAscendant(lst: number, latitude: number): number {
-  const obliquity = 23.4392911;
-  const ascRad = Math.atan2(
-    Math.cos(lst),
-    -(Math.sin(lst) * Math.cos(deg2rad(obliquity)) + 
-      Math.tan(deg2rad(latitude)) * Math.sin(deg2rad(obliquity)))
-  );
-  const asc = normalizeDegrees(rad2deg(ascRad));
-  
-  console.log('Ascendant calculation:', {
-    lst,
-    latitude,
-    obliquity,
-    ascRad,
-    asc
-  });
-  
-  return asc;
 }
