@@ -24,15 +24,34 @@ export function calculateJulianDay(utcDate: string, utcTime: string): number {
   return jdNoon + dayFraction;
 }
 
+export function calculateMeanSolarLongitude(jde: number): number {
+  // Calculate T (Julian centuries since J2000.0)
+  const T = (jde - 2451545.0) / 36525;
+  
+  // Calculate mean longitude using the formula
+  let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * Math.pow(T, 2);
+  
+  // Normalize to range [0, 360)
+  L0 = ((L0 % 360) + 360) % 360;
+  
+  console.log("Mean Solar Longitude calculation:", {
+    julianCenturies: T,
+    rawL0: L0,
+    normalizedL0: L0
+  });
+  
+  return L0;
+}
+
 export function calculateEquationOfTime(jde: number): number {
   // Calculate mean longitude of the Sun (L0)
-  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const L0 = solar.meanLongitude(T);
+  const L0 = calculateMeanSolarLongitude(jde);
   
   // Calculate apparent longitude of the Sun
   const lambdaApp = solar.apparentLongitude(jde);
   
   // Calculate nutation in longitude and mean obliquity
+  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
   const deltaPsi = nutation.nutation(jde);
   const epsilon = nutation.meanObliquity(T);
   
