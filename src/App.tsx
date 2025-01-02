@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { supabase } from './integrations/supabase/client';
 import Index from './pages/Index';
@@ -18,6 +18,8 @@ function App() {
           <Route path="/account" element={<Account />} />
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/style-guide" element={<StyleGuide />} />
+          {/* Catch all route - redirect to home page */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </SessionContextProvider>
