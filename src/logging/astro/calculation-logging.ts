@@ -24,163 +24,191 @@ export function logAllAstroCalculations(
   data: BirthChartData,
   calculationFunction: (data: BirthChartData) => BirthChartResult
 ): { result: BirthChartResult; log: CalculationLog } {
+  const steps: CalculationStep[] = [];
   const log: CalculationLog = {
     startTime: new Date().toISOString(),
     inputData: data,
-    steps: [],
+    steps,
     finalResult: null as unknown as BirthChartResult,
     endTime: "",
   };
 
-  // Wrap core calculation functions to capture everything
-  const wrappedJulianDay = (utcDate: string, utcTime: string) => {
-    const step: CalculationStep = {
-      functionName: "calculateJulianDay",
-      inputs: { utcDate, utcTime },
-      intermediateSteps: {},
-      outputs: {},
-      timestamp: new Date().toISOString(),
-    };
-
-    const [year, month, day] = utcDate.split('-').map(Number);
-    const [hour, minute] = utcTime.split(':').map(Number);
-    
-    step.intermediateSteps = {
-      year, month, day, hour, minute,
-    };
-    
-    const result = calculateJulianDay(utcDate, utcTime);
-    step.outputs = { julianDay: result };
-    log.steps.push(step);
-    return result;
+  // Store original functions
+  const originalFunctions = {
+    calculateJulianDay,
+    calculateDeltaT,
+    calculateMeanSolarLongitude,
+    calculateEquationOfTime,
+    calculateLunarParallax,
+    calculateGeocentricLatitude,
+    calculateMoonLongitude,
   };
 
-  const wrappedDeltaT = (jd: number) => {
-    const step: CalculationStep = {
-      functionName: "calculateDeltaT",
-      inputs: { julianDay: jd },
-      intermediateSteps: {},
-      outputs: {},
-      timestamp: new Date().toISOString(),
-    };
+  // Create wrapped versions that log everything
+  const wrappedFunctions = {
+    calculateJulianDay: (utcDate: string, utcTime: string) => {
+      const step: CalculationStep = {
+        functionName: "calculateJulianDay",
+        inputs: { utcDate, utcTime },
+        intermediateSteps: {},
+        outputs: {},
+        timestamp: new Date().toISOString(),
+      };
 
-    const T = (jd - 2451545.0) / 36525;
-    step.intermediateSteps = { julianCenturies: T };
-    
-    const result = calculateDeltaT(jd);
-    step.outputs = { deltaT: result };
-    log.steps.push(step);
-    return result;
+      try {
+        const result = originalFunctions.calculateJulianDay(utcDate, utcTime);
+        step.outputs = { julianDay: result };
+        steps.push(step);
+        return result;
+      } catch (error) {
+        step.outputs = { error: error.message };
+        steps.push(step);
+        throw error;
+      }
+    },
+
+    calculateDeltaT: (jd: number) => {
+      const step: CalculationStep = {
+        functionName: "calculateDeltaT",
+        inputs: { julianDay: jd },
+        intermediateSteps: {},
+        outputs: {},
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const result = originalFunctions.calculateDeltaT(jd);
+        step.outputs = { deltaT: result };
+        steps.push(step);
+        return result;
+      } catch (error) {
+        step.outputs = { error: error.message };
+        steps.push(step);
+        throw error;
+      }
+    },
+
+    calculateMeanSolarLongitude: (jde: number) => {
+      const step: CalculationStep = {
+        functionName: "calculateMeanSolarLongitude",
+        inputs: { julianEphemerisDay: jde },
+        intermediateSteps: {},
+        outputs: {},
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const result = originalFunctions.calculateMeanSolarLongitude(jde);
+        step.outputs = { meanLongitude: result };
+        steps.push(step);
+        return result;
+      } catch (error) {
+        step.outputs = { error: error.message };
+        steps.push(step);
+        throw error;
+      }
+    },
+
+    calculateEquationOfTime: (jde: number) => {
+      const step: CalculationStep = {
+        functionName: "calculateEquationOfTime",
+        inputs: { julianEphemerisDay: jde },
+        intermediateSteps: {},
+        outputs: {},
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const result = originalFunctions.calculateEquationOfTime(jde);
+        step.outputs = { equationOfTime: result };
+        steps.push(step);
+        return result;
+      } catch (error) {
+        step.outputs = { error: error.message };
+        steps.push(step);
+        throw error;
+      }
+    },
+
+    calculateLunarParallax: (moonDistance: number) => {
+      const step: CalculationStep = {
+        functionName: "calculateLunarParallax",
+        inputs: { moonDistance },
+        intermediateSteps: {},
+        outputs: {},
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const result = originalFunctions.calculateLunarParallax(moonDistance);
+        step.outputs = { parallax: result };
+        steps.push(step);
+        return result;
+      } catch (error) {
+        step.outputs = { error: error.message };
+        steps.push(step);
+        throw error;
+      }
+    },
+
+    calculateGeocentricLatitude: (geographicLat: number) => {
+      const step: CalculationStep = {
+        functionName: "calculateGeocentricLatitude",
+        inputs: { geographicLatitude: geographicLat },
+        intermediateSteps: {},
+        outputs: {},
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const result = originalFunctions.calculateGeocentricLatitude(geographicLat);
+        step.outputs = { geocentricLatitude: result };
+        steps.push(step);
+        return result;
+      } catch (error) {
+        step.outputs = { error: error.message };
+        steps.push(step);
+        throw error;
+      }
+    },
+
+    calculateMoonLongitude: (moonPos: { _ra: number; _dec: number }, epsRad: number) => {
+      const step: CalculationStep = {
+        functionName: "calculateMoonLongitude",
+        inputs: { 
+          rightAscension: moonPos._ra, 
+          declination: moonPos._dec, 
+          obliquityRadians: epsRad 
+        },
+        intermediateSteps: {},
+        outputs: {},
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const result = originalFunctions.calculateMoonLongitude(moonPos, epsRad);
+        step.outputs = { moonLongitude: result };
+        steps.push(step);
+        return result;
+      } catch (error) {
+        step.outputs = { error: error.message };
+        steps.push(step);
+        throw error;
+      }
+    },
   };
 
-  const wrappedMeanSolarLongitude = (jde: number) => {
-    const step: CalculationStep = {
-      functionName: "calculateMeanSolarLongitude",
-      inputs: { julianEphemerisDay: jde },
-      intermediateSteps: {},
-      outputs: {},
-      timestamp: new Date().toISOString(),
-    };
-
-    const T = (jde - 2451545.0) / 36525;
-    step.intermediateSteps = { julianCenturies: T };
-    
-    const result = calculateMeanSolarLongitude(jde);
-    step.outputs = { meanLongitude: result };
-    log.steps.push(step);
-    return result;
-  };
-
-  const wrappedEquationOfTime = (jde: number) => {
-    const step: CalculationStep = {
-      functionName: "calculateEquationOfTime",
-      inputs: { julianEphemerisDay: jde },
-      intermediateSteps: {},
-      outputs: {},
-      timestamp: new Date().toISOString(),
-    };
-
-    const result = calculateEquationOfTime(jde);
-    step.outputs = { equationOfTime: result };
-    log.steps.push(step);
-    return result;
-  };
-
-  const wrappedLunarParallax = (moonDistance: number) => {
-    const step: CalculationStep = {
-      functionName: "calculateLunarParallax",
-      inputs: { moonDistance },
-      intermediateSteps: {},
-      outputs: {},
-      timestamp: new Date().toISOString(),
-    };
-
-    const result = calculateLunarParallax(moonDistance);
-    step.outputs = { parallax: result };
-    log.steps.push(step);
-    return result;
-  };
-
-  const wrappedGeocentricLatitude = (geographicLat: number) => {
-    const step: CalculationStep = {
-      functionName: "calculateGeocentricLatitude",
-      inputs: { geographicLatitude: geographicLat },
-      intermediateSteps: {},
-      outputs: {},
-      timestamp: new Date().toISOString(),
-    };
-
-    const result = calculateGeocentricLatitude(geographicLat);
-    step.outputs = { geocentricLatitude: result };
-    log.steps.push(step);
-    return result;
-  };
-
-  const wrappedMoonLongitude = (moonPos: { _ra: number; _dec: number }, epsRad: number) => {
-    const step: CalculationStep = {
-      functionName: "calculateMoonLongitude",
-      inputs: { 
-        rightAscension: moonPos._ra, 
-        declination: moonPos._dec, 
-        obliquityRadians: epsRad 
-      },
-      intermediateSteps: {},
-      outputs: {},
-      timestamp: new Date().toISOString(),
-    };
-
-    const result = calculateMoonLongitude(moonPos, epsRad);
-    step.outputs = { moonLongitude: result };
-    log.steps.push(step);
-    return result;
-  };
-
-  // Override window logging function to capture everything
-  const originalLogAstroUtils = logAstroUtils;
-  const windowAny = window as any;
-  windowAny.logAstroUtils = (logData: any) => {
-    log.steps.push({
-      functionName: logData.event,
-      inputs: logData.inputs || {},
-      intermediateSteps: logData.intermediateSteps || {},
-      outputs: logData.outputs || {},
-      timestamp: logData.timestamp,
-    });
-    originalLogAstroUtils(logData);
-  };
+  // Replace the original functions with wrapped versions
+  Object.assign(window, wrappedFunctions);
 
   try {
-    // Run the actual calculation with our wrapped functions
+    // Run calculation with wrapped functions
     const result = calculationFunction(data);
     log.finalResult = result;
     log.endTime = new Date().toISOString();
-
-    // Dump all logs
-    dumpLogs();
-
     return { result, log };
   } finally {
-    // Restore original logging function
-    windowAny.logAstroUtils = originalLogAstroUtils;
+    // Restore original functions
+    Object.assign(window, originalFunctions);
   }
 }
