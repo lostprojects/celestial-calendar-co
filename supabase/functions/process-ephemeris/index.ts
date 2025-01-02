@@ -34,21 +34,24 @@ serve(async (req) => {
     // Read the PDF file
     const arrayBuffer = await file.arrayBuffer()
     const pdfDoc = await PDFDocument.load(arrayBuffer)
-    
     const pages = pdfDoc.getPages()
     const extractedData = []
     
     console.log(`Processing ${pages.length} pages`)
 
-    for (const page of pages) {
-      const text = await page.getText()
-      // Split text into lines and process each line
-      const lines = text.split('\n')
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i]
+      // Get the text content using the correct method
+      const textContent = await page.getTextContent()
+      const items = textContent.items || []
+      let pageText = items.map(item => item.str).join(' ')
       
-      console.log(`Processing ${lines.length} lines from page`)
+      console.log(`Processing text from page ${i + 1}:`, pageText)
+      
+      // Split text into lines and process each line
+      const lines = pageText.split('\n')
       
       for (const line of lines) {
-        // Enhanced parsing logic based on ephemeris data format
         const parsed = parseLine(line)
         if (parsed) {
           console.log('Parsed data:', parsed)
