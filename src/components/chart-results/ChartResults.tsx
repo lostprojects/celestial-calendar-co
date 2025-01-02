@@ -28,6 +28,16 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
   const { toast } = useToast();
   const user = useUser();
 
+  useEffect(() => {
+    if (mainWestern) {
+      console.log("Rendering chart results:", {
+        sunSign: mainWestern.sunSign,
+        moonSign: mainWestern.moonSign,
+        risingSign: mainWestern.risingSign
+      });
+    }
+  }, [mainWestern]);
+
   const getAIInterpretation = async () => {
     console.log("[ChartResults] Starting AI interpretation request");
     console.log("[ChartResults] User state:", { 
@@ -156,7 +166,6 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
           onClick={() => setOpenSection(openSection === 'rising' ? null : 'rising')}
         />
 
-        {/* AI Interpretation Section */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center p-8 space-y-4">
             <Loader2 className="w-8 h-8 text-accent-orange animate-spin" />

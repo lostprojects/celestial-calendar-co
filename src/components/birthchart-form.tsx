@@ -27,7 +27,6 @@ export default function BirthChartForm() {
   const user = useUser();
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
-    console.log("Location selected:", location);
     setFormData({
       ...formData,
       birthPlace: location.place,
@@ -42,13 +41,8 @@ export default function BirthChartForm() {
     console.log("Form submitted with data:", formData);
     
     try {
-      // Calculate Western only
-      console.log("Calculating Western chart...");
       const wChart = calculateBirthChart(formData);
-      console.log("Western Chart Results:", wChart);
       setWesternResults(wChart);
-
-      // Store in DB
       await supabaseInsert(formData, wChart);
 
       toast({
@@ -56,7 +50,7 @@ export default function BirthChartForm() {
         description: "Birth chart calculated successfully!",
       });
     } catch (err) {
-      console.error("Calculation error:", err);
+      console.error("Form submission error:", err);
       toast({
         title: "Error",
         description: err instanceof Error ? err.message : "Failed to calculate birth chart",
@@ -104,7 +98,6 @@ export default function BirthChartForm() {
               className="w-full"
               value={formData.birthDate}
               onChange={(e) => {
-                console.log("Birth date changed:", e.target.value);
                 setFormData({ ...formData, birthDate: e.target.value });
               }}
               required
@@ -118,7 +111,6 @@ export default function BirthChartForm() {
               className="w-full"
               value={formData.birthTime}
               onChange={(e) => {
-                console.log("Birth time changed:", e.target.value);
                 setFormData({ ...formData, birthTime: e.target.value });
               }}
               required
