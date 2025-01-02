@@ -1,18 +1,7 @@
-import { LogLevel } from '../utils/types';
-
-export interface AstroEvent {
-  event: string;
-  inputs: Record<string, any>;
-  outputs?: Record<string, any>;
-  intermediateSteps?: Record<string, any>;
-  timestamp: string;
-  level?: LogLevel;
-}
-
-export function logAstroUtils(event: AstroEvent) {
+export function logAstroUtils(data: any) {
   console.log(JSON.stringify({
-    ...event,
-    level: event.level || 'DEBUG',
-    timestamp: event.timestamp || new Date().toISOString()
+    module: 'ASTRO_UTILS',
+    timestamp: new Date().toISOString(),
+    ...data
   }, null, 2));
 }
