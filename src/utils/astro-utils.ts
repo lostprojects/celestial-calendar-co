@@ -15,11 +15,13 @@ import {
   rad2deg,
   normalizeDegrees
 } from './astro-core';
-import { 
-  logBirthChartCalculation,
-  logZodiacPosition,
-  logTimezoneDetection
-} from '@/logging/astro/utils-logging';
+
+// Import all logging functions
+import { logTimeInputs, logTimeConversion, logJulianCalculations } from '@/logging/astro/time-logging';
+import { logSolarComponents, logSunPosition, logMoonCalculations } from '@/logging/astro/position-logging';
+import { logCoordinateCalculations } from '@/logging/astro/coordinate-logging';
+import { logZodiacPosition, logFinalPositions } from '@/logging/astro/zodiac-logging';
+import { logTimezoneDetection } from '@/logging/astro/utils-logging';
 
 export interface BirthChartData {
   birthDate: string;
