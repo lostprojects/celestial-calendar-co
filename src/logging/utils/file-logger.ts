@@ -1,13 +1,16 @@
-import fs from 'fs';
-import path from 'path';
+const MAX_LOGS = 10;
+const LOG_KEY = 'astro_calculation_logs';
 
-const LOG_DIR = 'logs/astro';
-const MAX_LOG_FILES = 10;
+// Get existing logs from localStorage
+const getStoredLogs = (): string[] => {
+  const storedLogs = localStorage.getItem(LOG_KEY);
+  return storedLogs ? JSON.parse(storedLogs) : [];
+};
 
-// Ensure log directory exists
-if (!fs.existsSync(LOG_DIR)) {
-  fs.mkdirSync(LOG_DIR, { recursive: true });
-}
+// Store logs in localStorage
+const storeLogs = (logs: string[]) => {
+  localStorage.setItem(LOG_KEY, JSON.stringify(logs));
+};
 
 // Capture console output
 const originalConsole = {
@@ -43,31 +46,32 @@ console.error = (...args) => {
   originalConsole.error(...args);
 };
 
-// Function to write logs to file
+// Function to save logs
 export function dumpLogs() {
   if (currentLogs.length === 0) return;
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const filename = `astro-calc-${timestamp}.log`;
-  const filepath = path.join(LOG_DIR, filename);
+  const timestamp = new Date().toISOString();
+  const logEntry = {
+    timestamp,
+    logs: currentLogs.join('\n')
+  };
 
-  // Write current logs to file
-  fs.writeFileSync(filepath, currentLogs.join('\n'));
-  currentLogs = []; // Clear current logs
-
-  // Get all log files and keep only the last MAX_LOG_FILES
-  const files = fs.readdirSync(LOG_DIR)
-    .filter(file => file.endsWith('.log'))
-    .sort()
-    .reverse();
-
-  // Remove older files
-  if (files.length > MAX_LOG_FILES) {
-    files.slice(MAX_LOG_FILES).forEach(file => {
-      fs.unlinkSync(path.join(LOG_DIR, file));
-    });
+  const storedLogs = getStoredLogs();
+  storedLogs.unshift(logEntry);
+  
+  // Keep only the last MAX_LOGS entries
+  while (storedLogs.length > MAX_LOGS) {
+    storedLogs.pop();
   }
+
+  storeLogs(storedLogs);
+  currentLogs = []; // Clear current logs
 }
 
-// Dump logs on process exit
-process.on('exit', dumpLogs);
+// Export function to read logs
+export function getLogs() {
+  return getStoredLogs();
+}
+
+// Dump logs on window unload
+window.addEventListener('unload', dumpLogs);
