@@ -52,7 +52,7 @@ export function calculateEquationOfTime(jde: number): number {
   
   // Calculate nutation in longitude and mean obliquity
   const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const deltaPsi = nutation.nutation(jde);
+  const deltaPsi = nutation.nutation(jde)[0]; // Get just the nutation in longitude
   const epsilon = nutation.meanObliquity(T);
   
   // Calculate equation of time in degrees
