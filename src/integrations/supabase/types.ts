@@ -187,7 +187,7 @@ export type Database = {
         }
         Relationships: []
       }
-      vedic_sun_signs: {
+      sidereal_zodiac: {
         Row: {
           created_at: string
           element: string
@@ -226,7 +226,7 @@ export type Database = {
         }
         Relationships: []
       }
-      western_sun_signs: {
+      tropical_zodiac: {
         Row: {
           approx_sun_end: string
           approx_sun_start: string
