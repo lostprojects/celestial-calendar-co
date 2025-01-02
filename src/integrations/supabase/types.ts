@@ -29,7 +29,9 @@ export type Database = {
           sun_minutes: number | null
           sun_sign: string | null
           system_used: string | null
+          timezone: string | null
           user_id: string | null
+          utc_offset: number | null
         }
         Insert: {
           ascendant_degrees?: number | null
@@ -50,7 +52,9 @@ export type Database = {
           sun_minutes?: number | null
           sun_sign?: string | null
           system_used?: string | null
+          timezone?: string | null
           user_id?: string | null
+          utc_offset?: number | null
         }
         Update: {
           ascendant_degrees?: number | null
@@ -71,7 +75,9 @@ export type Database = {
           sun_minutes?: number | null
           sun_sign?: string | null
           system_used?: string | null
+          timezone?: string | null
           user_id?: string | null
+          utc_offset?: number | null
         }
         Relationships: [
           {
