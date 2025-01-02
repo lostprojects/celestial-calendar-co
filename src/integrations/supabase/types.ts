@@ -187,6 +187,45 @@ export type Database = {
         }
         Relationships: []
       }
+      vedic_sun_signs: {
+        Row: {
+          created_at: string
+          element: string
+          id: string
+          quality: string
+          representation: string
+          ruling_body: string[]
+          sanskrit_name: string
+          sanskrit_transliteration: string
+          sign: string
+          starting_degree: number
+        }
+        Insert: {
+          created_at?: string
+          element: string
+          id?: string
+          quality: string
+          representation: string
+          ruling_body: string[]
+          sanskrit_name: string
+          sanskrit_transliteration: string
+          sign: string
+          starting_degree: number
+        }
+        Update: {
+          created_at?: string
+          element?: string
+          id?: string
+          quality?: string
+          representation?: string
+          ruling_body?: string[]
+          sanskrit_name?: string
+          sanskrit_transliteration?: string
+          sign?: string
+          starting_degree?: number
+        }
+        Relationships: []
+      }
       western_sun_signs: {
         Row: {
           approx_sun_end: string
