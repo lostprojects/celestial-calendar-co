@@ -98,7 +98,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
       <div className="max-w-2xl mx-auto px-4 space-y-6">
         <BirthSignCard
           sign={mainWestern.sunSign}
-          position={`${mainWestern.sunDeg}°${mainWestern.sunMin}'`}
+          position="Sun"
           icon={Sun}
           iconColor="accent-orange"
           degrees={mainWestern.sunDeg}
@@ -110,7 +110,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
 
         <BirthSignCard
           sign={mainWestern.moonSign}
-          position={`${mainWestern.moonDeg}°${mainWestern.moonMin}'`}
+          position="Moon"
           icon={Moon}
           iconColor="accent-lightpalm"
           degrees={mainWestern.moonDeg}
@@ -122,7 +122,7 @@ export function ChartResults({ mainWestern, mainVedic, birthData }: ChartResults
 
         <BirthSignCard
           sign={mainWestern.risingSign}
-          position={`${mainWestern.risingDeg}°${mainWestern.risingMin}'`}
+          position="Rising"
           icon={Sunrise}
           iconColor="accent-palm"
           degrees={mainWestern.risingDeg}
