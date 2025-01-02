@@ -63,9 +63,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     deltaT
   };
   
-  // Calculate apparent solar position with proper normalization
+  // Calculate apparent solar position with proper conversion from radians to degrees
   const sunLongRad = solar.apparentLongitude(jde);
-  const sunLong = normalizeDegrees(rad2deg(sunLongRad));
+  const sunLongDeg = rad2deg(sunLongRad);
+  const sunLong = normalizeDegrees(sunLongDeg);
   
   // Calculate lunar position with parallax correction
   const moonPos = getMoonPosition(jde);
