@@ -60,7 +60,15 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const deltaT = calculateDeltaT(jd);
   const jde = jd + deltaT / 86400;
 
-  const sunLongitude = 203.16924732571317; // This will be replaced with proper calculation
+  // Calculate actual sun position using proper astronomical calculations
+  const T = (jde - 2451545.0) / 36525;
+  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * Math.pow(T, 2);
+  const M = 357.52911 + 35999.05029 * T - 0.0001537 * Math.pow(T, 2);
+  const e = 0.016708634 - 0.000042037 * T - 0.0000001267 * Math.pow(T, 2);
+  const C = (1.914602 - 0.004817 * T - 0.000014 * Math.pow(T, 2)) * Math.sin(deg2rad(M)) +
+           (0.019993 - 0.000101 * T) * Math.sin(2 * deg2rad(M)) +
+           0.000289 * Math.sin(3 * deg2rad(M));
+  const sunLongitude = L0 + C;
   const sunPosition = getZodiacPosition(sunLongitude);
   
   const moonPos = getMoonPosition(jde);
