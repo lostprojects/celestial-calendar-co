@@ -1,3 +1,9 @@
+export interface CelestialPosition {
+  _ra: number;  // Right ascension in radians
+  _dec: number; // Declination in radians
+  range?: number;
+}
+
 export interface BirthChartData {
   birthDate: string;
   birthTime: string;
@@ -18,16 +24,24 @@ export interface BirthChartResult {
   moonMin: number;
   risingDeg: number;
   risingMin: number;
-}
-
-export interface CelestialPosition {
-  _ra: number;  // Right ascension in radians
-  _dec: number; // Declination in radians
-  range?: number;
+  absolutePositions?: {
+    sun: number;
+    moon: number;
+    ascending: number;
+  };
+  calculation?: {
+    jde: number;
+    deltaT: number;
+    obliquity: number;
+    nutationLong: number;
+    nutationObl: number;
+  };
 }
 
 export interface AstronomicalConstants {
   obliquity: number;
   nutationLong: number;
   nutationObl: number;
+  jde?: number;
+  deltaT?: number;
 }

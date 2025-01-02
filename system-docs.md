@@ -77,3 +77,26 @@ _Last Updated: March 19, 2024_
   - Simplified geocentric latitude calculation for better maintainability
   - Enhanced documentation with source references
   - Removed unverified constants for better reliability
+
+### src/utils/astro/types.ts
+- **Purpose**: Type definitions for astronomical calculations
+- **Dependencies**: None
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Added CelestialPosition interface
+  - Enhanced BirthChartResult with absolute positions
+  - Added calculation metadata types
+  - Fixed type exports
+
+### src/utils/astro-utils.ts
+- **Purpose**: Core astrological calculation functions
+- **Dependencies**: moment-timezone, astronomia/*
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Added improved error handling with AstronomicalError class
+  - Enhanced timezone determination for polar regions
+  - Added parallax and refraction corrections
+  - Added detailed calculation metadata to results
+  - Fixed type exports
+  - Added extensive logging for debugging
+
