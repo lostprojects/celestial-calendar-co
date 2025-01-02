@@ -25,13 +25,8 @@ export function calculateJulianDay(utcDate: string, utcTime: string): number {
 }
 
 export function calculateMeanSolarLongitude(jde: number): number {
-  // Calculate T (Julian centuries since J2000.0)
   const T = (jde - 2451545.0) / 36525;
-  
-  // Calculate mean longitude using the formula
   let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * Math.pow(T, 2);
-  
-  // Normalize to range [0, 360)
   L0 = ((L0 % 360) + 360) % 360;
   
   console.log("Mean Solar Longitude calculation:", {
@@ -44,31 +39,21 @@ export function calculateMeanSolarLongitude(jde: number): number {
 }
 
 export function calculateEquationOfTime(jde: number): number {
-  // Calculate mean longitude of the Sun (L0)
+  const T = (jde - 2451545.0) / 36525;
   const L0 = calculateMeanSolarLongitude(jde);
+  const e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
+  const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  const y = Math.tan(deg2rad(23.44)) * Math.tan(deg2rad(23.44));
   
-  // Calculate apparent longitude of the Sun
-  const lambdaApp = solar.apparentLongitude(jde);
+  const Eq = 4 * rad2deg(
+    y * Math.sin(2 * deg2rad(L0)) -
+    2 * e * Math.sin(deg2rad(M)) +
+    4 * e * y * Math.sin(deg2rad(M)) * Math.cos(2 * deg2rad(L0)) -
+    0.5 * y * y * Math.sin(4 * deg2rad(L0)) -
+    1.25 * e * e * Math.sin(2 * deg2rad(M))
+  );
   
-  // Calculate nutation in longitude and mean obliquity
-  const T = (jde - 2451545.0) / 36525; // Julian centuries since J2000.0
-  const deltaPsi = nutation.nutation(jde)[0]; // Get just the nutation in longitude
-  const epsilon = nutation.meanObliquity(T);
-  
-  // Calculate equation of time in degrees
-  // EOT = -0.0057183 - L0 + λapp + Δψ·cos(ε)
-  const eot = -0.0057183 - L0 + lambdaApp + deltaPsi * Math.cos(deg2rad(epsilon));
-  
-  console.log("Equation of Time calculation:", {
-    julianCenturies: T,
-    meanLongitude: L0,
-    apparentLongitude: lambdaApp,
-    nutation: deltaPsi,
-    meanObliquity: epsilon,
-    result: eot
-  });
-  
-  return eot;
+  return Eq;
 }
 
 export function calculateLunarParallax(moonDistance: number): number {
