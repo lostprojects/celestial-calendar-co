@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileType, AlertCircle, Loader2 } from "lucide-react";
+import { Upload, FileText, AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -14,7 +14,8 @@ const EphemerisUpload = () => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
-      'application/pdf': ['.pdf']
+      'text/csv': ['.csv'],
+      'text/plain': ['.txt']
     },
     onDrop: (acceptedFiles) => {
       setError(null);
@@ -25,7 +26,7 @@ const EphemerisUpload = () => {
       });
     },
     onDropRejected: () => {
-      setError("Please upload PDF files only");
+      setError("Please upload CSV files only");
     }
   });
 
@@ -36,12 +37,12 @@ const EphemerisUpload = () => {
     try {
       for (const file of files) {
         // First, upload to storage
-        const fileName = `${crypto.randomUUID()}.pdf`;
+        const fileName = `${crypto.randomUUID()}.csv`;
         console.log('Uploading file to storage:', fileName);
         
         const { data: uploadData, error: uploadError } = await supabase
           .storage
-          .from('ephemeris_pdfs')
+          .from('ephemeris_files')
           .upload(fileName, file);
 
         if (uploadError) {
@@ -88,7 +89,7 @@ const EphemerisUpload = () => {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">Ephemeris Data Upload</h1>
         <p className="text-muted-foreground">
-          Upload PDF files containing ephemeris data to populate the database.
+          Upload CSV files containing ephemeris data to populate the database.
         </p>
       </div>
 
@@ -110,10 +111,10 @@ const EphemerisUpload = () => {
         `}
       >
         <input {...getInputProps()} />
-        <Upload className="h-12 w-12 text-muted-foreground" />
+        <FileText className="h-12 w-12 text-muted-foreground" />
         <div className="text-center">
           <p className="text-lg font-medium">
-            {isDragActive ? 'Drop the files here' : 'Drag & drop PDF files here'}
+            {isDragActive ? 'Drop the files here' : 'Drag & drop CSV files here'}
           </p>
           <p className="text-sm text-muted-foreground">
             or click to select files
@@ -130,7 +131,7 @@ const EphemerisUpload = () => {
                 key={index}
                 className="flex items-center gap-2 p-2 rounded bg-muted"
               >
-                <FileType className="h-4 w-4" />
+                <FileText className="h-4 w-4" />
                 <span>{file.name}</span>
                 <span className="text-sm text-muted-foreground">
                   ({Math.round(file.size / 1024)} KB)
