@@ -21,8 +21,8 @@ export interface BirthChartResult {
 }
 
 export interface CelestialPosition {
-  _ra: number;
-  _dec: number;
+  _ra: number;  // Right ascension in radians
+  _dec: number; // Declination in radians
   range?: number;
 }
 

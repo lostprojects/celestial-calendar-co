@@ -58,9 +58,11 @@ function determineTimezone(latitude: number, longitude: number, providedTimezone
       if (!zone) continue;
 
       // Calculate distance using simplified formula
+      const zoneLat = 0; // Default to 0 since MomentZone doesn't have lat/long
+      const zoneLong = 0;
       const dist = Math.sqrt(
-        Math.pow(latitude - (zone.lat || 0), 2) + 
-        Math.pow(longitude - (zone.long || 0), 2)
+        Math.pow(latitude - zoneLat, 2) + 
+        Math.pow(longitude - zoneLong, 2)
       );
 
       if (dist < minDist) {

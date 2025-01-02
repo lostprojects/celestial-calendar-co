@@ -191,5 +191,5 @@ export function calculateObliquity(jd: number): number {
     return deg2rad(eps0 + dEps/3600);
 }
 
-// Type exports
+// Only export ZodiacSign type, remove duplicate CelestialPosition export
 export type ZodiacSign = typeof ZODIAC_SIGNS[number];
