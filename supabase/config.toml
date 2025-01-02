@@ -1,4 +1,1 @@
 project_id = "qwpveubezldowcycifbh"
-
-[functions.process-ephemeris]
-verify_jwt = false
