@@ -2,7 +2,7 @@ import { CalendarGregorianToJD } from "astronomia/julian";
 import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as sidereal from "astronomia/sidereal";
-import { equation } from "astronomia/eqtime";
+import * as eqtime from "astronomia/eqtime";
 
 export const ZODIAC_SIGNS = [
   "Aries", "Taurus", "Gemini", "Cancer", 
@@ -25,7 +25,7 @@ export function calculateJulianDay(utcDate: string, utcTime: string): number {
 }
 
 export function calculateEquationOfTime(jde: number): number {
-  return equation(jde);
+  return eqtime.equation(jde);
 }
 
 export function calculateLunarParallax(moonDistance: number): number {
