@@ -1,6 +1,5 @@
 import moment from 'moment-timezone';
 import { position as getMoonPosition } from "astronomia/moonposition";
-import * as solar from "astronomia/solar";
 import * as sidereal from "astronomia/sidereal";
 import * as nutation from "astronomia/nutation";
 import {
@@ -13,10 +12,11 @@ import {
   calculateMoonLongitude,
   deg2rad,
   rad2deg,
-  normalizeDegrees
+  normalizeDegrees,
+  calculateMeanSolarLongitude
 } from './astro-core';
 
-import { logAstroUtils, AstroEvent } from '@/logging/astro/utils-logging';
+import { logAstroUtils } from '@/logging/astro/utils-logging';
 
 export interface BirthChartData {
   birthDate: string;
@@ -104,15 +104,15 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const eps = 23.4392911;
   const epsRad = deg2rad(eps);
 
-  const meanLongitude = solar.meanLongitude(jde);
+  const meanLongitude = calculateMeanSolarLongitude(jde);
   const nutationCorr = nutation.nutation(jde).deltaPsi;
-  const sunLongRad = solar.apparentLongitude(jde);
+  const sunLongRad = deg2rad(meanLongitude + nutationCorr);
   
   logAstroUtils({
     event: 'SOLAR_COMPONENTS',
     inputs: { julianEphemerisDay: jde },
     outputs: {
-      meanLongitudeDeg: rad2deg(meanLongitude),
+      meanLongitudeDeg: meanLongitude,
       apparentLongitudeDeg: rad2deg(sunLongRad),
       nutationCorrectionDeg: rad2deg(nutationCorr),
       obliquity: eps
@@ -170,19 +170,6 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const localSiderealTime = gst + data.longitude/15;
   const localSiderealDeg = localSiderealTime * 15;
   const localSiderealRad = deg2rad(localSiderealDeg);
-  
-  logAstroUtils({
-    event: 'COORDINATE_CALCULATIONS',
-    inputs: {
-      latitude: data.latitude,
-      longitude: data.longitude
-    },
-    outputs: {
-      geocentricLatitude: geoLat,
-      localSiderealTime
-    },
-    timestamp: new Date().toISOString()
-  });
   
   const latRad = deg2rad(data.latitude);
   const y = Math.cos(localSiderealRad);

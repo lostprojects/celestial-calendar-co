@@ -1,8 +1,4 @@
 import { CalendarGregorianToJD } from "astronomia/julian";
-import * as solar from "astronomia/solar";
-import { position as getMoonPosition } from "astronomia/moonposition";
-import * as sidereal from "astronomia/sidereal";
-import * as nutation from "astronomia/nutation";
 import { logAstroUtils } from '@/logging/astro/utils-logging';
 
 export const ZODIAC_SIGNS = [
