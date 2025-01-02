@@ -1,4 +1,5 @@
 export function logSunPosition(longitudeRad: number, longitudeDeg: number, normalizedDeg: number) {
+  console.log("Raw solar.apparentLongitude() output:", longitudeRad);
   console.log("Sun Position Calculations:", {
     longitudeRadians: longitudeRad,
     longitudeDegrees: longitudeDeg,
