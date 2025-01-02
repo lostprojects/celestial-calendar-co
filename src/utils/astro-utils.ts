@@ -36,31 +36,22 @@ export interface BirthChartResult {
 }
 
 function findTimezoneFromCoords(lat: number, lng: number) {
+  // Get all timezone names
   const timezones = moment.tz.names();
-  let closestZone = null;
-  let minDistance = Infinity;
-
-  timezones.forEach(zoneName => {
-    const zone = moment.tz.zone(zoneName);
-    if (!zone) return;
-    
-    // Get zone coordinates (many zones have them)
-    const zoneCoords = zone.countries?.[0]?.coords;
-    if (!zoneCoords) return;
-    
-    const [zoneLat, zoneLng] = zoneCoords.split(',').map(Number);
-    const distance = Math.sqrt(
-      Math.pow(lat - zoneLat, 2) + 
-      Math.pow(lng - zoneLng, 2)
-    );
-    
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestZone = zoneName;
-    }
-  });
-
-  return closestZone || 'UTC';
+  
+  // Find timezone based on rough geographical zones
+  if (lng >= -12 && lng <= 0 && lat >= 35 && lat <= 60) {
+    return 'Europe/London'; // Western Europe
+  } else if (lng >= 0 && lng <= 20 && lat >= 35 && lat <= 60) {
+    return 'Europe/Paris'; // Central Europe
+  } else if (lng >= -180 && lng <= -50 && lat >= 24 && lat <= 50) {
+    return 'America/New_York'; // North America
+  } else if (lng >= 100 && lng <= 145 && lat >= -45 && lat <= -10) {
+    return 'Australia/Sydney'; // Eastern Australia
+  }
+  
+  // Default to UTC if no specific zone found
+  return 'UTC';
 }
 
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
@@ -191,7 +182,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 }
 
 function getZodiacPosition(longitude: number) {
-  const signIndex = Math.round(longitude / 30);
+  const signIndex = Math.floor(longitude / 30);
   const totalDegrees = longitude % 30;
   const degrees = Math.floor(totalDegrees);
   const minutes = Math.floor((totalDegrees - degrees) * 60);
