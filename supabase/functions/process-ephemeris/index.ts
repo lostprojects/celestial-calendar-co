@@ -7,6 +7,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Configure pdf.js for server-side usage
+const pdfjsWorker = await import('https://cdn.skypack.dev/pdfjs-dist@3.11.174/build/pdf.worker.js')
+globalThis.pdfjsWorker = pdfjsWorker
+
+// Initialize pdf.js
+pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.skypack.dev/pdfjs-dist@3.11.174/build/pdf.worker.js'
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -34,8 +41,16 @@ serve(async (req) => {
     // Read the PDF file
     const arrayBuffer = await file.arrayBuffer()
     
-    // Set up the worker and load the PDF
-    const loadingTask = pdfjs.getDocument({ data: arrayBuffer })
+    console.log('Loading PDF document...')
+    
+    // Load the PDF document
+    const loadingTask = pdfjs.getDocument({
+      data: new Uint8Array(arrayBuffer),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true
+    })
+    
     const pdf = await loadingTask.promise
     const extractedData = []
     
@@ -43,7 +58,10 @@ serve(async (req) => {
 
     // Process each page
     for (let i = 1; i <= pdf.numPages; i++) {
+      console.log(`Getting page ${i}...`)
       const page = await pdf.getPage(i)
+      
+      console.log(`Extracting text from page ${i}...`)
       const textContent = await page.getTextContent()
       let pageText = textContent.items.map((item) => item.str).join(' ')
       
