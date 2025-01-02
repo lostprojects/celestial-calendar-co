@@ -2,6 +2,7 @@ import moment from 'moment-timezone';
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as solar from "astronomia/solar";
 import * as sidereal from "astronomia/sidereal";
+import * as nutation from "astronomia/nutation";
 import {
   ZODIAC_SIGNS,
   calculateJulianDay,
@@ -33,6 +34,27 @@ export interface BirthChartResult {
   risingMin: number;
 }
 
+function calculateEOT(jd: number, deltaT: number) {
+  const jde = jd + deltaT / 86400;
+  const L0 = solar.meanLongitude(jde);
+  const M = solar.meanAnomaly(jde);
+  const epsilon = nutation.meanObliquity(jde);
+  const eccentricity = solar.eccentricity(jde);
+  const C = eccentricity * Math.sin(M);
+  const EOT = solar.equationOfTime(jde);
+  
+  console.log("EOT calculation:", {
+    meanLongitude: rad2deg(L0),
+    meanAnomaly: rad2deg(M),
+    obliquity: rad2deg(epsilon),
+    eccentricity,
+    equationOfCenter: rad2deg(C),
+    equationOfTime: EOT
+  });
+  
+  return EOT;
+}
+
 export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
@@ -57,6 +79,11 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   const deltaT = 67.2;
   const jde = jd + deltaT / 86400;
+
+  // Calculate EOT correction
+  const eot = calculateEOT(jd, deltaT);
+  console.log("Equation of Time correction:", eot);
+
   console.log("Time calculations:", {
     localTime: localMoment.format(),
     utcTime: utcMoment.format(),
@@ -65,17 +92,18 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   });
 
   // Calculate obliquity (ε) for J2000.0
-  const eps = 23.4392911; // Exact value for J2000.0
+  const eps = 23.4392911;
   const epsRad = deg2rad(eps);
 
-  // Calculate sun position
-  const sunLongRad = solar.apparentLongitude(jde);
+  // Calculate sun position with EOT correction
+  const sunLongRad = solar.apparentLongitude(jde) + deg2rad(eot / 240); // Convert EOT minutes to degrees (1 degree = 4 minutes)
   const normalizedSunLong = rad2deg(sunLongRad);
   
   console.log("Sun position:", {
     longitudeRad: sunLongRad,
     longitudeDeg: normalizedSunLong,
-    normalizedDeg: normalizedSunLong
+    normalizedDeg: normalizedSunLong,
+    eotCorrection: eot / 240
   });
 
   // Moon calculation section - DO NOT MODIFY ANYTHING HERE
