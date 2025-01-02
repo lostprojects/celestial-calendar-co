@@ -14,6 +14,10 @@ import {
   rad2deg,
   normalizeDegrees
 } from './astro-core';
+import { logTimeInputs, logTimezoneDetection, logTimeConversion, logJulianCalculations } from '@/logging/astro/time-logging';
+import { logSunPosition, logMoonCalculations } from '@/logging/astro/position-logging';
+import { logZodiacPosition, logFinalPositions } from '@/logging/astro/zodiac-logging';
+import { logCoordinateCalculations } from '@/logging/astro/coordinate-logging';
 
 export interface BirthChartData {
   birthDate: string;
@@ -36,21 +40,18 @@ export interface BirthChartResult {
 }
 
 function findTimezoneFromCoords(lat: number, lng: number) {
-  // Get all timezone names
   const timezones = moment.tz.names();
   
-  // Find timezone based on rough geographical zones
   if (lng >= -12 && lng <= 0 && lat >= 35 && lat <= 60) {
-    return 'Europe/London'; // Western Europe
+    return 'Europe/London';
   } else if (lng >= 0 && lng <= 20 && lat >= 35 && lat <= 60) {
-    return 'Europe/Paris'; // Central Europe
+    return 'Europe/Paris';
   } else if (lng >= -180 && lng <= -50 && lat >= 24 && lat <= 50) {
-    return 'America/New_York'; // North America
+    return 'America/New_York';
   } else if (lng >= 100 && lng <= 145 && lat >= -45 && lat <= -10) {
-    return 'Australia/Sydney'; // Eastern Australia
+    return 'Australia/Sydney';
   }
   
-  // Default to UTC if no specific zone found
   return 'UTC';
 }
 
@@ -58,25 +59,15 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const [year, month, day] = data.birthDate.split("-").map(Number);
   const [hour, minute] = data.birthTime.split(":").map(Number);
   
-  console.log("Input data:", {
-    date: `${year}-${month}-${day}`,
-    time: `${hour}:${minute}`,
-    place: data.birthPlace,
-    lat: data.latitude,
-    lng: data.longitude
-  });
+  logTimeInputs(data);
 
   const timezone = findTimezoneFromCoords(data.latitude, data.longitude);
+  logTimezoneDetection(timezone, { lat: data.latitude, lng: data.longitude });
+
   const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
   const utcMoment = localMoment.utc();
   
-  console.log("Time conversion details:", {
-    detectedTimezone: timezone,
-    localTime: localMoment.format("YYYY-MM-DD HH:mm Z"),
-    utcTime: utcMoment.format("YYYY-MM-DD HH:mm [UTC]"),
-    offset: localMoment.format("Z"),
-    isDST: localMoment.isDST()
-  });
+  logTimeConversion(localMoment, utcMoment);
 
   const jd = calculateJulianDay(
     utcMoment.format("YYYY-MM-DD"),
@@ -85,18 +76,10 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   const deltaT = calculateDeltaT(jd);
   const jde = jd + deltaT / 86400;
-  
   const eot = calculateEquationOfTime(jde);
   const correctedJde = jde + eot;
   
-  console.log("Time calculations:", {
-    localTime: localMoment.format(),
-    utcTime: utcMoment.format(),
-    julianDay: jd,
-    julianEphemerisDay: jde,
-    equationOfTime: eot,
-    correctedJde: correctedJde
-  });
+  logJulianCalculations(jd, deltaT, jde, eot);
 
   const eps = 23.4392911;
   const epsRad = deg2rad(eps);
@@ -105,13 +88,8 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   let normalizedSunLong = rad2deg(sunLongRad) - 180;
   normalizedSunLong = ((normalizedSunLong % 360) + 360) % 360;
   
-  console.log("Sun position:", {
-    longitudeRad: sunLongRad,
-    longitudeDeg: normalizedSunLong,
-    normalizedDeg: normalizedSunLong
-  });
+  logSunPosition(sunLongRad, normalizedSunLong, normalizedSunLong);
 
-  // Moon calculation section - DO NOT MODIFY ANYTHING HERE
   const moonPos = getMoonPosition(jde);
   const moonDistance = moonPos.range;
   const parallax = calculateLunarParallax(moonDistance);
@@ -125,16 +103,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     _dec: moonPos._dec + deltaDec
   };
   
-  console.log("Moon calculations:", {
-    distance: moonDistance,
-    parallax,
-    geoLat,
-    lst,
-    hourAngle,
-    deltaRA,
-    deltaDec,
-    topocentric: topoMoonPos
-  });
+  logMoonCalculations(moonDistance, parallax, geoLat, lst, hourAngle, deltaRA, deltaDec, topoMoonPos);
 
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
@@ -144,13 +113,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const localSiderealDeg = localSiderealTime * 15;
   const localSiderealRad = deg2rad(localSiderealDeg);
   
-  console.log("LST calculation:", {
-    gstHours: gst,
-    longitudeHours: data.longitude/15,
-    lstHours: localSiderealTime,
-    lstDegrees: localSiderealDeg,
-    lstRadians: localSiderealRad
-  });
+  logCoordinateCalculations(data.latitude, data.longitude, geoLat, localSiderealTime);
   
   const latRad = deg2rad(data.latitude);
   const y = Math.cos(localSiderealRad);
@@ -162,11 +125,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonPosition = getZodiacPosition(finalMoonLongitude);
   const ascPosition = getZodiacPosition(ascendant);
 
-  console.log("Final zodiac positions:", {
-    sun: sunPosition,
-    moon: moonPosition,
-    ascendant: ascPosition
-  });
+  logFinalPositions(sunPosition, moonPosition, ascPosition);
 
   return {
     sunSign: sunPosition.sign,
@@ -187,8 +146,11 @@ function getZodiacPosition(longitude: number) {
   const degrees = Math.floor(totalDegrees);
   const minutes = Math.floor((totalDegrees - degrees) * 60);
   
+  const sign = ZODIAC_SIGNS[signIndex];
+  logZodiacPosition(longitude, signIndex, sign, degrees, minutes);
+  
   return {
-    sign: ZODIAC_SIGNS[signIndex],
+    sign,
     degrees,
     minutes
   };

@@ -3,6 +3,7 @@ import * as solar from "astronomia/solar";
 import { position as getMoonPosition } from "astronomia/moonposition";
 import * as sidereal from "astronomia/sidereal";
 import * as nutation from "astronomia/nutation";
+import { logSunPosition } from "@/logging/astro/position-logging";
 
 export const ZODIAC_SIGNS = [
   "Aries", "Taurus", "Gemini", "Cancer", 
@@ -28,13 +29,6 @@ export function calculateMeanSolarLongitude(jde: number): number {
   const T = (jde - 2451545.0) / 36525;
   let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * Math.pow(T, 2);
   L0 = ((L0 % 360) + 360) % 360;
-  
-  console.log("Mean Solar Longitude calculation:", {
-    julianCenturies: T,
-    rawL0: L0,
-    normalizedL0: L0
-  });
-  
   return L0;
 }
 
@@ -72,17 +66,6 @@ export function calculateMoonLongitude(moonPos: { _ra: number; _dec: number }, e
   const cosLambda = Math.cos(ra);
   const lambdaRad = Math.atan2(sinLambda, cosLambda);
   const normalizedLambdaRad = ((lambdaRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-  
-  console.log("Moon calculation steps:", {
-    ra,
-    dec,
-    epsRad,
-    sinLambda,
-    cosLambda,
-    lambdaRad,
-    normalizedLambdaRad
-  });
-  
   return normalizedLambdaRad;
 }
 
