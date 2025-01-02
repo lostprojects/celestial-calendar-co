@@ -1,14 +1,19 @@
 const MAX_LOGS = 10;
 const LOG_KEY = 'astro_calculation_logs';
 
+interface LogEntry {
+  timestamp: string;
+  logs: string;
+}
+
 // Get existing logs from localStorage
-const getStoredLogs = (): string[] => {
+const getStoredLogs = (): LogEntry[] => {
   const storedLogs = localStorage.getItem(LOG_KEY);
   return storedLogs ? JSON.parse(storedLogs) : [];
 };
 
 // Store logs in localStorage
-const storeLogs = (logs: string[]) => {
+const storeLogs = (logs: LogEntry[]) => {
   localStorage.setItem(LOG_KEY, JSON.stringify(logs));
 };
 
@@ -51,7 +56,7 @@ export function dumpLogs() {
   if (currentLogs.length === 0) return;
 
   const timestamp = new Date().toISOString();
-  const logEntry = {
+  const logEntry: LogEntry = {
     timestamp,
     logs: currentLogs.join('\n')
   };
