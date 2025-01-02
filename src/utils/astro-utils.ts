@@ -110,6 +110,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   logAstroUtils({
     event: 'SOLAR_COMPONENTS',
+    inputs: { julianEphemerisDay: jde },
     outputs: {
       meanLongitudeDeg: rad2deg(meanLongitude),
       apparentLongitudeDeg: rad2deg(sunLongRad),
@@ -124,6 +125,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   logAstroUtils({
     event: 'SUN_POSITION',
+    inputs: { sunLongitudeRadians: sunLongRad },
     intermediateSteps: {
       longitudeRadians: sunLongRad,
       longitudeDegrees: normalizedSunLong
@@ -147,6 +149,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   
   logAstroUtils({
     event: 'MOON_CALCULATIONS',
+    inputs: { julianEphemerisDay: jde },
     intermediateSteps: {
       distance: moonDistance,
       parallax,
@@ -193,6 +196,11 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 
   logAstroUtils({
     event: 'FINAL_POSITIONS',
+    inputs: {
+      sunLongitude: normalizedSunLong,
+      moonLongitude: finalMoonLongitude,
+      ascendant: ascendant
+    },
     outputs: {
       sun: sunPosition,
       moon: moonPosition,
