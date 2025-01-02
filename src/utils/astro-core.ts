@@ -9,21 +9,22 @@ export const ZODIAC_SIGNS = [
   "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
+export function calculateDeltaT(jd: number): number {
+  const T = (jd - 2451545.0) / 36525;  // Julian centuries since J2000.0
+  return 62.92 + 0.32217 * T + 0.005589 * Math.pow(T, 2);
+}
+
 export function calculateJulianDay(utcDate: string, utcTime: string): number {
   const [year, month, day] = utcDate.split('-').map(Number);
   const [hour, minute] = utcTime.split(':').map(Number);
-
-  // Get JD for noon on the given date
   const jdNoon = CalendarGregorianToJD(year, month, day);
-
-  // Calculate hours since noon
   const hoursSinceNoon = hour - 12 + minute / 60;
-
-  // If time is after noon, move to the next Julian epoch (+1 day)
   const dayFraction = hoursSinceNoon >= 0 ? 1 + hoursSinceNoon / 24 : hoursSinceNoon / 24;
-
-  // Final JD
   return jdNoon + dayFraction;
+}
+
+export function calculateEquationOfTime(jde: number): number {
+  return solar.equationOfTime(jde);
 }
 
 export function calculateLunarParallax(moonDistance: number): number {
@@ -36,20 +37,13 @@ export function calculateGeocentricLatitude(geographicLat: number): number {
   return latRad - (0.1924 * Math.sin(2 * latRad));
 }
 
-// Updated Moon longitude calculation that stays in radians
 export function calculateMoonLongitude(moonPos: { _ra: number; _dec: number }, epsRad: number): number {
   const { _ra: ra, _dec: dec } = moonPos;
-
-  // Compute sine and cosine of the ecliptic longitude (in radians)
   const sinLambda = Math.sin(ra) * Math.cos(epsRad) + Math.tan(dec) * Math.sin(epsRad);
   const cosLambda = Math.cos(ra);
-
-  // Calculate the ecliptic longitude in radians
   const lambdaRad = Math.atan2(sinLambda, cosLambda);
-
-  // Normalize to [0, 2π)
   const normalizedLambdaRad = ((lambdaRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-
+  
   console.log("Moon calculation steps:", {
     ra,
     dec,
@@ -59,11 +53,10 @@ export function calculateMoonLongitude(moonPos: { _ra: number; _dec: number }, e
     lambdaRad,
     normalizedLambdaRad
   });
-
+  
   return normalizedLambdaRad;
 }
 
-// Helper functions for angle conversions
 export function deg2rad(degrees: number): number {
   return degrees * Math.PI / 180;
 }

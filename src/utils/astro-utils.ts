@@ -5,6 +5,8 @@ import * as sidereal from "astronomia/sidereal";
 import {
   ZODIAC_SIGNS,
   calculateJulianDay,
+  calculateDeltaT,
+  calculateEquationOfTime,
   calculateLunarParallax,
   calculateGeocentricLatitude,
   calculateMoonLongitude,
@@ -45,31 +47,34 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lng: data.longitude
   });
 
-  // Convert local time to UTC using moment-timezone
-  const localMoment = moment.tz([year, month - 1, day, hour, minute], "Europe/London");
+  const timezone = moment.tz.guess();
+  const localMoment = moment.tz([year, month - 1, day, hour, minute], timezone);
   const utcMoment = localMoment.utc();
   
-  // Calculate Julian Day from UTC time
   const jd = calculateJulianDay(
     utcMoment.format("YYYY-MM-DD"),
     utcMoment.format("HH:mm")
   );
   
-  const deltaT = 67.2;
+  const deltaT = calculateDeltaT(jd);
   const jde = jd + deltaT / 86400;
+  
+  const eot = calculateEquationOfTime(jde);
+  const correctedJde = jde + eot;
+  
   console.log("Time calculations:", {
     localTime: localMoment.format(),
     utcTime: utcMoment.format(),
     julianDay: jd,
-    julianEphemerisDay: jde
+    julianEphemerisDay: jde,
+    equationOfTime: eot,
+    correctedJde: correctedJde
   });
 
-  // Calculate obliquity (ε) for J2000.0
-  const eps = 23.4392911; // Exact value for J2000.0
+  const eps = 23.4392911;
   const epsRad = deg2rad(eps);
 
-  // Calculate sun position
-  const sunLongRad = solar.apparentLongitude(jde);
+  const sunLongRad = solar.apparentLongitude(correctedJde);
   const normalizedSunLong = rad2deg(sunLongRad);
   
   console.log("Sun position:", {
@@ -106,10 +111,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
   const finalMoonLongitude = rad2deg(moonLongRad);
 
-  // Rising sign calculation - ONLY MODIFYING THIS SECTION
-  const gst = sidereal.apparent(jde) % 24; // Normalize to 0-24 hours
-  const localSiderealTime = gst + data.longitude/15; // Convert to LST
-  const localSiderealDeg = localSiderealTime * 15; // Convert to degrees
+  const gst = sidereal.apparent(correctedJde) % 24;
+  const localSiderealTime = gst + data.longitude/15;
+  const localSiderealDeg = localSiderealTime * 15;
   const localSiderealRad = deg2rad(localSiderealDeg);
   
   console.log("LST calculation:", {
@@ -120,14 +124,12 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     lstRadians: localSiderealRad
   });
   
-  // Calculate Ascendant using atan2 with PROPERLY swapped x,y parameters
   const latRad = deg2rad(data.latitude);
   const y = Math.cos(localSiderealRad);
   const x = Math.sin(localSiderealRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
-  let ascendant = rad2deg(Math.atan2(x, y)); // PROPERLY swapped to (x,y)
+  let ascendant = rad2deg(Math.atan2(x, y));
   ascendant = normalizeDegrees(ascendant);
 
-  // Get zodiac positions
   const sunPosition = getZodiacPosition(normalizedSunLong);
   const moonPosition = getZodiacPosition(finalMoonLongitude);
   const ascPosition = getZodiacPosition(ascendant);
