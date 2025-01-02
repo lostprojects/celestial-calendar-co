@@ -1,46 +1,27 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { supabase } from "./integrations/supabase/client";
-import { Navbar } from "./components/Navbar";
-import { Footer } from "./components/Footer";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Account from "./pages/Account";
-import StyleGuide from "./pages/StyleGuide";
-import Glossary from "./pages/Glossary";
-import EphemerisUpload from "./pages/EphemerisUpload";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from './integrations/supabase/client';
+import Index from './pages/Index';
+import Auth from './pages/Auth';
+import Account from './pages/Account';
+import Glossary from './pages/Glossary';
+import StyleGuide from './pages/StyleGuide';
+import './App.css';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+function App() {
+  return (
     <SessionContextProvider supabaseClient={supabase}>
-      <TooltipProvider>
-        <div className="min-h-screen flex flex-col bg-background">
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Navbar />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/style-guide" element={<StyleGuide />} />
-                <Route path="/glossary" element={<Glossary />} />
-                <Route path="/ephemeris-upload" element={<EphemerisUpload />} />
-              </Routes>
-            </main>
-            <Footer />
-          </BrowserRouter>
-        </div>
-      </TooltipProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/glossary" element={<Glossary />} />
+          <Route path="/style-guide" element={<StyleGuide />} />
+        </Routes>
+      </Router>
     </SessionContextProvider>
-  </QueryClientProvider>
-);
+  );
+}
 
 export default App;

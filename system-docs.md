@@ -60,6 +60,7 @@ _Last Updated: March 19, 2024_
   - Integrated Supabase SessionContextProvider
   - Added account management page route
   - Added route for the new Glossary page
+  - Removed ephemeris upload route
 
 ### src/components/Footer.tsx
 - **Purpose**: Footer component for the application
@@ -79,28 +80,6 @@ _Last Updated: March 19, 2024_
   - Added normalizeRadians utility function
   - Improved type safety with const assertions
 
-### supabase/functions/process-ephemeris/index.ts
-- **Purpose**: Edge Function for processing PDF files and inserting data into Supabase
-- **Dependencies**: pdf-lib, @supabase/supabase-js
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Enhanced PDF parsing logic with validation
-  - Added detailed logging for debugging
-  - Improved error handling and data validation
-  - Added support for retrograde planet detection
-  - Implemented planet name normalization
-  - Added longitude range validation
-
-### src/utils/astro/types.ts
-- **Purpose**: Type definitions for astronomical calculations
-- **Dependencies**: None
-- **Last Updated**: March 19, 2024
-- **Recent Changes**:
-  - Added CelestialPosition interface
-  - Enhanced BirthChartResult with absolute positions
-  - Added calculation metadata types
-  - Fixed type exports
-
 ### src/utils/astro-utils.ts
 - **Purpose**: Core astrological calculation functions
 - **Dependencies**: moment-timezone, astronomia/*
@@ -113,3 +92,12 @@ _Last Updated: March 19, 2024_
   - Fixed type exports
   - Added extensive logging for debugging
 
+### src/utils/astro/types.ts
+- **Purpose**: Type definitions for astronomical calculations
+- **Dependencies**: None
+- **Last Updated**: March 19, 2024
+- **Recent Changes**:
+  - Added CelestialPosition interface
+  - Enhanced BirthChartResult with absolute positions
+  - Added calculation metadata types
+  - Fixed type exports
