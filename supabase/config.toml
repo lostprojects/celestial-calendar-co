@@ -1,4 +1,4 @@
 project_id = "qwpveubezldowcycifbh"
 
-[functions.generate-astro-advice]
+[functions.process-ephemeris]
 verify_jwt = false

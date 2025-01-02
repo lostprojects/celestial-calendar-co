@@ -28,10 +28,17 @@ serve(async (req) => {
 
     // Read the file content
     const text = await file.text()
+    console.log('File content:', text.substring(0, 200)) // Log first 200 chars for debugging
+    
     const rows = text.split('\n')
+    if (rows.length < 2) {
+      throw new Error('CSV file must contain at least a header row and one data row')
+    }
     
     // Process header row to find column indices
     const headers = rows[0].split(',').map(h => h.trim().toLowerCase())
+    console.log('Headers:', headers)
+    
     const dateIndex = headers.findIndex(h => h.includes('date'))
     const planetIndex = headers.findIndex(h => h.includes('planet'))
     const longitudeIndex = headers.findIndex(h => 
@@ -53,9 +60,10 @@ serve(async (req) => {
       const row = rows[i].trim()
       if (!row) continue // Skip empty rows
       
-      const columns = row.split(',').map(c => c.trim())
-      
       try {
+        const columns = row.split(',').map(c => c.trim())
+        console.log(`Processing row ${i}:`, columns)
+        
         // Parse and validate date
         const dateStr = columns[dateIndex]
         const date = new Date(dateStr)
@@ -93,6 +101,7 @@ serve(async (req) => {
           retrograde
         })
       } catch (error) {
+        console.error(`Error processing row ${i}:`, error)
         errors.push(error.message)
       }
     }
@@ -120,6 +129,8 @@ serve(async (req) => {
       )
     }
 
+    console.log(`Inserting ${processedData.length} rows into database`)
+    
     // Insert data into Supabase
     const { data, error } = await supabase
       .from('ephemeris_data')
