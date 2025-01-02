@@ -102,6 +102,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
   const meanLongitude = calculateMeanSolarLongitude(jde);
   const nutationCorr = nutation.nutation(jde).deltaPsi;
   const sunLongRad = deg2rad(meanLongitude + nutationCorr);
+  const normalizedSunLong = normalizeDegrees(rad2deg(sunLongRad));
   
   logAstroUtils({
     event: 'SOLAR_CALCULATION',
@@ -128,6 +129,9 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     _dec: moonPos._dec + deltaDec
   };
   
+  const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
+  const finalMoonLongitude = rad2deg(moonLongRad);
+  
   logAstroUtils({
     event: 'LUNAR_CALCULATION',
     inputs: { julianEphemerisDay: jde },
@@ -137,9 +141,6 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
     },
     timestamp: new Date().toISOString()
   });
-
-  const moonLongRad = calculateMoonLongitude(topoMoonPos, epsRad);
-  const finalMoonLongitude = rad2deg(moonLongRad);
 
   const gst = sidereal.apparent(jde) % 24;
   const localSiderealTime = gst + data.longitude/15;
@@ -185,6 +186,7 @@ export function calculateBirthChart(data: BirthChartData): BirthChartResult {
 
   logAstroUtils({
     event: 'BIRTH_CHART_CALCULATION_COMPLETE',
+    inputs: data,
     outputs: result,
     timestamp: new Date().toISOString()
   });
