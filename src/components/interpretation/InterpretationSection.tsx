@@ -1,15 +1,29 @@
 import React from "react";
-import { Star, Heart, Gem, Leaf, Sparkles } from "lucide-react";
-import { useUser } from "@supabase/auth-helpers-react";
-import { Button } from "@/components/ui/button";
+import { Star, Heart, Gem, Leaf, Sparkles, LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../../components/ui/button";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  star: Star,
+  heart: Heart,
+  gem: Gem,
+  leaf: Leaf,
+  sparkles: Sparkles
+};
 
 interface InterpretationSectionProps {
-  interpretation: string;
+  interpretation: {
+    content: string;
+    sections: {
+      title: string;
+      content: string;
+      icon?: string;
+    }[];
+  };
+  isBlurred?: boolean;
 }
 
-export function InterpretationSection({ interpretation }: InterpretationSectionProps) {
-  const user = useUser();
+export function InterpretationSection({ interpretation, isBlurred = false }: InterpretationSectionProps) {
   const navigate = useNavigate();
 
   return (
@@ -25,40 +39,29 @@ export function InterpretationSection({ interpretation }: InterpretationSectionP
             <div className="h-px flex-1 bg-accent-orange/20" />
           </div>
           
-          <div className={`prose prose-slate max-w-none space-y-12 relative ${!user ? 'blur-none' : ''}`}>
-            {interpretation.split('\n\n').map((section, index) => {
-              const icons = [
-                <Star key="star" className="w-8 h-8 text-accent-orange" />,
-                <Heart key="heart" className="w-8 h-8 text-accent-lightpalm" />,
-                <Gem key="gem" className="w-8 h-8 text-accent-palm" />,
-                <Leaf key="leaf" className="w-8 h-8 text-accent-lightorange" />,
-                <Sparkles key="sparkles" className="w-8 h-8 text-accent-orange" />
-              ];
-              const titles = [
-                "Your Cosmic Essence",
-                "Emotional Landscape",
-                "Life Path & Purpose",
-                "Personal Growth",
-                "Future Potential"
-              ];
+          <div className="prose prose-slate max-w-none space-y-12 relative">
+            {interpretation.sections.map((section, index) => {
+              const IconComponent = section.icon ? ICON_MAP[section.icon] : Star;
               
               return (
                 <div key={index} className="space-y-4">
                   <div className="flex flex-col items-center gap-3">
-                    {icons[index]}
+                    <IconComponent className={`w-8 h-8 ${
+                      index % 2 === 0 ? 'text-accent-orange' : 'text-accent-lightpalm'
+                    }`} />
                     <h4 className="text-2xl font-serif font-semibold text-primary-dark/90 text-center">
-                      {titles[index]}
+                      {section.title}
                     </h4>
                   </div>
                   <p className="text-primary-dark/80 leading-relaxed text-sm font-mono max-w-2xl mx-auto">
-                    {section.replace(/^###\s*/g, '')}
+                    {section.content}
                   </p>
                 </div>
               );
             })}
           </div>
 
-          {!user && (
+          {isBlurred && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/60 to-white/95 backdrop-blur-[2px] rounded-3xl" 
                    style={{

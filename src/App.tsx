@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
-import { supabase } from './integrations/supabase/client';
+import { supabase } from './services/database';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import Account from './pages/Account';

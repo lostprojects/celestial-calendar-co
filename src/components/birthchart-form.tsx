@@ -1,33 +1,28 @@
 import React, { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useUser } from "@supabase/auth-helpers-react";
-import {
-  calculateBirthChart,
-  BirthChartData,
-  BirthChartResult,
-} from "@/utils/astro-utils";
+import type { BirthChartData } from "../services/astrology/types";
 import { ChartResults } from "./chart-results/ChartResults";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LocationSearch } from "./LocationSearch";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "../hooks/use-toast";
+import { logger } from "../lib/logger";
+
+const DEFAULT_FORM_DATA: BirthChartData = {
+  birthDate: "1980-10-14",
+  birthTime: "00:30",
+  birthPlace: "",
+  latitude: 0,
+  longitude: 0,
+};
 
 export default function BirthChartForm() {
-  const [formData, setFormData] = useState<BirthChartData>({
-    birthDate: "1980-10-14",
-    birthTime: "00:30",
-    birthPlace: "",
-    latitude: 0,
-    longitude: 0,
-  });
-
-  const [westernResults, setWesternResults] = useState<BirthChartResult | null>(null);
+  const [formData, setFormData] = useState<BirthChartData>(DEFAULT_FORM_DATA);
+  const [showResults, setShowResults] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const { toast } = useToast();
-  const user = useUser();
 
   const handleLocationSelect = (location: { place: string; lat: number; lng: number }) => {
-    console.log("Location selected:", location);
+    logger.debug("Location selected", location);
     setFormData({
       ...formData,
       birthPlace: location.place,
@@ -39,58 +34,29 @@ export default function BirthChartForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsCalculating(true);
-    console.log("Form submitted with data:", formData);
+    logger.info("Form submitted", formData);
     
     try {
-      // Calculate Western only
-      console.log("Calculating Western chart...");
-      const wChart = calculateBirthChart(formData);
-      console.log("Western Chart Results:", wChart);
-      setWesternResults(wChart);
+      // Validate form data
+      if (!formData.birthPlace || !formData.latitude || !formData.longitude) {
+        throw new Error("Please select a valid birth location");
+      }
 
-      // Store in DB
-      await supabaseInsert(formData, wChart);
-
+      setShowResults(true);
       toast({
         title: "Success",
-        description: "Birth chart calculated successfully!",
+        description: "Calculating your birth chart...",
       });
     } catch (err) {
-      console.error("Calculation error:", err);
+      logger.error("Validation error", err);
       toast({
         title: "Error",
-        description: err instanceof Error ? err.message : "Failed to calculate birth chart",
+        description: err instanceof Error ? err.message : "Please check your input",
         variant: "destructive",
       });
     } finally {
       setIsCalculating(false);
     }
-  }
-
-  async function supabaseInsert(
-    data: BirthChartData,
-    result: BirthChartResult,
-  ) {
-    const { error } = await supabase.from("birth_charts").insert({
-      name: "Anonymous",
-      birth_date: data.birthDate,
-      birth_time: data.birthTime,
-      birth_place: data.birthPlace,
-      latitude: data.latitude,
-      longitude: data.longitude,
-      system_used: "tropical",
-      sun_sign: result.sunSign,
-      sun_degrees: result.sunDeg,
-      sun_minutes: result.sunMin,
-      moon_sign: result.moonSign,
-      moon_degrees: result.moonDeg,
-      moon_minutes: result.moonMin,
-      ascendant_sign: result.risingSign,
-      ascendant_degrees: result.risingDeg,
-      ascendant_minutes: result.risingMin,
-      user_id: user?.id,
-    });
-    if (error) throw error;
   }
 
   return (
@@ -104,7 +70,7 @@ export default function BirthChartForm() {
               className="w-full"
               value={formData.birthDate}
               onChange={(e) => {
-                console.log("Birth date changed:", e.target.value);
+                logger.debug("Birth date changed", e.target.value);
                 setFormData({ ...formData, birthDate: e.target.value });
               }}
               required
@@ -118,7 +84,7 @@ export default function BirthChartForm() {
               className="w-full"
               value={formData.birthTime}
               onChange={(e) => {
-                console.log("Birth time changed:", e.target.value);
+                logger.debug("Birth time changed", e.target.value);
                 setFormData({ ...formData, birthTime: e.target.value });
               }}
               required
@@ -145,14 +111,10 @@ export default function BirthChartForm() {
         </form>
       </div>
 
-      {westernResults && (
+      {showResults && (
         <section className="bg-background w-full py-16 mt-24">
           <div className="container mx-auto px-4">
-            <ChartResults
-              mainWestern={westernResults}
-              mainVedic={null}
-              interpretation={undefined}
-            />
+            <ChartResults birthData={formData} />
           </div>
         </section>
       )}

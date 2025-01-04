@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Sun, Moon, ArrowUp } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "integrations/supabase/client";
 import { useUser } from "@supabase/auth-helpers-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "hooks/use-toast";
 import { format, parseISO } from "date-fns";
 
 interface BirthChartData {

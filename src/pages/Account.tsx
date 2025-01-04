@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useToast } from "@/components/ui/use-toast";
-import { AccountDetails } from "@/components/account/AccountDetails";
-import { CalendarModule } from "@/components/account/CalendarModule";
-import { UpcomingReadingsModule } from "@/components/account/UpcomingReadingsModule";
-import { RecentChartsModule } from "@/components/account/RecentChartsModule";
-import { CommunityModule } from "@/components/account/CommunityModule";
-import { BirthChartSummaryModule } from "@/components/account/BirthChartSummaryModule";
-import { ProgressListCard } from "@/components/account/ProgressListCard";
+import { useToast } from "../components/ui/use-toast";
 import { Calendar } from "lucide-react";
+import {
+  AccountDetails,
+  CalendarModule,
+  UpcomingReadingsModule,
+  RecentChartsModule,
+  CommunityModule,
+  BirthChartSummaryModule,
+  ProgressListCard
+} from "../features/account";
 
 const Account = () => {
   const user = useUser();

@@ -8,14 +8,27 @@ export default defineConfig({
   server: {
     host: "::",
     port: 8080,
+    hmr: {
+      overlay: false, // Disable the error overlay
+    },
+    watch: {
+      // Reduce file system watching sensitivity
+      usePolling: false,
+      interval: 1000,
+    },
   },
   plugins: [
     react(),
-    process.env.NODE_ENV === 'development' && componentTagger(),
+    // Only use componentTagger in production
+    process.env.NODE_ENV === 'production' && componentTagger(),
   ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  optimizeDeps: {
+    // Force Vite to pre-bundle these dependencies
+    include: ['react', 'react-dom', '@radix-ui/react-icons'],
   },
 });

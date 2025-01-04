@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useToast } from "components/ui/use-toast";
+import { Button } from "components/ui/button";
+import { Input } from "components/ui/input";
 import {
   Form,
   FormField,
@@ -10,7 +10,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
+} from "components/ui/form";
 
 type ProfileFormValues = {
   full_name: string;
@@ -59,7 +59,7 @@ export function AccountDetails({ userId, initialData }: { userId: string, initia
           <FormField
             control={form.control}
             name="full_name"
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <FormItem>
                 <FormLabel className="text-base">Full Name</FormLabel>
                 <FormControl>

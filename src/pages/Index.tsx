@@ -1,6 +1,6 @@
-import { Hero } from "@/components/Hero";
-import { BirthChartSection } from "@/components/BirthChartSection";
-import { Footer } from "@/components/Footer";
+import { Hero } from "../components/Hero";
+import { BirthChartSection } from "../features/birth-chart";
+import { Footer } from "../components/Footer";
 
 const Index = () => {
   return (
